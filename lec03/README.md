@@ -270,14 +270,13 @@ $$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
 
 - loss function에 Taylor series 근사를 적용하면 수식은 다음과 같다,
 
-  $$ \delta L = L(x; W) - L(x; W_{p} = W - \delta W) $$
+$$ \delta L = L(x; W) - L(x; W_{p} = W - \delta W) $$
 
-  $$ = \sum_{i}{g_{i}{\delta}w_{i}} + {1 \over 2}\sum_{i}{h_{ii}{\delta}{w_{i}^{2}}}+ {1 \over 2}{\sum_{i \neq j}{h_{ij}{\delta}w_{i}{\delta}w_{j}}}+O({||{\delta}W||}^{3}) $$
+$$ = \sum_{i}{g_{i}{\delta}w_{i}} + {1 \over 2}\sum_{i}{h_{ii}{\delta}{w_{i}^{2}}}+ {1 \over 2}{\sum_{i \neq j}{h_{ij}{\delta}w_{i}{\delta}w_{j}}}+O({||{\delta}W||}^{3}) $$
 
+- first order derivative $g_{i} = {{\partial}L \over {{\partial}w_{i}}}$
 
-  - first order derivative $g_{i} = {{\partial}L \over {{\partial}w_{i}}}$
-
-  - second order derivative $h_{i,j} = {{\partial}^{2}L \over {{\partial}w_{i}{\partial}w_{j}}}$
+- second order derivative $h_{i,j} = {{\partial}^{2}L \over {{\partial}w_{i}{\partial}w_{j}}}$
 
 우선 third order derivative항( $O({||{\delta}W||}^{3})$ )은 매우 작다고 가정하고 제거할 수 있다.(objective function $L$ 은 거의 **quadratic**(2차 방정식)에 가깝다.)
 
