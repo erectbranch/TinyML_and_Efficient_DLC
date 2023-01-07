@@ -41,7 +41,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 ### Lecture 3: Pruning and Sparsity (Part I)
 
-[ [slides]https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec03-Pruning-I.pdf) | [video](https://youtu.be/sZzc6tAtTrM) ]
+[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec03-Pruning-I.pdf) | [video](https://youtu.be/sZzc6tAtTrM) ]
 
 ### Lecture 4: Pruning and Sparsity (Part II)
 
