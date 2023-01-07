@@ -194,19 +194,19 @@ pruning은 크게 unstructured/structured 두 가지 방식으로 적용할 수 
 
     **channel pruning**은 importance가 작은 channel들을 자르는 방법이다. CPU 관점에서 봤을 때 제일 작업 부하가 적다. 이렇게 channel 수를 줄이는 것으로 direct하게 speedup을 구현할 수 있지만, 대신 compression ratio는 낮은 편이다.
 
-    ThiNet(2017)에서는 'pruning된 후 channel의 output element( $\hat{x}$ )들의 합'이 '원래 channel의 output element( $\hat{y}$ )들의 합'과 차이가 적은 channel을 중요하지 않다고 판단하고 잘라낸다.
-
-    $$ \underset{S}{\mathrm{argmin}} \sum_{i=1}^{m}{({\hat{y}_{i}} - \sum_{j \in S}{\hat{x}_{i,j}})^2} $$
-
-    $$ s.t. \quad |S| = C \times r, \quad S \subset \lbrace 1,2,...,C \rbrace $$
-
     ![channel pruning](images/channel_pruning.png)
 
-    참고로 이 방법이 모든 channel size를 일정하게 줄이는 uniform shrink보다 더 효율적이다.
+    ThiNet(2017)에서는 'pruning된 후 channel의 output element( $\hat{x}$ )들의 합'이 '원래 channel의 output element( $\hat{y}$ )들의 합'과 차이가 적은 channel을 중요하지 않다고 판단하고 잘라낸다.
 
-    ![uniform shrink < channel prune](images/uniform_vs_channel_pruning.png)
+$$ \underset{S}{\mathrm{argmin}} \sum_{i=1}^{m}{({\hat{y}_{i}} - \sum_{j \in S}{\hat{x}_{i,j}})^2} $$
 
-    ![uniform shrink < channel prune 2](images/uniform_vs_channel_pruning_2.png)
+$$ s.t. \quad |S| = C \times r, \quad S \subset \lbrace 1,2,...,C \rbrace $$
+
+참고로 channel pruning이 모든 channel size를 일정하게 줄이는 uniform shrink보다 더 효율적이다.
+
+![uniform shrink < channel prune](images/uniform_vs_channel_pruning.png)
+
+![uniform shrink < channel prune 2](images/uniform_vs_channel_pruning_2.png)
 
 ---
 

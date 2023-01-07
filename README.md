@@ -25,6 +25,18 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 </br>
 
+## 🚩 정리한 문서 목록
+
+### 📔 Efficient Inference
+
+- [Pruning](https://github.com/erectbranch/TinyML_and_Efficient_DLP/tree/master/lec03)
+
+  > unstructured/structured pruning
+  
+  > magnitude-based pruning(L1-norm), second-order-based pruning, percentage-of-zero-based pruning, regression-based pruning
+
+</br>
+
 ## :mag: Schedule
 
 ### Lecture 1: Introduction
