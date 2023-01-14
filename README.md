@@ -35,6 +35,16 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   
   > magnitude-based pruning(L1-norm), second-order-based pruning, percentage-of-zero-based pruning, regression-based pruning
 
+- [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/TinyML_and_Efficient_DLP/tree/master/lec07/summary01)
+
+  > input stem, stage, head
+  
+  > AlexNet, VGGNet, SqueezeNet(global average pooling, fire module, pointwise convolution)
+  
+  >ResNet50(bottleneck block, residual learning), ResNeXt(grouped convolution)
+  
+  >MobileNet(depthwise-separable convolution), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle)
+
 </br>
 
 ## :mag: Schedule

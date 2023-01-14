@@ -116,9 +116,9 @@ neural network architecture는 보통 input stem, head, 그리고 여러 stage�
 
 ### 7.1.2 ResNet50: bottleneck block
 
-ResNet에서 소개된 개념으로, **bypass layer**를 적용하는 개선으로 bottleneck을 줄일 수 있다.
+ResNet에서 소개된 개념으로, **bypass layer**를 적용하는 개선으로 연산량을 줄일 수 있다.
 
-다음은 **Residual Block**의 구조를 나타낸 그림이다.
+다음은 **Residual Block**에서 연산량을 줄인 **bottleneck block**의 구조를 나타낸 그림이다.
 
 ![ResNet bottleneck block](images/ResNet_bottleneck.png)
 
