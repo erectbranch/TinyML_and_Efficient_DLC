@@ -98,7 +98,7 @@ neural network architecture는 보통 input stem, head, 그리고 여러 stage�
 
     ![fire module 구조](images/fire_module.png)
 
-    > [1x1 convolution이란?](https://euneestella.github.io/research/2021-10-14-why-we-use-1x1-convolution-at-deep-learning/): resolution은 변하지 않고, channel의 수만 더 적은 크기로 조절된다.(feature map의 차원이 $1 \times 1$ filter의 개수로 축소된다.), 반대로 $1 \times 1$ convolution을 이용해 feature map 차원을 늘릴 수도 있다.
+    > [1x1 convolution이란?](https://euneestella.github.io/research/2021-10-14-why-we-use-1x1-convolution-at-deep-learning/): resolution은 변하지 않고, channel의 수만 더 적은 크기로 조절된다.(feature map의 차원이 $1 \times 1$ filter의 개수로 축소된다.), 반대로 $1 \times 1$ convolution을 이용해 feature map 차원을 늘릴 수도 있다. 이를 **pointwise convolution**이라고 지칭한다.
  
     1. squeeze convolution layer: $3 \times 3$ convolution filter 대신 $1 \times 1$ filter로 교체해서 수행한다.(parameter가 9x 감소하는 효과) 수행한 뒤 ReLU activation을 거친다.
 
@@ -165,5 +165,73 @@ ResNeXt(2017)에서는 $3 \times 3$ convolution을 $3 \times 3$ **grouped convol
 > 사실 중간이 제일 먼저 제안된 ResNeXt block이다. 왼쪽이 그 다음 등장했으며 구현이 가장 간단하면서도 효율적인 구조이다.(GPU와 관련이 깊다.)
 
 > 이런 복잡한 computational graph을 자동으로 mapping할 수 있는 방법들이 여럿 제시됐다.
+
+---
+
+### 7.2.3 MobileNet: depthwise-separable block
+
+> [depthwise-separable convolution](https://velog.io/@woojinn8/LightWeight-Deep-Learning-5.-MobileNet), [MobileNet](https://velog.io/@woojinn8/LightWeight-Deep-Learning-6.-MobileNet-2-MobileNet%EC%9D%98-%EA%B5%AC%EC%A1%B0-%EB%B0%8F-%EC%84%B1%EB%8A%A5)
+
+MobileNet(2017)은 특정 조건을 만족하는 group convolution에 적용할 수 있는 **depthwise-separable convolution**을 제안한다. 
+
+> depthwise-separable convolution은 Xception이란 논문에서 먼저 제안된 방식이다. 하지만 Xception이 이를 이용해 accuracy를 개선하려고 했다면, MobileNet은 model의 경량화를 위해서 사용했다.
+
+depthwise-seperable convolution은 channel을 분리하여, channel information과 spatial information을 각각 별개의 단계에서 연산을 수행한다.
+
+![depthwise-separable convolution](images/depthwise-separable.png)
+
+![depthwise-separable convolution 2](images/depthwise-separable_2.png)
+
+- 우선 channel을 모두 분리한다. 따라서  channel 수만큼 group이 생기는 group convolution의 형태가 된다.
+
+- 그 다음 각 group에서 convolution을 수행한다.(spatial information을 capture한다.)
+
+- 그 다음 이를 다시 연결한 뒤 $1 \times 1$ convolution을 이용해서 channel 사이의 information을 병합한다.
+
+---
+
+### 7.2.4 MobileNetV2: inverted bottleneck block
+
+하지만 이런 depthwise convolution은 기존의 convolution보다 낮은 capacity를 가지게 된다. MobileNetV2는 input에 $1 \times 1$ convolution을 적용해서 input의 channel 수를 늘린 뒤, 연산 과정을 수행하도록 만들어서  compensate한다.
+
+> 특히 ReLU를 activation으로 사용하기 때문에 필연적으로 information의 손실이 발생할 수밖에 없다. (ReLU는 기본적으로 음수에서는 0을 반환하지만, 양수에서는 자기 자신을 반환하는 linear transform으로 볼 수 있었다.)
+
+> 더 낮은 차원의 subspace로 mapping하면서 가지는 information을 **maniford**라고 지칭한다.
+
+![channel compensate](images/linear_bottlenecks.png)
+
+channel 수를 늘리면 어느 한 channel에서 소실된 information이 있더라도, 다른 channel에서 그 information을 가지고 있을 수 있다.
+
+![inverted residual block](images/inverted_residual_block.png)
+
+또한 skip connection으로 **inverted residual block**을 제안한다. 기존 residual block이 'wide $\rightarrow$ narrow $\rightarrow$ wide'와 같은 구조였지만, inverted residual block은 반대로 'narrow $\rightarrow$ wide $\rightarrow$ narrow'와 같은 형태를 가지게 된다.
+
+> 연산량 면에서 residual block보다 더 적기 때문에, memory efficiency면에서 더 효율이 좋다.
+
+> inverted residual block을 'bottleneck residual block'이라고도 한다.
+
+참고로 ReLU가 아닌 ReLU6를 activation function으로 사용한다.
+
+![ReLU6](images/ReLU6.png)
+
+---
+
+### 7.2.5 ShuffleNet: 1x1 group convolution & channel shuffle
+
+하지만 group마다 convolution이 적용되는 탓에, 서로 다른 group에 있는 channel이 feature information을 공유하지 못했다. 
+
+ShuffleNet은 **channel shuffle** 기법을 제안하며 이 부분을 추가로 compensate한다.
+
+![ShuffleNet](images/ShuffleNet.png)
+
+![channel shuffle](images/channel_shuffle.png)
+
+---
+
+### 7.2.6 accuracy-efficiency trade-off on ImageNet
+
+다음은 ImageNet에서 여러 model이 갖는 MACs(efficiency)와 accuracy를 나타낸 도표다.
+
+![accuracy-efficiency tradeoff on ImageNet](images/accuracy-efficiency_tradeoff.png)
 
 ---
