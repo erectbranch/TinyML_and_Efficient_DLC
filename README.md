@@ -9,7 +9,7 @@
   
 <b>강의 주제: TinyML and Efficient Deep Learning Computing</b></br>
 Instructor : Song Han(Associate Professor, MIT EECS)</br>
-[[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)] | [[schedule](https://efficientml.ai/schedule/)]</b>
+[[schedule](https://efficientml.ai/schedule/)] | [[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)] | [[github](https://github.com/mit-han-lab/6s965-fall2022)]</b>
 
 </div>
 
