@@ -41,9 +41,19 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   
   > AlexNet, VGGNet, SqueezeNet(global average pooling, fire module, pointwise convolution)
   
-  >ResNet50(bottleneck block, residual learning), ResNeXt(grouped convolution)
+  > ResNet50(bottleneck block, residual learning), ResNeXt(grouped convolution)
   
-  >MobileNet(depthwise-separable convolution), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle)
+  > MobileNet(depthwise-separable convolution), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle)
+
+- [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLP/tree/master/lec11)
+
+  > microcontroller, flash/SRAM usage, peak SRAM usage, MCUNet: TinyNAS, TinyEngine
+
+  > TinyNAS: automated search space optimization(weight/resolution multiplier), resource-constrained model specialization(Once-for-All)
+
+  > MCUNetV2: patch-based inference, network redistribution, joint automated search for optimization, MCUNetV2 architecture(VWW dataset inference)
+
+  > RNNPool, MicroNets(MOPs & latency/energy consumption relationship)
 
 </br>
 
