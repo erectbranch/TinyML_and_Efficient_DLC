@@ -18,11 +18,11 @@ AutoML(자동기계학습)에서는 다음과 같은 process를 자동화하는 
 
     ![HPO](images/HPO.png)
 
-    model training이 고정된 hyperparameter 상에서 model parameter를 학습하는 것과 달리, HPO는 **meta-optimization**으로 hyper-parameter 자체를 학습한다.
+    model training이 고정된 hyperparameter 상에서 model parameter를 학습하는 것과 달리, HPO는 **meta-optimization**으로 hyperparameter 자체를 학습한다.
 
     > hyperparameter로는 learning rate, lr scheduling 방법, loss function, epoch, weight initialization 방법, normalization 방법, layer depth 등이 해당된다.
     
-    > 그런데 hyper-parameter를 변경할 경우, model weight를 초기화하고 처음부터 다시 훈련을 수행해야 한다. 따라서 이를 방지하기 위한 Hyperband 등의 방식이 제안됐다.
+    > 그런데 hyperparameter를 변경할 경우, model weight를 초기화하고 처음부터 다시 훈련을 수행해야 한다. 따라서 이를 방지하기 위한 Hyperband 등의 방식이 제안됐다.
 
 - **NAS**(Neural Architecture Search)
 
@@ -233,5 +233,7 @@ ShuffleNet은 **channel shuffle** 기법을 제안하며 이 부분을 추가로
 다음은 ImageNet에서 여러 model이 갖는 MACs(efficiency)와 accuracy를 나타낸 도표다.
 
 ![accuracy-efficiency tradeoff on ImageNet](images/accuracy-efficiency_tradeoff.png)
+
+> 하지만 ImageNet에서의 benchmark만 믿어서는 안 된다. 실제 downstream(산업)에서 활용하고자 할 때는 이런 benchmark와 일치하는 결과를 보여준다는 보장은 없다.
 
 ---
