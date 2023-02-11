@@ -29,13 +29,13 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 ### 📔 Efficient Inference
 
-- [Pruning](https://github.com/erectbranch/TinyML_and_Efficient_DLP/tree/master/lec03)
+- [Pruning](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec03)
 
   > unstructured/structured pruning
   
   > magnitude-based pruning(L1-norm), second-order-based pruning, percentage-of-zero-based pruning, regression-based pruning
 
-- [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/TinyML_and_Efficient_DLP/tree/master/lec07/summary01)
+- [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary01)
 
   > input stem, stage, head
   
@@ -45,7 +45,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   
   > MobileNet(depthwise-separable convolution), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle)
 
-- [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLP/tree/master/lec11)
+- [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec11)
 
   > microcontroller, flash/SRAM usage, peak SRAM usage, MCUNet: TinyNAS, TinyEngine
 
