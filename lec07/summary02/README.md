@@ -81,7 +81,7 @@ RNN controller는 총 다섯 단계를 거쳐서 candidate cell를 generate한�
 
 5. hidden state를 합칠 방법을 고른다.(add, concatenate 등)
 
-그렇다면 다음 조건에서는 search space의 크기(design space의 유형 수)는 총 몇 개가 될까? architecture의 layer는 총 B개로 구성되어 있다고 하자.
+이해를 돕기 위해 문제를 하나 풀어보자. 다음 조건에서는 search space의 크기(design space의 유형 수)는 총 몇 개가 될까? architecture의 layer는 총 B개로 구성되어 있다고 하자.
 
 - 2개의 input 유형
 
@@ -101,7 +101,7 @@ RNN controller는 총 다섯 단계를 거쳐서 candidate cell를 generate한�
 
 > 또한 **meta-architecture**(메타 구조)를 선택해서 NAS를 수행하기 때문에, cell search의 복잡성이 대부분 meta-architecture에 의해 설명되지 않도록 새로운 설계 방법이 필요했다.
 
-> 최선은 meta-architecture 역시 NAS가 스스로 최적화할 수 있게 하는 것이다. 
+> 최선의 방법은 meta-architecture 역시 NAS가 스스로 최적화할 수 있게 설계하는 것이다. 
 
 ---
 
@@ -122,3 +122,127 @@ RNN controller는 총 다섯 단계를 거쳐서 candidate cell를 generate한�
 결과를 보면 사람이 design한 strategy와 상당히 다른 것을 볼 수 있다. 하지만 높은 accuracy와 irregularity 사이에서 균형을 맞춰야 한다. irregularity topology는 hardware상으로 구현하기 어려우며, 또한 parallize하기도 어렵기 때문이다.
 
 ---
+
+## 7.6 Design the Search Space
+
+더 효율적인 search space를 선택하기 위해, 예를 들어 ResNet에서는 cumulative error distribution을 지표로 사용할 수 있다. 아래가 ResNet의 cumulative error distribution가 그려진 도표이다.
+
+![ResNet cumulative error distribution](images/ResNet_cumulative_error_distribution.png)
+
+- 파란색 곡선에 해당되는 search space: 38.9%의 model이 49.4%가 넘는 error를 가졌다.
+
+- 주황색 곡선에 해당되는 search space: 38.7%의 model이 43.2%가 넘는 error를 가졌다.
+
+  > 이 둘 중에서는 주황색 곡선의 design space가 더 낫다. 
+
+하지만 이처럼 cumulative error distribution을 측정하려면 굉장히 긴 시간동안 training을 거쳐야 한다. 또한 memory나 storage 제약을 갖는 장치에서는 수행할 수 없는 방법과 다름없다. computation은 저렴하지만 memory는 비싸다는 기본 원칙을 상기하자.
+
+따라서 hardware 제약이 있는 기기에서 NAS를 수행할 수 있도록, TinyNAS에서는 다음과 같은 과정을 거친다.
+
+1. Automated search space optimization
+
+2. Resource-constrained model specialization
+
+![TinyNAS](images/TinyNAS.png)
+
+model training으로 많은 resource를 낭비하는 대신, 다른 방식으로 최적의 model을 찾고자 시도한다. 바로 동일한 memory 제약에서는 <U>FLOPs가 클수록 큰 model capacity를 가지며, 이는 곧 높은 accuracy로 이어진다는 heuristic</U>이다.
+
+![FLOPs distribution](images/FLOPs_and_probability.png)
+
+---
+
+## 7.7 Search Strategy
+
+---
+
+### 7.7.1 Grid Search
+
+가장 간단한 방법으로 **grid search**가 있다. 간단한 예시로 다음과 같이 Width나 Resolution에서 몇 가지 point를 지정한다.(width 3개, resolution 3개로 총 9개의 조합이 나온 예다.)
+
+![grid search ex](images/grid_search_ex.png)
+
+- latency constraint를 만족하면 파란색, 만족하지 못하면 빨간색으로 표시했다.
+
+하지만 이런 간단한 예시와는 다르게 실제 응용에서는 선택지와 dimension이 훨씬 커지게 된다. 범위를 넓게, step을 작게 설정할수록 최적해를 찾을 가능성은 커지지만 시간이 오래 걸리게 된다.
+
+> 대체로 넓은 범위와 큰 step으로 설정한 뒤, 범위를 좁히는 방식을 사용한다.
+
+이런 방법을 사용하는 model은 대표적으로 EfficientNet가 있다. EfficientNet은 depth, width, resolution이 관계가 있다는 사실을 바탕으로 **compound scaling** 방법을 제안한다. 
+
+![EfficientNet graph](images/efficientnet_graph.png)
+
+- w, d, r이 일정 값 이상이 되면 accuracy가 빠르게 saturate된다. 따라서 이들을 함께 고려할 필요가 있다.
+
+아래가 이런 관측을 바탕으로 한 compound scaling을 나타낸 그림이다.
+
+![compound scaling](images/compound_scaling.png)
+
+- 기존에 수동으로 하나씩 width scaling, depth scaling, resolution scaling을 적용한 것과 다르게, compound scaling은 width/depth/resolution을 함께 고려하며 scaling한다.
+
+EfficientNet은 각 layer가 수행하는 연산(F)를 고정하고, width, depth, resolution만을 변수로 search space를 탐색한다.
+
+$$ \underset{d,w,r}{\max} \quad Accuracy(N(d,w,r)) $$
+
+---
+
+### 7.7.2 random search
+
+Grid Search의 문제를 개선한 방법으로 **random search**가 제안되었다. random search는 정해진 범위 내에서 말 그대로 임의로 선택하며 수행하며, grid search보다 상대적으로 더 빠르고 효율적이다.
+
+> random search는 차원이 적을 때 최선의 parameter search strategy일 가능성이 크다. 
+
+![grid search, random search](images/grid_random_search.png)
+
+grid search보다 더 효율적인 이유는 직관적으로도 이해할 수 있다. 종종 일부 parameter는 다른 parameter보다 performance에 큰 영향을 미친다. 가령 model이 hyperparameter 1에 매우 민감하고, hyperparameter 2에는 민감하지 않다고 하자.
+
+grid search는 {hyperparameter 1 3개} * {hyperparameter 2 3개}를 시도한다. 반면 random search의 경우에는 hyperparameter 1 9개의 다른 값(혹은 hyperparameter 2 9개의 다른 값)을 시도할 수 있다. 따라서 더 나은 결과를 얻을 수 있다.
+
+또한 Single-Path-One-Shot(SPOS)에서는 random search가 다른 advance된 방법들(예를 들면 evolutionary architecture search)보다 좋은 baseline을 제공할 수 있다.
+
+SPOS란 말 그대로 single path와 one-shot 접근법을 사용하는 NAS이다. 이 방법은 architecture search를 탐색하기 위해, reinforcement learning 또는 evolutionary algorithm를 사용하지 않고 **uniform sampling**을 사용하는 방법이다.
+
+![single path one-shot NAS with sampling](images/single_path_one-shot.png)
+
+이를 이해하기 위해 잠시 one-shot NAS와 기존 NAS를 비교하고 넘어가자. 
+
+![NAS algorithm](images/NAS_algorithm_ex.png)
+
+위는 기존 NAS를 나타낸 그림이다. 기존 NAS에서는 (1) candidate architecture를 만들고 train,evaluate한 뒤, (2) 해당 candidate architecture의 evaluation 결과를 바탕으로 학습한다. 따라서 candidate architecture가 수렴(convergence)될 때까지 계속해서 만들어내야 한다. 그러므로 resource 소모가 굉장히 크다,
+
+다음으로는 만들어진 candidate architecture에서 비교적 좋은 architecture를 파악한다. 그런 다음 algorithm의 핵심은 이러한 candidate architecture의 순위를 매기는 기능이다. 그런데 기존의 NAS에서는 비교적 bias를 유지한 채로 순위가 매겨진다.
+
+![one-shot NAS algorithm](images/one-shot_NAS_algorithm.png)
+
+반면 one-shot NAS는 모든 candidate architecture를 포함하며 weight를 공유하는 **supernet**에서 search space를 탐색한다. 기존 NAS가 순위 사이에 상관 관계가 보존되는 것과 달리 one-shot NAS는 상관 관계가 없다.
+
+덕분에 resource가 덜 필요하다는 비용 절감적 장점을 지닌다. 하지만 각 architecture를 개별적으로 train하고 evaluate하는 기존 NAS보다는 performance가 낮다.
+
+---
+ 
+### 7.7.3 reinforcement learning
+
+기존 RNN controller에서 accuracy는 미분 가능하지 않았으므로, RNN controller를 update할 다른 방법이 필요했다.
+
+따라서 policy gradient method를 사용하여 RNN controller를 update하는 다른 방법을 쓴다.
+
+> [Policy Gradient Algorithms](https://talkingaboutme.tistory.com/entry/RL-Policy-Gradient-Algorithms)
+
+![update parameters](images/update_parameters.png)
+
+---
+
+### 7.7.4 Bayesian optimization
+
+
+---
+
+### 7.7.5 gradient-based search
+
+![DARTS](images/DARTS.png)
+
+기존 NAS가 이산적인 방법으로 rank를 정해왔지만, DARTS는 미분이 가능한 연속되는 변수를 이용해 search한다.
+
+커다란 단일 architecture에서 이 architecture의 loss를 최소화하기 위한 training을 진행하며, 여기서 성능 향상에 도움이 되는 operation의 $\alpha$ 값을 높여주면서 적절한 방향으로 수렴시킨다.
+
+이 과정이 끝나면 각 node에서 input operation 중 $\alpha$ 를 크기순으로 k개를 남겨서, architecture를 단순화하고 최종 architecture를 도출한다.
+
