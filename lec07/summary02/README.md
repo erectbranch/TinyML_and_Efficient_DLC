@@ -201,48 +201,7 @@ grid search는 {hyperparameter 1 3개} * {hyperparameter 2 3개}를 시도한다
 
 SPOS란 말 그대로 single path와 one-shot 접근법을 사용하는 NAS이다. 이 방법은 architecture search를 탐색하기 위해, reinforcement learning 또는 evolutionary algorithm를 사용하지 않고 **uniform sampling**을 사용하는 방법이다.
 
-![single path one-shot NAS with sampling](images/single_path_one-shot.png)
-
-이를 이해하기 위해 잠시 one-shot NAS와 기존 NAS를 비교하고 넘어가자. 
-
-![NAS algorithm](images/NAS_algorithm_ex.png)
-
-위는 기존 NAS를 나타낸 그림이다. 기존 NAS에서는 (1) candidate architecture를 만들고 train,evaluate한 뒤, (2) 해당 candidate architecture의 evaluation 결과를 바탕으로 학습한다. 따라서 candidate architecture가 수렴(convergence)될 때까지 계속해서 만들어내야 한다. 그러므로 resource 소모가 굉장히 크다,
-
-다음으로는 만들어진 candidate architecture에서 비교적 좋은 architecture를 파악한다. 그런 다음 algorithm의 핵심은 이러한 candidate architecture의 순위를 매기는 기능이다. 그런데 기존의 NAS에서는 비교적 bias를 유지한 채로 순위가 매겨진다.
-
-![one-shot NAS algorithm](images/one-shot_NAS_algorithm.png)
-
-반면 one-shot NAS는 모든 candidate architecture를 포함하며 weight를 공유하는 **supernet**에서 search space를 탐색한다. 기존 NAS가 순위 사이에 상관 관계가 보존되는 것과 달리 one-shot NAS는 상관 관계가 없다.
-
-덕분에 resource가 덜 필요하다는 비용 절감적 장점을 지닌다. 하지만 각 architecture를 개별적으로 train하고 evaluate하는 기존 NAS보다는 performance가 낮다.
+one-shot NAS는 모든 candidate architecture를 포함하며 weight를 공유하는 **supernet**에서 search space를 탐색한다. 덕분에 resource가 덜 필요하다는 비용 절감적 장점을 지닌다. 하지만 각 architecture를 개별적으로 train하고 evaluate하는 기존 NAS보다는 performance가 낮다.
 
 ---
  
-### 7.7.3 reinforcement learning
-
-기존 RNN controller에서 accuracy는 미분 가능하지 않았으므로, RNN controller를 update할 다른 방법이 필요했다.
-
-따라서 policy gradient method를 사용하여 RNN controller를 update하는 다른 방법을 쓴다.
-
-> [Policy Gradient Algorithms](https://talkingaboutme.tistory.com/entry/RL-Policy-Gradient-Algorithms)
-
-![update parameters](images/update_parameters.png)
-
----
-
-### 7.7.4 Bayesian optimization
-
-
----
-
-### 7.7.5 gradient-based search
-
-![DARTS](images/DARTS.png)
-
-기존 NAS가 이산적인 방법으로 rank를 정해왔지만, DARTS는 미분이 가능한 연속되는 변수를 이용해 search한다.
-
-커다란 단일 architecture에서 이 architecture의 loss를 최소화하기 위한 training을 진행하며, 여기서 성능 향상에 도움이 되는 operation의 $\alpha$ 값을 높여주면서 적절한 방향으로 수렴시킨다.
-
-이 과정이 끝나면 각 node에서 input operation 중 $\alpha$ 를 크기순으로 k개를 남겨서, architecture를 단순화하고 최종 architecture를 도출한다.
-
