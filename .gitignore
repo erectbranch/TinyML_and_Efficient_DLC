@@ -3,3 +3,14 @@ appendix/
 *.log
 **/.ipynb_checkpoints
 **/*checkpoints/
+
+# lec17
+**/__MACOSX/
+**/code_generator/
+**/tinyengine/
+**/tinyengine.zip
+**/mcunet-5fps-vww.tflite
+
+# git clone
+**/tinyengine/
+**/mcunet/
