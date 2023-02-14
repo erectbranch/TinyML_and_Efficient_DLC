@@ -357,7 +357,7 @@ NAS에서 **Bayesian optimization**을 적용하면, exploitation과 exploration
 
 > [exploration(탐색)과 exploitation(활용)](https://github.com/erectbranch/Neural_Networks_and_Deep_Learning/tree/master/ch09)
 
-![Bayesian optimization](images/Bayesian_optimization.png)
+![Bayesian optimization](images/bayesian_optimization.png)
 
 - exploration이 우선적일 때: a to c
 
