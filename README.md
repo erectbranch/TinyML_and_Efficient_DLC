@@ -45,6 +45,14 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   
   > MobileNet(depthwise-separable convolution), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle)
 
+- [Neural Architecture Search: RNN controller & search strategy](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary02)
+
+  > RNN controller, cell-level search space, network-level search space
+
+  > Search Strategy: grid search, random search, reinforcement learning, bayesian optimization, gradient-based search, evolutionary search
+
+  > EfficientNet(compound scaling), ProxylessNAS(architecture parameter, mixed operation function, binary gate), DARTS(latency penalty term)
+
 - [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec11)
 
   > microcontroller, flash/SRAM usage, peak SRAM usage, MCUNet: TinyNAS, TinyEngine
