@@ -409,6 +409,8 @@ $$ Loss = {Loss}_{CE} + {\lambda}_{1}{||w||}_{2}^{2} + {\lambda}_{2}\mathbb{E}[\
 
 ![mutation on depth](images/mutation_depth.png)
 
+> MB는 MobileNet의 inverted bottleneck convolution layer을 의미한다. MB3은 expansion ratio가 3, MB6은 expansion ratio가 6인 것을 의미한다.
+
 - stage 1의 depth가 3에서 2로 mutate되었다.
 
 - stage 2의 depth가 3에서 4로 mutate되었다.
