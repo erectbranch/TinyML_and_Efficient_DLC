@@ -53,6 +53,12 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   > EfficientNet(compound scaling), ProxylessNAS(architecture parameter, mixed operation function, binary gate), DARTS(latency penalty term)
 
+- [Neural Architecture Search: latency profiling & Once-for-All Network](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec08)
+
+  > MACs/FLOPs and latency, latency predictor(layer-wise latency profiling, network-wise latency profiling), specialized models for different hardware(mobile, CPU, GPU)
+
+  > Once-for-All Network: progressive shrinking(elastic resolution/kernel size/depth/width)
+
 - [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec11)
 
   > microcontroller, flash/SRAM usage, peak SRAM usage, MCUNet: TinyNAS, TinyEngine
