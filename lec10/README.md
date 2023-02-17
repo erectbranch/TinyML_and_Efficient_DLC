@@ -4,7 +4,7 @@
 
 ![challenge](images/challenge.png)
 
-큰 computation 능력과 memory를 가진 cloud 기반 model에서, edge에서 사용할 수 있는 model로 **knowledge distillation**을 진행하려면 어떻게 해야 할까?
+큰 computation 능력과 memory를 가진 cloud 기반 model에서, edge에서 사용할 수 있는 model로 **knowledge transfer**을 진행하려면 어떻게 해야 할까?
 
 cloud AI와 tiny AI의 training curve 차이를 보자.
 
@@ -19,6 +19,8 @@ cloud AI와 tiny AI의 training curve 차이를 보자.
 ## 10.1 summary of knowledge distillation
 
 > [distiller documentation: knowledge distillation](https://intellabs.github.io/distiller/knowledge_distillation.html)
+
+> 처음 **Knowledge Transfer**(KT)라는 개념이 존재하던 때는 얕은 model밖에 transfer가 불가능했지만, **Knowledge Distillation**(KD)가 등장하고 나서부터 큰 teacher model에서 작은 student model로 knowledge를 transfer할 수 있게 되었다.
 
 knowledge distillation은 2015년 발표된 논문으로, knowledge를 teacher network에서 student network로 transfer하는 방법이다.
 
@@ -125,7 +127,9 @@ teacher model의 probabilities에 softmax temperature를 적용해 보자.
 
 ## 10.2 matching intermediate features
 
-teacher model과 student model은 서로 비슷한 feature distribution을 가져야 되기 때문에, feature distribution을 비교해서 knowledge distillation을 진행하는 방법이다.
+teacher model과 student model은 서로 비슷한 feature distribution을 가져야 되기 때문에, feature distribution을 비교해서 knowledge transfer을 진행하는 방법이다.
+
+아래는 loss function을 **MMD**(Maximum Mean Discrepancy. 최대 평균 불일치)를 사용하는 Like What You Like(2017) 논문 내용이다. 아래와 같이 두 distribution가 있을 때, 이 둘의 거리를 잴 수 있다.
 
 ![matching intermediate features](images/matching_intermediate_features.png)
 
@@ -138,5 +142,65 @@ feature map 간의 평균 discrepancy(불일치)를 줄이기 위해서는 기�
 > [cosine distance 소개](https://seongkyun.github.io/study/2019/04/01/cosine_distance/)
 
 feature map이 가까울수록(cosine distance가 작을수록) teacher feature map과 student feature map이 유사해진다.
+
+> [MMD와 kernel trick](https://www.youtube.com/watch?v=kT4MtGfRcN0)
+
+> 아래 식을 보면 알 수 있듯, sample들을 추출해서 평균을 낸 다음 teacher sample과 student sample 둘의 차이를 구해서 거리를 잰다.
+
+![MMD](images/MMD.png)
+
+혹은 다른 방법으로 feature maps 사이의 L2 distance를 최소화할 수 있다. Paraphrasing Complex Network 논문(2018)에서는 다음과 같이 feature map을 비교한다.
+
+> [paraphrasing complex network 세미나](https://tv.naver.com/v/5440966)
+
+![paraphrasing complex network](images/paraphrasing_complex_network.png)
+
+- teacher network의 마지막 feature map 이후에 Paraphraser라는 convolution node를 추가해서 feature map을 다른 차원으로 projection한다.
+
+  - $m \rightarrow m \times k$ ( $k$ 는 일반적으로 0.5 ) 만큼 channel 수를 squeeze한다.
+
+- student network 마지막 feature map 이후에 Translator라는 node를 추가해서 이 결과를 위와 비교한다.
+
+> 논문에서는 Factor Transfer(FT)라는 명칭을 쓴다. autoencoder와 비슷하게 볼 수 있다.
+
+> 이름의 유래는 Paraphraser는 선생님의 입장에서 학생에게 쉽게 설명하는 것이고, Translator는 학생 입장에서 선생님의 말을 이해하는 것이다.
+
+---
+
+## 10.3 matching intermediate attention maps
+
+> [Paying More Attention to Attention](https://arxiv.org/abs/1612.03928)
+
+![attention transfer](images/attention_transfer.png)
+
+feature map을 이용하기 때문에 어떠한 mapping function을 정의해서 feature map을 통과시킨다. 각각 teacher model과 student model에서 통과시킨 결과물에 L2 loss를 적용해서 차이를 구한다.
+
+그렇다면 어떻게 mapping이 되는지 한 번 살펴보자. CNN에서는 3차원 grid 구조(channel 수, height, weight 값을 갖는)인 activation tensor $A \in R^{C \times H \times W} $ 가 있다. 이 중에서도 예를 들어 image $32 \times 32$ 처럼 두 차원으로 **spatial dependence**를 표현하고, 마지막 차원이 각 channel( $C$ )의 independent한 성질을 나타내는 것이다.
+
+따라서 activation-based mapping function $\mathcal{F}$ 는 3D tensor를 input으로 받고, output으로 다음과 같이 flatten된 2D tensor를 반환한다.
+
+![attention mapping](images/attention_mapping.png)
+
+$$ \mathcal{F} : R^{C \times H \times W} \rightarrow R^{H \times W} $$
+
+이러한 spatial attention mapping function은 다양하게 정의할 수 있는데, 논문에서도 아래 3가지 방법을 소개하고 있다.
+
+- 절댓값의 합: $F_{sum}(A) = \sum_{i=1}^{C}{|A_{i}|}$
+
+- 절댓값의 p 거듭제곱 합: $F_{sum}^{p}(A) = \sum_{i=1}^{C}{|A_{i}|}^{p}$ ( 이때 $p > 1$ )
+
+- 절댓값의 p 거듭제곱 값 중 최댓값: $F_{max}^{p}(A) = \max_{i=1,c}{|A_{i}|}^{p}$ ( 이때 $p > 1$ )
+
+> $i$ 는 channel index, $p$ 는 승수로 연산 후에 더해준다는 의미이다. 수학적으로 거듭제곱을 **power**라는 단어로 표현한다.
+
+이를 바탕으로 attention map을 이용해 loss를 정의하고, 이 loss를 최소화하는 방법으로 knowledge transfer를 진행한다.
+
+![matching intermediate attention map](images/matching_intermediate_attention_map.png)
+
+흥미롭게도 동일한 input에서 accuracy가 높은 model(perfomant model)들의 activation map이 비슷한 점을 확인할 수 있다.
+
+![attention map comparison](images/attention_maps_compare.png)
+
+- accuracy가 비교적 작은 NIN model과 다르게, accuracy가 높은 ResNet34와 ResNet101이 비슷한 activation map을 갖는다.
 
 ---
