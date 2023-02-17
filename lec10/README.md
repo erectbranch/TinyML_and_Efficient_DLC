@@ -204,3 +204,41 @@ $$ \mathcal{F} : R^{C \times H \times W} \rightarrow R^{H \times W} $$
 - accuracy가 비교적 작은 NIN model과 다르게, accuracy가 높은 ResNet34와 ResNet101이 비슷한 activation map을 갖는다.
 
 ---
+
+## 10.4 matching sparsity pattern
+
+match할 수 있는 또 다른 요소로 **sparsity** pattern이 있다. teacher model과 student model은 ReLU activation을 거치면 비슷한 sparsity pattern을 가져야 할 것이다.
+
+> ReLU activation을 거치면 음수 값은 모두 0이 되었다.
+
+따라서 **indicator funcion** $\rho(x) = 1[x > 0]$ 을 사용해서, sparsity pattern을 match시킬 수 있다.
+
+아래는 'Knowledge Transfer via Distillation of Activation Boundaries Formed by Hidden Neurons' 논문(2018)에서 sparsity map을 나타낸 그림이다.
+
+> [Knowledge Transfer via Distillation of Activation Boundaries Formed by Hidden Neurons](https://arxiv.org/abs/1811.03233)
+
+![matching sparsity pattern](images/matching_sparsity_pattern.png)
+
+- 흰색 ~ 파란색: activated region이다. 파란색일수록 response strength가 높다.
+
+기본적으로 classification에서 model이 학습하는 것은 feature space 내 **decision boundary**이다.(위 그림처럼 decision boundary는 activation boundary와 큰 연관성을 갖는다.)
+
+> decision boundary는 feature space를 여러 class로 나누는 hyperplane처럼 생각하면 쉽다.
+
+수식으로 정리하면 loss function은 다음과 같다. 우선 knowledge transfer의 목적은 다음과 같이 나타낼 수 있다.
+
+$$ \mathcal{L}(I) = {|| \sigma({\mathcal{T}(I)}) - \sigma({\mathcal{S}(I)}) ||}^{2}_{2} $$
+
+- $I$ : input image
+
+- $\mathcal{T}$ : input image를 받는 teacher network의 layer
+
+- $\mathcal{S}$ : input image를 받는 student network의 layer
+
+- $\sigma(x)$ : ReLU ( = $max(0, x)$ )
+
+이를 indicator function을 이용하면 다음과 같은 수식이 된다.
+
+$$ \mathcal{L}(I) = {|| \rho({\mathcal{T}(I)}) - \rho({\mathcal{S}(I)}) ||}_{1} $$
+
+---
