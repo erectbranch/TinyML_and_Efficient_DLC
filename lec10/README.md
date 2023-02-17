@@ -185,9 +185,9 @@ $$ \mathcal{F} : R^{C \times H \times W} \rightarrow R^{H \times W} $$
 
 이러한 spatial attention mapping function은 다양하게 정의할 수 있는데, 논문에서도 아래 3가지 방법을 소개하고 있다.
 
-- 절댓값의 합: $F_{sum}(A) = \sum_{i=1}^{C}{|A_{i}|}$
+- 절댓값의 합: $F_{sum}(A) = {\sum}_{i=1}^{C}{|A_{i}|}$
 
-- 절댓값의 p 거듭제곱 합: $F_{sum}^{p}(A) = \sum_{i=1}^{C}{|A_{i}|}^{p}$ ( 이때 $p > 1$ )
+- 절댓값의 p 거듭제곱 합: $F_{sum}^{p}(A) = {\sum}_{i=1}^{C}{|A_{i}|}^{p}$ ( 이때 $p > 1$ )
 
 - 절댓값의 p 거듭제곱 값 중 최댓값: $F_{max}^{p}(A) = \max_{i=1,c}{|A_{i}|}^{p}$ ( 이때 $p > 1$ )
 
