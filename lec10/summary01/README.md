@@ -10,9 +10,51 @@ cloud AI와 tiny AI의 training curve 차이를 보자.
 
 ![ResNet50, MobileNetV2](images/ResNet50_vs_MobileNetV2.png)
 
+> [NETWORK AUGMENTATION FOR TINY DEEP LEARNING(2022)](https://arxiv.org/pdf/2110.08890.pdf)
+
+> 가로 축은 epoch, 세로 축은 accuracy
+
 - cloud model(ResNet50): epoch가 늘면서 training accuracy가 80%가 넘는 결과를 보인다..
 
 - edge model(MobileNetV2-Tiny): epoch가 늘어도 training accuracy가 50% 정도에 가까운 결과를 보인다.
+
+들어가기 앞서 잠시 위 그림이 나온 논문을 설명하고 넘어간다. 논문에서는 over-fitting을 방지하기 위한 regulation 테크닉, 예를 들면 **data augmentation**(데이터 증강), **dropout**과 같은 기법이 large neural network에서는 효과적이지만 tiny neural network에서는 오히려 역효과가 발생한다고 주장한다.
+
+> data augmentation은 dataset을 여러가지 방법을 통해 augment하는 방법이다. mirroring, random cropping, rotation, shearing, local wrapping 등
+
+따라서 noise를 추가하여 capacity를 잡아먹는 data augmentation보다는 model을 augment(reverse dropout)하는 것이 필요하다. tiny model은 반대로 capacity의 제약으로 인해 under-fitting이 자주 발생하기 때문이다. 논문에서는 Network Augmentation을 **NetAug**로 지칭하며 소개한다.
+
+예시로 model training 단순히 standard stochastic gradient descent를 이용한다고 가정해 보자. training은 loss function $L$ 이 최소가 되는 $W_{t}$ 를 찾아나가는 과정이다.
+
+$$ {W_{t}}^{n+1} = {W_{t}}^{n} - {\eta}{{{\partial}{\mathcal{L}}({W_{t}}^{n})} \over {{\partial}({W_{t}}^{n})}} $$
+
+- ${\eta}$ : learning rate
+
+하지만 tiny neural network에서는 capacity의 제약 때문에, large neural network보다 local mimimums에 stuck될 가능성이 크다.
+
+여기에 NetAug 버전의 augmented loss function ${\mathcal{L}}_{aug}$ 은 다음과 같다.
+
+$$ {\mathcal{L}}_{aug} = {\mathcal{L}}(W_{t}) + {\alpha}_{1}{\mathcal{L}}([W_{t}, W_{1}] + \cdots + {\alpha}_{i}{\mathcal{L}}([W_{t}, W_{i}])) $$
+
+- ${\mathcal{L}}(W_{t})$ : base supervision(기존 model이 training을 진행하면서 제공하는 어떠한 label(정답))
+
+- 나머지 항 : auxiliary(보조) supervision. 일종의 sub-model처럼 작동한다.
+
+  - $[W_{t}, W_{i}]$ : tiny neural network의 weight $W_{t}$ 와 새 weights $W_{i}$ 를 포함하는 augmented model을 의미한다.
+
+  - ${\alpha}_{i}$ : augmented model마다 loss 영향을 조절하는 scaling hyper-parameter
+
+이때 모든 augmented model의 weight를 sharing하며, 제일 큰 largest augmented model만 계속 유지한다.(one-shot NAS와 마찬가지로 weight-sharing 전략을 사용하는 것이다.)
+
+![Learning curves on ImageNet](images/NetAug_ImageNet_Learning_curve.png)
+
+> 파란색 점선: NetAug를 적용하지 않은 기존 learning curve
+
+> 빨간색 실선: NetAug를 적용한 learning curve
+
+- MbV2-Tiny에서 NetAug를 적용한 결과를 보면, 해당 기법이 under-fitting을 줄이고 training과 validation accuracy를 높인 걸 알 수 있다.
+
+- 하지만 반대로 ResNet50과 같은 큰 model에서는 over-fitting을 발생시킨다.(높은 training accuracy, 낮은 validation accuracy)
 
 ---
 
