@@ -59,6 +59,12 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   > Once-for-All Network: progressive shrinking(elastic resolution/kernel size/depth/width)
 
+- [Knowledge Distillation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary01)
+
+  > NetAug, knowledge transfer(KT)
+  
+  > knowledge distillation: distillation loss, softmax temperature, matching intermediate weights/features/attention maps/sparsity pattern 
+
 - [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec11)
 
   > microcontroller, flash/SRAM usage, peak SRAM usage, MCUNet: TinyNAS, TinyEngine
