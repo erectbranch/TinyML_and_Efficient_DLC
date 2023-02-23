@@ -6,6 +6,10 @@
 
 큰 computation 능력과 memory를 가진 cloud 기반 model에서, edge에서 사용할 수 있는 model로 **knowledge transfer**을 진행하려면 어떻게 해야 할까?
 
+---
+
+## 10.1 cloud AI vs tiny AI: NetAug
+
 cloud AI와 tiny AI의 training curve 차이를 보자.
 
 ![ResNet50, MobileNetV2](images/ResNet50_vs_MobileNetV2.png)
@@ -58,7 +62,7 @@ $$ {\mathcal{L}}_{aug} = {\mathcal{L}}(W_{t}) + {\alpha}_{1}{\mathcal{L}}([W_{t}
 
 ---
 
-## 10.1 summary of knowledge distillation
+## 10.2 summary of knowledge distillation
 
 > [distiller documentation: knowledge distillation](https://intellabs.github.io/distiller/knowledge_distillation.html)
 
@@ -125,7 +129,7 @@ $$ \mathcal{L}(x; W) = {\alpha} * \mathcal{H}(z_{s}; T = 1) + {\beta} * \mathcal
 
 ---
 
-### 10.1.1 intuition of knowledge distillation
+### 10.2.1 intuition of knowledge distillation
 
 이제 예시를 보며 knowledge distillation이 어떻게 진행되는지 파악해 보자. 아래는 고양이 그림을 입력으로 주었을 때 teacher model과 student model의 prediction 결과를 보여준다.(개 고양이의 binary classification 문제)
 
@@ -147,7 +151,7 @@ teacher model의 probabilities에 softmax temperature를 적용해 보자.
 
 ---
 
-## 10.2 matching intermediate weights
+## 10.3 matching intermediate weights
 
 반면 final prediction을 matching시키기보다, intermediate weights(혹은 intermediate feature map)를 matching시키는 방법도 있다. 
 
@@ -167,7 +171,7 @@ teacher model의 probabilities에 softmax temperature를 적용해 보자.
 
 ---
 
-## 10.2 matching intermediate features
+## 10.4 matching intermediate features
 
 teacher model과 student model은 서로 비슷한 feature distribution을 가져야 되기 때문에, feature distribution을 비교해서 knowledge transfer을 진행하는 방법이다.
 
@@ -209,7 +213,7 @@ feature map이 가까울수록(cosine distance가 작을수록) teacher feature 
 
 ---
 
-## 10.3 matching intermediate attention maps
+## 10.5 matching intermediate attention maps
 
 > [Paying More Attention to Attention](https://arxiv.org/abs/1612.03928)
 
@@ -247,7 +251,7 @@ $$ \mathcal{F} : R^{C \times H \times W} \rightarrow R^{H \times W} $$
 
 ---
 
-## 10.4 matching sparsity pattern
+## 10.6 matching sparsity pattern
 
 match할 수 있는 또 다른 요소로 **sparsity** pattern이 있다. teacher model과 student model은 ReLU activation을 거치면 비슷한 sparsity pattern을 가져야 할 것이다.
 
