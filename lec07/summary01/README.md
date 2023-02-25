@@ -62,7 +62,11 @@ neural network architecture는 보통 input stem, head, 그리고 여러 stage�
 
 ---
 
-### 7.1.1 manually-designed neural network
+## 7.2 manually-designed neural network
+
+---
+
+### 7.2.1 AlexNet, VGGNet
 
 - **AlexNet**(2012)
 
@@ -84,37 +88,76 @@ neural network architecture는 보통 input stem, head, 그리고 여러 stage�
 
     또한 $(3 \times 3)$ convolution이 bottleneck을 유발하는 지점이 된다.
 
-- **SqueezeNet**(2016)
+---
 
-    ![SqueezeNet](images/SqueezeNet.png)
+### 7.2.2 SqueezeNet
 
-    SqueezeNet은 $3 \times 3$ convolution을 **fire module**로 교체했다. 또한 head 지점에서 **global average pooling**(1차원 vector로 변경)을 적용해서, head 부분의 cost를 줄였다.
+> [SqueezeNet 논문](https://arxiv.org/pdf/1602.07360)
 
-    > 큰 activation map을 가지고 있을수록 성능이 좋기 때문에, SqueezeNet에서는 후반부에서 집중적으로 downsampilng을 적용한다.
+![SqueezeNet](images/SqueezeNet.png)
 
-    > layer 하나의 filter 연산에 필요한 parameter의 총 개수는 (input channel 수) * (filter 개수) * ( grid(3*3) )였다. 따라서 filter의 수를 줄이고, input channel의 수를 줄여서 parameter 수를 줄이는 전략을 사용한 것이다.
+**SqueezeNet**(2016)은 $3 \times 3$ convolution을 **fire module**이라는 연산으로 교체해서 수행한다. 
 
-    fire module은 총 두 가지 layer로 구성된다.
+또한 head 지점에서 **global average pooling**(1차원 vector로 변경)을 적용해서 head 부분의 cost를 줄인다.
 
-    ![fire module 구조](images/fire_module.png)
+우선 SqueezeNet의 fire module은 'layer 하나당 3x3 filter 연산에 필요한 parameter의 양'을 줄이고자 하는 시도다. 
 
-    > [1x1 convolution이란?](https://euneestella.github.io/research/2021-10-14-why-we-use-1x1-convolution-at-deep-learning/): resolution은 변하지 않고, channel의 수만 더 적은 크기로 조절된다.(feature map의 차원이 $1 \times 1$ filter의 개수로 축소된다.), 반대로 $1 \times 1$ convolution을 이용해 feature map 차원을 늘릴 수도 있다. 이를 **pointwise convolution**이라고 지칭한다.
- 
-    1. squeeze convolution layer: $3 \times 3$ convolution filter 대신 $1 \times 1$ filter로 교체해서 수행한다.(parameter가 9x 감소하는 효과) 수행한 뒤 ReLU activation을 거친다.
+필요한 parameter 개수를 잠시 계산해 보자. input image (150, 150, 3)에 (3, 3) filter 32개(=output channel 수)를 적용하면 필요한 parameter 갯수는 다음과 같다.
 
-    2. expand convolution layer: $1 \times 1$ , $3 \times 3$ filter를 사용한다. 마찬가지로 ReLU activation을 적용한다.
+- $3 \times 3$ (filter size) $\times 3$ (input channel) $\times 32$ (filter 개수)
 
-    ![fire module](images/fire_module_2.png)
-    
-    이때 squeeze convolution layer의 $1 \times 1$ filter 개수 $s_{1 \times 1}$ 를, expand convolution layer의 $1 \times 1$ , $3 \times 3$ filter 개수인 $e_{1 \times 1}, e_{3 \times 3}$ 의 합보다 작게 설정해서 $3 \times 3$ filter로 들어가는 channel 수를 제한한다.
+> bias가 있을 때는 이 식에 bias 개수를 단순히 더하면 된다.
 
-    > fire9 이후 dropout 50%를 적용한다. 
-    
-    > 또한 SqueezeNet에 deep compression을 적용해도, model size가 510개 가량 줄어들지만 성능은 크게 차이가 나지 않는 유연함을 보인다.
+SqueezeNet은 다음과 같은 방법으로 parameter 수를 줄인다.
+
+1. 3x3 filter(9개 parameter) 대신 
+**1x1 filter**(1개 parameter)를 사용해서 parameter 수를 9배 줄인다. 
+
+  ![SqueezeNet 1x1](images/SqueezeNet_1x1_filter.png)
+
+2. input channel 수를 **squeeze**하여 parameter 수를 줄인다.
+
+   > 마찬가지로 1x1 filter convolution으로 channel 수를 줄일 수 있다. [1x1 convolution이란?](https://euneestella.github.io/research/2021-10-14-why-we-use-1x1-convolution-at-deep-learning/): resolution은 변하지 않고, channel의 수만 더 적은 크기로 조절된다.(feature map의 차원이 $1 \times 1$ filter의 개수로 축소된다.), 반대로 $1 \times 1$ convolution을 이용해 feature map 차원을 늘릴 수도 있다. 이를 **pointwise convolution**이라고 지칭한다.
+
+3. 초반부는 큰 activation map을 갖도록 network를 구성해서 최대한 압축에 의한 정보 손실을 막고, **후반부에 가서 집중적으로 downsampling**을 수행한다.
+
+> 이렇게 parameter 수를 줄이면 (1) distributed training이 더 용이해지고 (2) overhead가 줄어서 학습도 빨라지며, (3) embedded system에서 수행할 수준으로 작은 model로 만들 수 있다.
+
+fire module은 **squeeze**, **expand** 두 가지 단계로 진행된다. 아래 128개 channel을 갖는 input이 있을 때 fire module을 거치는 과정을 표현한 예시를 보며 파악해 보자.
+
+![fire module 구조](images/fire_module_3.png)
+
+1. **squeeze**: (128개 channel을 가진 input이) 1x1 filter에 의해 16개 channel을 갖게 squeeze된다.
+
+2. **expand**: squeeze된 16개 channel을 갖는 input에 각각 1x1 filter와 3x3 filter 연산을 수행한다.
+
+    - 1x1 filter: 64개 channel을 갖는 output을 만든다.
+
+    - 3x3 filter: 64개 channel을 갖는 output을 만든다.
+
+    - 1x1 filter와 3x3 filter의 output을 **concatenate**하면 총 128개 channel을 갖는 output이 생긴다.
+
+위 예시는 input의 channel 수와 output의 channel 수가 동일하지만 fire module마다 이 비율을 조절할 수 있다. 이제 fire module들로 구성된 3가지 SqueezeNet 구조를 살펴보자.
+
+![SqueezeNet](images/SqueezeNet_2.png)
+
+- 왼쪽: 기본 구조
+
+- 가운데: 기본 구조 + simple bypass
+
+- 오른쪽: 기본 구조: complex bypass
+
+> bypass는 아래 7.2.3절(ResNet)에서 소개할 개념으로 skip connection으로 불리는 방법이다. bypass를 이용하면 fire module이 갖는 bottleneck 문제를 일정 부분 해결할 수 있다.
+
+bypass를 적용하기 위해서는 중요한 조건이 있다. 바로 **input channel 수와 output channel 수가 동일**해야 한다는 점이다. 가운데 구조는 이런 조건에 맞춰서 가능한 구간만 skip connection을 적용한 것이며, 오른쪽은 conv 1x1로 channel 수를 맞춰서 bypass를 적용해준 것이다.
+
+![SqueezeNet + bypass](images/SqueezeNet_and_bypass.png)
+
+하지만 실험을 수행한 결과를 보면, 가운데 simple bypass가 더 model size도 작은데 accuracy가 더 높은 수치를 기록했다. 따라서 적절한 수준으로 bypass를 적용하는 것이 중요하다.
 
 ---
 
-### 7.1.2 ResNet50: bottleneck block
+### 7.2.3 ResNet50: bottleneck block
 
 ResNet에서 소개된 개념으로, **bypass layer**를 적용하는 개선으로 연산량을 줄일 수 있다.
 
@@ -138,7 +181,7 @@ ResNet에서 소개된 개념으로, **bypass layer**를 적용하는 개선으�
 
 ---
 
-### 7.2.2 ResNeXt: grouped convolution
+### 7.2.4 ResNeXt: grouped convolution
 
 ResNeXt(2017)에서는 $3 \times 3$ convolution을 $3 \times 3$ **grouped convolution**으로 대체한다. 차원을 줄이고 **cardinality**를 늘려서 효율을 높인 것이다.
 
@@ -168,7 +211,7 @@ ResNeXt(2017)에서는 $3 \times 3$ convolution을 $3 \times 3$ **grouped convol
 
 ---
 
-### 7.2.3 MobileNet: depthwise-separable block
+### 7.2.5 MobileNet: depthwise-separable block
 
 > [depthwise-separable convolution](https://velog.io/@woojinn8/LightWeight-Deep-Learning-5.-MobileNet), [MobileNet](https://velog.io/@woojinn8/LightWeight-Deep-Learning-6.-MobileNet-2-MobileNet%EC%9D%98-%EA%B5%AC%EC%A1%B0-%EB%B0%8F-%EC%84%B1%EB%8A%A5)
 
@@ -190,9 +233,9 @@ depthwise-seperable convolution은 channel을 분리하여, channel information�
 
 ---
 
-### 7.2.4 MobileNetV2: inverted bottleneck block
+### 7.2.6 MobileNetV2: inverted bottleneck block
 
-하지만 이런 depthwise convolution은 기존의 convolution보다 낮은 capacity를 가지게 된다. MobileNetV2는 input에 $1 \times 1$ convolution을 적용해서 input의 channel 수를 늘린 뒤, 연산 과정을 수행하도록 만들어서  compensate한다.
+하지만 이런 depthwise convolution은 기존의 convolution보다 낮은 capacity를 가지게 된다. MobileNetV2(2018)는 input에 $1 \times 1$ convolution을 적용해서 input의 channel 수를 늘린 뒤, 연산 과정을 수행하도록 만들어서  compensate한다.
 
 > 특히 ReLU를 activation으로 사용하기 때문에 필연적으로 information의 손실이 발생할 수밖에 없다. (ReLU는 기본적으로 음수에서는 0을 반환하지만, 양수에서는 자기 자신을 반환하는 linear transform으로 볼 수 있었다.)
 
@@ -216,11 +259,11 @@ channel 수를 늘리면 어느 한 channel에서 소실된 information이 있�
 
 ---
 
-### 7.2.5 ShuffleNet: 1x1 group convolution & channel shuffle
+### 7.2.7 ShuffleNet: 1x1 group convolution & channel shuffle
 
 하지만 group마다 convolution이 적용되는 탓에, 서로 다른 group에 있는 channel이 feature information을 공유하지 못했다. 
 
-ShuffleNet은 **channel shuffle** 기법을 제안하며 이 부분을 추가로 compensate한다.
+ShuffleNet(2017)은 **channel shuffle** 기법을 제안하며 이 부분을 추가로 compensate한다.
 
 ![ShuffleNet](images/ShuffleNet.png)
 
@@ -228,7 +271,55 @@ ShuffleNet은 **channel shuffle** 기법을 제안하며 이 부분을 추가로
 
 ---
 
-### 7.2.6 accuracy-efficiency trade-off on ImageNet
+### 7.2.8 SENet: Squeeze-and-Excitation block
+
+> [Squeeze-and-Excitation Networks 논문](https://arxiv.org/pdf/1709.01507.pdf)
+
+SENet(2017)은 ILSVRC 2017에서 우승한 model로 **Squeeze-and-Excitation**(**SE**) block을 사용한다. 
+
+SE block의 목적은 여러 channel을 가진 feature map에서 <U>각 channel의 정보가 얼마나 중요한지를 판단</U>하는 것이다. 
+
+- 3차원 feature map에서 spatial 부분을 $1 \times 1$ 로 압축(depth인 channel 개수는 유지). 압축은 global average pooling 연산을 이용한 1차원 벡터화.(Squeeze. **압축**)
+
+- 1차원 벡터를 normalize한 값을 가중치처럼 사용.(Excitation. **재조정**)
+
+이런 특징 때문에 SE block은 다른 CNN model(VGG, ResNet 등)의 어디든 부착할 수 있다. 아래가 바로 SE block을 나타낸 그림이다.
+
+![SE block](images/SE_block.png)
+
+- $F_{sq}(\cdot)$ : Squeeze 연산.(global average pooling)
+
+$$ z = F_{sq}(u_{c}) = {{1} \over {H \times W}} {\sum_{i=1}^{H}}{\sum_{j=1}^{W}}{u_{c}(i, j)} $$
+
+> $u_{c}$ 는 channel $c$번째에 있는 feature map( $H \times W$ )이다.
+
+- $F_{ex}(\cdot)$ : Excitation 연산.(normalize). squeeze로 만들어진 1차원 벡터 $z$ 를 normalize하는데, FC1 - ReLU - FC2 - Sigmoid 순서로 진행된다. 결과는 가중치 벡터 $s$ 가 된다.
+
+![Excitation](images/Excitation.png)
+
+$$ s = F_{ex}(z, W) = {\sigma}(W_{2} {\delta}(W_{1} z)) $$
+
+- $z$ : 앞서 squeeze해서 만들어진 1차원 벡터
+
+- $W_{1}, W_{2}$ : Fully-connected layer의 weight matrix. reduction ratio $r$ 을 둬서 노드 수를 조절한다. $W_{1} \in \mathbb{R}^{{C \over r} \times C}$ , $W_{2} \in \mathbb{R}^{C \times {C \over r}}$
+
+  - 위 식에서 $\mathbb{R}$ 을 보면 알겠지만, $C$ 차원 벡터 input $z$ 는 $W_{1}$ 과 만나 $C \over r$ 차원 벡터가 된다.(activation으로 ReLU 적용)
+  
+  - 그리고 이 $C \over r$ 차원 벡터는 $W_{2}$ 와 만나 $C$ 차원 벡터로 변환된다. 이를 sigmoid 연산을 통해 0과 1 사이의 값으로 normalize한다.
+
+> $\delta$ : ReLU 연산, $\sigma$ : Sigmoid 연산
+
+> reduction ratio $r$ 은 총 연산량에 추가되는 parameter 수(계산 복잡도)에 영향을 미친다. $r$ 을 바꿔가며 model마다 최적의 값을 찾는 과정이 필요하다.
+
+이렇게 구한 가중치 벡터 $s$ 를 원래 feature map $u$ 에 곱해준다.
+
+$$ F_{scale}(u_{c}, s_{c}) = s_{c} \cdot u_{c} $$
+
+SE block을 추가해도 parameter 수가 크게 늘어나지는 않는다. 따라서 적은 연산량 증가로도 performance 향상을 기대할 수 있는 방법론이 바로 SE block이다.
+
+---
+
+### 7.2.9 accuracy-efficiency trade-off on ImageNet
 
 다음은 ImageNet에서 여러 model이 갖는 MACs(efficiency)와 accuracy를 나타낸 도표다.
 
