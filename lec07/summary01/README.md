@@ -159,7 +159,7 @@ bypass를 적용하기 위해서는 중요한 조건이 있다. 바로 **input c
 
 ### 7.2.3 ResNet50: bottleneck block
 
-ResNet에서 소개된 개념으로, **bypass layer**를 적용하는 개선으로 연산량을 줄일 수 있다.
+ResNet에서는 **bypass layer**라는 연산량을 줄일 수 있는 개념을 소개한다.
 
 다음은 **Residual Block**에서 연산량을 줄인 **bottleneck block**의 구조를 나타낸 그림이다.
 
@@ -169,7 +169,7 @@ ResNet에서 소개된 개념으로, **bypass layer**를 적용하는 개선으�
 
 2. channel 개수가 줄어든 feature map에 $3 \times 3$ convolution을 적용한다.(이 다음 batch normalization과 ReLU를 거친다.)
 
-3. $1 \times 1$ convolution을 사용해서 chennel 수를 다시 4배 늘려서 맞춰 준다.
+3. $1 \times 1$ convolution을 사용해서 channel 수를 다시 4배 늘려서 맞춰 준다.
 
 > 총 8.5배 연산이 줄어든다. input을 $x$ 라고 하고 1~3 과정을 거친 output을 $F(x)$ 로 표현한다.
 
@@ -183,7 +183,7 @@ ResNet에서 소개된 개념으로, **bypass layer**를 적용하는 개선으�
 
 ### 7.2.4 ResNeXt: grouped convolution
 
-ResNeXt(2017)에서는 $3 \times 3$ convolution을 $3 \times 3$ **grouped convolution**으로 대체한다. 차원을 줄이고 **cardinality**를 늘려서 효율을 높인 것이다.
+**ResNeXt**(2017)에서는 $3 \times 3$ convolution을 $3 \times 3$ **grouped convolution**으로 대체한다. 차원을 줄이고 **cardinality**를 늘려서 효율을 높인 것이다.
 
 > hyperparameter로 쓰인 cardinality는 convolution을 몇 개의 그룹으로 분할했는지 나타낸다. 수학에서 쓰이는 cardinality는 두 개체간의 관계(일대일, 일대다, 다대다)를 나타낸다.
 
@@ -215,47 +215,95 @@ ResNeXt(2017)에서는 $3 \times 3$ convolution을 $3 \times 3$ **grouped convol
 
 > [depthwise-separable convolution](https://velog.io/@woojinn8/LightWeight-Deep-Learning-5.-MobileNet), [MobileNet](https://velog.io/@woojinn8/LightWeight-Deep-Learning-6.-MobileNet-2-MobileNet%EC%9D%98-%EA%B5%AC%EC%A1%B0-%EB%B0%8F-%EC%84%B1%EB%8A%A5)
 
-MobileNet(2017)은 특정 조건을 만족하는 group convolution에 적용할 수 있는 **depthwise-separable convolution**을 제안한다. 
+**MobileNet**(2017)은 특정 조건을 만족하는 group convolution에 적용할 수 있는 **depthwise-separable convolution**, **pointwise convolution** 두 가지 layer로 구성된 depthwise-separable block을 제안한다. 
 
 > depthwise-separable convolution은 Xception이란 논문에서 먼저 제안된 방식이다. 하지만 Xception이 이를 이용해 accuracy를 개선하려고 했다면, MobileNet은 model의 경량화를 위해서 사용했다.
 
-depthwise-seperable convolution은 channel을 분리하여, channel information과 spatial information을 각각 별개의 단계에서 연산을 수행한다.
+- depthwise-seperable convolution은 input channel을 분리하고, channel information과 spatial information을 각각 별개로 취급해서 연산을 수행한다. 
+
+- channel별로 수행된 결과물을 이은 뒤, pointwise convolution을 이용해서 channel들의 정보를 합친다.
+
+아래 그림을 보며 MobileNet의 block 구조를 살펴보자.
 
 ![depthwise-separable convolution](images/depthwise-separable.png)
 
 ![depthwise-separable convolution 2](images/depthwise-separable_2.png)
 
-- 우선 channel을 모두 분리한다. 따라서  channel 수만큼 group이 생기는 group convolution의 형태가 된다.
+1. input channel을 모두 분리한다. 
 
-- 그 다음 각 group에서 convolution을 수행한다.(spatial information을 capture한다.)
+   > 따라서 channel 수만큼 group이 생기는 **group convolution**로도 볼 수 있다.
 
-- 그 다음 이를 다시 연결한 뒤 $1 \times 1$ convolution을 이용해서 channel 사이의 information을 병합한다.
+2. 각 group마다 convolution을 수행한다.(이 과정에서 spatial information이 capture된다.)
+
+   - activation function으로는 ReLU6를 사용한다.
+
+3. channel(group)들을 다시 concat(연결)한 뒤, $1 \times 1$ convolution을 이용해서 각 channel이 갖는 spatial information을 합친다.
+
+   - activation function으로는 ReLU6를 사용한다.
+
+> 이처럼 ReLU가 아닌 ReLU6를 사용해서 연산량을 더욱 줄인다.
+
+![ReLU6](images/ReLU6.png)
 
 ---
 
 ### 7.2.6 MobileNetV2: inverted bottleneck block
 
-하지만 이런 depthwise convolution은 기존의 convolution보다 낮은 capacity를 가지게 된다. MobileNetV2(2018)는 input에 $1 \times 1$ convolution을 적용해서 input의 channel 수를 늘린 뒤, 연산 과정을 수행하도록 만들어서  compensate한다.
+하지만 depthwise-separable block를 적용해서 연산량과 model size는 줄일 수 있었지만, 기존보다 낮은 capacity를 갖게 되었다.
 
-> 특히 ReLU를 activation으로 사용하기 때문에 필연적으로 information의 손실이 발생할 수밖에 없다. (ReLU는 기본적으로 음수에서는 0을 반환하지만, 양수에서는 자기 자신을 반환하는 linear transform으로 볼 수 있었다.)
-
-> 더 낮은 차원의 subspace로 mapping하면서 가지는 information을 **maniford**라고 지칭한다.
+**MobileNetV2**(2018)는 기존 방법에서 정보 손실을 최대한 compensate할 수 있는 발전된 방법을 제시한다. 특히 ReLU를 activation으로 사용할 때, input/output channel이 많을수록 정보 손실이 적다는 사실을 이용한다.
 
 ![channel compensate](images/linear_bottlenecks.png)
 
-channel 수를 늘리면 어느 한 channel에서 소실된 information이 있더라도, 다른 channel에서 그 information을 가지고 있을 수 있다.
+> 참고로 더 낮은 차원의 subspace로 mapping되면서 갖는 information을 **maniford**라고 지칭한다.
+
+이제 MobileNet과 MobileNetV2 block의 차이를 그림으로 보면서 파악해 보자. MobileNetV2는 ReLU에 의한 정보 손실이 적게끔 input channel 수를 (1x1 convolution으로) 더 많이 늘려서 연산을 수행한다.
+
+![Mb vs MbV2](images/Mb_and_MbV2_block.png)
+
+- (가운데) MbV2 block을 보면 **inverted residuals**를 적용한다.
+
+  -  기존 ResNet의 bottleneck block이 input channel 수를 줄인 다음 다시 맞춰서 bypass를 적용한 것과 다르게, MbV2는 <U>input channel 수를 늘린 다음 다시 줄여서 bypass를 적용</U>한다.
+
+  > 이러한 반대되는 모습 때문에 inverted residual block이라고 부른다.
+
+- (오른쪽) stride=2는 downsampling을 위해 사용하는 block이다. 
+
+> layer내 몇몇 구간에서 ReLU에 의한 정보 손실을 방지하기 위해 activation으로 linear function을 쓴다. ReLU는 (non-linear하며) 기본적으로 음수에서는 0을 반환하지만, <U>양수에서는 자기 자신을 반환하는 linear transform으로 볼 수 있다</U>는 점을 생각하면 고친 것이 어색하지 않다.
+
+> 실제로 이렇게 linear function을 써서 정보 손실을 줄인 편이 performance 면에서 더 좋은 결과를 보였다.
+
+이번에는 다른 그림으로도 살펴 보자.
 
 ![inverted residual block](images/inverted_residual_block.png)
 
-또한 skip connection으로 **inverted residual block**을 제안한다. 기존 residual block이 'wide $\rightarrow$ narrow $\rightarrow$ wide'와 같은 구조였지만, inverted residual block은 반대로 'narrow $\rightarrow$ wide $\rightarrow$ narrow'와 같은 형태를 가지게 된다.
+1. input channel 수를 1x1 convolution을 이용해서 늘린다.
 
-> 연산량 면에서 residual block보다 더 적기 때문에, memory efficiency면에서 더 효율이 좋다.
+   - activation function으로는 ReLU6를 사용한다.
 
-> inverted residual block을 'bottleneck residual block'이라고도 한다.
+2. depthwise convolution을 수행한다.
 
-참고로 ReLU가 아닌 ReLU6를 activation function으로 사용한다.
+   - activation function으로는 ReLU6를 사용한다.
 
-![ReLU6](images/ReLU6.png)
+3. 이들을 concat한 뒤, pointwise convolution으로 channel의 정보를 합친다.
+
+   - activation function으로는 linear를 사용한다.
+
+4. skip connection(inverted residual)을 적용한다.
+
+논문에서 드는 MobileNetV2 architecture 예시를 보며 operator를 어떻게 표기하는지 파악하자.
+
+![MbV2 arch](images/MbV2_arch.png)
+
+- $t$ : expansion factor(주로 5~10)
+
+- $c$ : output channel 수
+
+- $n$ : 반복 횟수
+
+- $s$ : stride(2이면 downsampling)
+
+- 모든 spatial convolution은 3x3 kernel을 사용했다.
 
 ---
 
@@ -319,7 +367,71 @@ SE block을 추가해도 parameter 수가 크게 늘어나지는 않는다. 따�
 
 ---
 
-### 7.2.9 accuracy-efficiency trade-off on ImageNet
+### 7.2.9 MobileNetV3
+
+> [Searching for MobileNetV3 논문](https://arxiv.org/pdf/1905.02244.pdf)
+
+**MobileNetV3**(2019)는 MobileNetV2의 후속 논문으로, NetAdapt algorithm으로 보완한 hardware-aware NAS를 이용해 더 개선된 architecture를 제안한다.
+
+또한 논문에서는 target resource에 따라 사용할 수 있도록 크기가 다른 두 가지 버전을 제안한다.
+
+- MobileNetV3-Large
+
+  ![MbV3-Large](images/MbV3-Large.png)
+
+- MobileNetV3-Small
+
+  ![MbV3-Small](images/MbV3-Small.png)
+
+앞서 본 MobileNetV2와 비교하면 더 많은 layer를 가지면서도 다양한 kernel size를 사용하는 것을 볼 수 있다. 또한 MbV2에서 볼 수 없었던 몇 가지 기호가 있다.
+
+- SE: Squeeze-and-Excitation block
+
+- NL: type of nonlinearity used
+
+  - HS: h-swish
+
+  - RE: ReLU
+
+- NBN: batch normalization
+
+NAS를 통해 찾은 MbV3 architecture는, MbV2에서 expensive layers(연산량이 많은 layer. 특히 last stage)와 nonlinearity function'을 보완한 형태를 갖고 있다.
+
+1. redesign expensive layers(last stage)
+
+   가령 MbV2 예시에서는 1x1 conv로 channel 수를 늘린 7x7x1280에서 avgpool을 적용해서 feature를 추출했었다. 덕분에 rich feature를 얻을 수는 있었지만, 이 과정에서 드는 cost가 다른 layer에 비해서 너무 큰 편이었다.
+
+   따라서 MbV3은 이 과정을 나눠서 상호작용하는 식으로 feature는 보존하면서 latency는 줄인 구조를 제시했다.
+
+    ![MbV3 last stage](images/MbV3_last_stage.png)
+
+    - 1x1 conv로 channel 수를 늘리지 않고 먼저 avgpool을 적용해서 feature를 추출한 뒤, 1x1 conv로 channel 수를 늘린다. 
+    
+    - 결과에 다시 1x1 conv를 적용해서 channel 수를 맞춘다.
+
+2. nonlinearity(activation function)으로 ReLU 대신 **h-swish**를 섞어서 사용한다.
+
+    > 섞어서 사용하는 편이 더 좋은 성능을 보인다.
+
+h-swish를 알기 위해서는, 우선 ReLU 대신 사용하도록 제안된 nonlinearity인 **swish**부터 알아야 한다.
+
+![swish vs ReLU](images/swish_vs_ReLU.png)
+
+$$ \mathrm{swish} \, x = x \cdot {\sigma}(x) $$
+
+$$ {\sigma}(x) = {{1} \over {1 + e^{-x}}} $$
+
+이처럼 swish는 sigmoid function( ${\sigma}(x)$ )을 사용한 nonlinearity로 ReLU와 비슷한 특성을 갖는다. 하지만 ReLU와 달리 어느 정도 음수를 허용하며 직선이 아닌 곡선의 형태를 갖는다.(미분해서 상수 값이 아니다.)
+
+하지만 sigmoid 연산은 연산량을 많이 사용하기 때문에 다음과 같이 swish를 수정한 **h-swish**를 사용한다.
+
+![swish vs h-swish](images/swish_vs_h-swish.png)
+
+$$ x{{\mathrm{ReLU}6(x+3)} \over {6}} $$
+
+---
+
+### 7.2.10 accuracy-efficiency trade-off on ImageNet
 
 다음은 ImageNet에서 여러 model이 갖는 MACs(efficiency)와 accuracy를 나타낸 도표다.
 
