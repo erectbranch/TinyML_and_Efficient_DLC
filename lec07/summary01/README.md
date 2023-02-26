@@ -145,7 +145,7 @@ fire module은 **squeeze**, **expand** 두 가지 단계로 진행된다. 아래
 
 - 가운데: 기본 구조 + simple bypass
 
-- 오른쪽: 기본 구조: complex bypass
+- 오른쪽: 기본 구조 + complex bypass
 
 > bypass는 아래 7.2.3절(ResNet)에서 소개할 개념으로 skip connection으로 불리는 방법이다. bypass를 이용하면 fire module이 갖는 bottleneck 문제를 일정 부분 해결할 수 있다.
 
