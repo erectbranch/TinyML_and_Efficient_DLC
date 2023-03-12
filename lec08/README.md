@@ -111,42 +111,74 @@ dataset은 architecture와 layer Operation(Op. convolution, pooling 등)마다�
 
 그러나 이런 hardware도 제각각 다양한 모델을 갖는다. device마다 성능 제약도 다르기 때문에 이 모든 device에 대응하는 NAS model architecture를 만들기는 어렵다.
 
-따라서 once-for-all network를 training해서, supernet에서 specialized model architecture를 선택하는 방법을 사용한다.
+따라서 once-for-all NAS 방법은 하나의 큰 supernet을 training하고, 해당 pretrained supernet에서 subnet(specialized model architecture)를 선택하는 방법을 사용한다.
 
-> 예를 들어 한 supernet에서 snapdragon 8 gen 1, snapdragon 888, qualcomm 855에 각각 specialized model architecture를 선택해 낼 수 있다.
+예를 들어 한 supernet에서 snapdragon 8 gen 1, snapdragon 888, qualcomm 855에 각각 specialized model architecture subnet을 추출할 수 있다.
 
-> 이런 식으로 한 supernet을 이용해서 다양한 hardware constraints를 만족할 수 있다. 가령 full battery mode, low battery mode, battery-saving mode에 맞는 model들도 제약 조건에 따라 얻을 수 있다.
+> 더 다양한 hardware constraints에 따라 subnet을 추출할 수도 있다. 가령 full battery mode, low battery mode, battery-saving mode에 맞는 model들도 제약 조건을 설정해서 얻을 수 있다.
 
 ---
 
-## 8.2 Once-for-All Network
+## 8.2 Once-for-All NAS
 
-Once-for-All network에서는 progressive하게 kernel size, depth, resolution을 prune하는 **progressive shrinking**(PS)을 사용한다.
+> [ONCE-FOR-ALL 논문](https://arxiv.org/pdf/1908.09791.pdf)
+
+> [ONCE-FOR-ALL github](https://github.com/mit-han-lab/once-for-all)
+
+Once-for-All NAS에서 사용하는 supernet training에는 굉장히 많은 GPU cost가 필요하다. 따라서 **progressive shrinking**(PS)라는 방법을 이용해서 supernet을 training한다.
+
+그 다음 OFA NAS에서는 동일한 구조의 모델에서, kernel size, depth, width를 조절하면서 제약 조건을 만족하는 subnet architecture를 찾는다. 
+
+> MobileNetV3 model을 기준으로 설명하면, inverted bottleneck block마다 사용하는 kernel size, depth(block 내 layer 개수), width()는 을 의미한다.
+
+일반적인 CNN architecture를 보면서 어떤 요소를 바꿔나가는 것인지 파악해 보자. 아래 예시처럼 몇 가지 고를 수 있는 옵션을 가지고 최적의 조합을 찾는 것이다.
+
+![typical CNN](images/typical_CNN.jpeg)
+
+- image resolution: {128, 132, ..., 220, 224}
+
+- kernel size: filter size. {3(3x3), 5(5x5), 7(7x7)} (3가지 옵션)
+
+- depth: layer 개수. {2, 3, 4} (3가지 옵션)
+
+- width: channel 개수. convolution 과정에서 사용할 channel의 개수를 의미한다.
+
+  > width는 MobileNetV2,3의 expand ratio 개념을 떠올리면 이해할 수 있다. 따라서 실제 코드에서 `e`라는 변수로 조절하기도 한다.
+
+이때 매번 pretrained supernet에서 다른 조건을 갖는 subnet을 추출, evaluate한다면 너무나 많은 cost가 필요하게 된다. 따라서 이를 대신해 탐색 과정(OFA는 Genetia Algorithm. GA를 사용)에서는 **predictor**를 사용한다.
+
+> MLP나 미리 구성해 둔 LUT(Look-Up Table)을 조회하는 방식으로 predictor를 구현한다. 어느 것이나 구현을 위해서는 subnet sample들이 필요하다.
+
+subnet의 configuration(바뀌는 kernel size, depth, width 조건들)에 따라 latency(혹은 FLOPS), accuracy를 도출해 주는 predictor로 subnet이 제약 조건을 만족하는지 확인하는 것이다.
+
+이후 제약 조건을 만족하는 best subnet을 찾으면, 그 때는 실제로 supernet을 deepcopy한 복사본에서 subnet configuration대로 추출해 내서 evaluate한다.
+
+---
+
+### 8.2.1 Progressive Shrinking
 
 우선 maximum kernel size(예시는 7), depth(예시는 4), width(예시는 6)을 갖는 largest neural network를 training한다. 그 다음 더 작은 subnet을 support할 수 있도록, 아래와 같이 progressive하게 network를 fine-tune해 나간다.
 
-- progressive shrinking: kernel size
+- progressive shrinking: **kernel size**
 
     ![progressive shrinking: kernel size](images/progressive_shrinking_kernel_size.png)
 
-    예시는 7x7 kernel로 시작한다. 그 다음 이 kernel에 transform matrix를 적용하여 5x5 kernel로 만들어 training한다. 이를 3x3 kernel까지 반복한다.(따라서 동일한 weight를 share한다고 할 수 있다.)
+    예시는 7x7 kernel로 시작한다. 그 다음 이 kernel에 transform matrix를 적용하여 5x5 kernel로 만들어 training한다. 이를 3x3 kernel까지 반복한다.
 
-- progressive shrinking: layer 개수
+- progressive shrinking: **depth**(layer 개수)
 
     ![progressive shrinking: layers](images/progressive_shrinking_layers.png)
 
-    예시는 layer 4개에서 시작한다. 그 다음 layer 3개로 training하고, 그 다음은 2개로 train한다.(depth가 계속해서 줄어든다.) 따라서 제일 작은 model이 갖는 layer D개는 제일 큰 model과도 share한다.
+    예시는 layer 4개에서 시작한다. 그 다음 layer 3개로 training하고, 그 다음은 2개로 train한다.(depth가 계속해서 줄어든다.)
 
-- progressive shrinking: channel 개수
+- progressive shrinking: **width**(channel 개수)
 
     ![progressive shrinking: channels](images/progressive_shrinking_channels.png)
 
-    처음은 channel 4개를 가지고 train하다가, 중요하지 않은 것으로 판단되는 channel은 pruning한다. 그래도 제일 important한 channel들의 weight들은 계속 share된다.
+    처음은 channel 4개를 가지고 train하다가, 중요하지 않은 것으로 판단되는 channel은 pruning한다. 
 
-이렇게 largest network의 training이 끝이 나면, depth와 width의 max 조건을 고정한 채, 각 layer의 kernel size를 elastic하게 선택할 수 있다.(3, 5, 7)
+> 이런 과정을 통해 supernet과 subnet이 모두 weight를 sharing할 수 있는 것이다.
 
-> 이보다 앞서 input image의 size를 elastic하게 선택할 수 있다.(elastic resolution) 이 경우 각 batch에서 random하게 image size를 sampling한다.
-
-그 다음은 elastic depth, elastic width를 순차적으로 진행한다.
+이렇게 supernet의 training이 끝이 나면, NAS도 progressive shrinking에서 사용한 조건들을 이용해서 subnet을 탐색한다.
 
 ---
