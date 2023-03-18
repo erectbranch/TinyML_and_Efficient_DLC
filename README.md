@@ -35,6 +35,12 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   
   > magnitude-based pruning(L1-norm), second-order-based pruning, percentage-of-zero-based pruning, regression-based pruning
 
+- [Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05)
+
+  > integer, fixed-point, floating-point(IEEE 754 single/half precision, BF16, TF32)
+
+  > K-Means-based weight quantization, huffman coding, linear quantization(zero point, scale)
+
 - [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary01)
 
   > input stem, stage, head
