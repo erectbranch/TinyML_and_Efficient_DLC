@@ -213,6 +213,8 @@ ResNet에서는 **bypass layer**라는 연산량을 줄일 수 있는 개념을 
 
 ### 7.2.5 MobileNet: depthwise-separable block
 
+> [MobileNet 논문](https://arxiv.org/pdf/1704.04861.pdf)
+
 > [depthwise-separable convolution](https://velog.io/@woojinn8/LightWeight-Deep-Learning-5.-MobileNet), [MobileNet](https://velog.io/@woojinn8/LightWeight-Deep-Learning-6.-MobileNet-2-MobileNet%EC%9D%98-%EA%B5%AC%EC%A1%B0-%EB%B0%8F-%EC%84%B1%EB%8A%A5)
 
 **MobileNet**(2017)은 특정 조건을 만족하는 group convolution에 적용할 수 있는 **depthwise-separable convolution**, **pointwise convolution** 두 가지 layer로 구성된 depthwise-separable block을 제안한다. 
@@ -247,7 +249,35 @@ ResNet에서는 **bypass layer**라는 연산량을 줄일 수 있는 개념을 
 
 ---
 
+#### 7.2.5.1 MobileNetV1: Width Multiplier, Resolution Multiplier
+
+또한 MobileNet에서는 model shrinking을 위해 다음 두 가지 하이퍼파라미터를 도입했다. {accuracy}와 {latency, size}의 tradeoff가 발생한다.
+
+> TinyNAS(lec11)에서 더 자세히 볼 예정
+
+- **Width Multiplier** $\alpha$
+
+  - network의 각 layer마다 단순히 uniform하게 곱해주는 파라미터다. 어느 layer의 input channel의 수 $M$ 은 ${\alpha}M$ , output channel의 수 $N$ 은 ${\alpha}N$ 이 된다.
+
+  - model shrinking을 위한 하이퍼파라미터이므로 $\alpha \in (0, 1]$ 범위에 속한다.
+
+  > 주로 1, 0.75, 0.5, 0.25 등의 값을 사용하며, $\alpha = 1$ 일 때가 baseline MobileNet, $\alpha < 1$ 일 때가 reduced MobileNet이다.
+
+- **Resolution Multiplier** $\rho$
+
+  - input image의 resolution을 줄이는 파라미터로, 결과적으로 모든 layer의 internal representation이 동일한 비율로 감소하게 된다.
+
+  - model shrinking을 위한 하이퍼파라미터이므로 $\rho \in (0, 1]$ 범위에 속한다.
+
+  > baseline MobileNet이 주로 224, 192, 160, 128 resolution이었으며, 여기에 $\rho$ 를 곱해주면 reduced MobileNet이 된다.
+
+Width Multiplier는 flash에 저장되는 filter의 channel 수를 조절하므로(model weight들), flash memory usage를 줄이기 위해 사용할 수 있다. 반면 Resolution Multiplier는 input/output activation 파라미터 수를 조절하므로, SRAM usage를 줄이기 위해 사용할 수 있다.
+
+---
+
 ### 7.2.6 MobileNetV2: inverted bottleneck block
+
+> [MobileNetV2: Inverted Residuals and Linear Bottlenecks 논문](https://arxiv.org/pdf/1801.04381.pdf)
 
 하지만 depthwise-separable block를 적용해서 연산량과 model size는 줄일 수 있었지만, 기존보다 낮은 capacity를 갖게 되었다.
 
