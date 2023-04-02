@@ -100,6 +100,10 @@ search space를 구성하는 방법도 다양한 방식이 있다. 우선 가장
 
 - supernet이 search space의 모든 layer configuration과 connection을 포함하기 떄문에, one-shot performance estimation으로 사용할 수 있다.
 
+- 따라서 supernet 자체는 하나의 **overparameterized weight-sharing network**로, 여기서 내부의 subnet architecture를 선택해서 simultenous하게 training하게 된다.
+
+  > 실제로 subnet을 추출할 때는, supernet에서 weight를 직접 복사하는 방식으로 진행한다.
+
 ---
 
 ### 7.4.1 cell-level search space
