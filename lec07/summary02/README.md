@@ -1,6 +1,8 @@
 # 7 Neural Architecture Search (Part I)
 
-다음은 7.2절에서 살핀 benchmark에 AutoML로 찾아낸 neural architecture를 추가한 것이다. AutoML로 찾아낸 neural architecture가 훨씬 적은 연산량으로도 더 좋은 accuracy를 보이는 것을 확인할 수 있다. 
+> [Exploring the Implementation of Network Architecture Search(NAS) for TinyML Application](http://essay.utwente.nl/89778/1/nieuwenhuis_MA_EEMCS.pdf)
+
+다음은 7.2절에서 살핀 benchmark에 AutoML로 찾아낸 neural architecture를 추가한 것이다. AutoML로 찾아낸 neural architecture가 훨씬 적은 연산량으로도, manually-designed model보다 더 높은 accuracy를 가지는 것을 확인할 수 있다. 
 
 ![automatic design](images/automatic_design.png)
 
@@ -58,7 +60,49 @@ NAS의 바탕이 된 "Neural Architecture Search with Reinforcement Learning”(
 
 ---
 
-## 7.4 cell-level search space
+## 7.4 Search Space
+
+NAS 알고리즘은 기본적으로 '구성 가능한 network 종류'를 정의하면서 시작한다. 그리고 **search space**에서 constraint를 만족하는 특정 type의 network를 탐색해 나가기 시작한다.
+
+search space는 **network를 만들기 위한 elements**를 모아둔 집합이다. 보통 어떠한 application에 적합한 network를 만들 수 있는 elements들로 구성된다.
+
+- 여러 종류의 layer(convolution layer, fully connected layer, pooling layer 등)가 있을 수 있다. 
+
+- neuron 수, kernel size, activation 유형 등 <U>각 layer가 어떤 특징을 가질지 정의하는 parameter</U>들을 포함하기도 한다.
+
+> search space를 탐색하는 조합의 수를 제한해서 search에 드는 시간을 줄어들도록 구현할 수도 있다.
+
+search space를 구성하는 방법도 다양한 방식이 있다. 우선 가장 직관적인 **chain-structured search space**가 있다.
+
+![chain-structured search space](images/chain-structured_search_space.png)
+
+- 서로 다른 layer 사이에 단 하나의 연결만 존재한다.
+
+- **layer 수**, **type**이나 구성을 변경시키면서 search를 진행한다.
+
+좀 더 복잡한 search space를 구성하는 방법으로는 **cell-structured search space**가 있다. 대표적으로 **ResNet**이 해당된다.
+
+![cell-structured search space](images/cell-structured_search_space.png)
+
+- chain-structured search space와 다르게, <U>layer 수는 늘릴 수 없고</U> **type**만 바꿀 수 있다.
+
+- 일반적으로 특정 network architecture를 정해 놓고, cell끼리는 해당 architecture의 연결 방식을 그대로 따라간다.
+
+마지막으로 muitiple branch를 포함하는 하나의 대규모 신경망을 포함하는 search space가 있다. 바로 이것이 **supernetwork**(supernet)이다.
+
+![multi-branch supernetwork](images/multi-branch_supernet.png)
+
+- 모든 subnet의 high-level architecture는 동일하다.(예를 들면 MobileNetV3을 기반으로 탐색하는 등)
+
+- 차이는 layer의 content에 있다. 
+
+  - 예를 들어 특정 위치의 어느 layer는 항상 convolution layer인데, subnet끼리는 kernel size나 filter 수가 다를 수 있다. 
+
+- supernet이 search space의 모든 layer configuration과 connection을 포함하기 떄문에, one-shot performance estimation으로 사용할 수 있다.
+
+---
+
+### 7.4.1 cell-level search space
 
 search space 탐색의 비효율적인 면을 개선하기 위해 **cell-level search space**이 제안되었다. RNN controller과 reinforcement learning을 이용해서 효율적인 reduction cell과 normal cell을 찾아낸다.
 
@@ -108,7 +152,7 @@ RNN controller는 총 다섯 단계를 거쳐서 candidate cell를 generate한�
 
 ---
 
-## 7.5 network-level search space
+### 7.4.2 network-level search space
 
 **network-level search space**에서는 자주 쓰이는 pattern을 고정하고, 오직 각 stage에서 쌓는 block 개수(depth)를 search한다.
 
@@ -126,7 +170,7 @@ RNN controller는 총 다섯 단계를 거쳐서 candidate cell를 generate한�
 
 ---
 
-## 7.6 Design the Search Space
+## 7.5 Design the Search Space
 
 더 효율적인 search space를 선택하기 위해, 예를 들어 ResNet에서는 cumulative error distribution을 지표로 사용할 수 있다. 아래가 ResNet의 cumulative error distribution가 그려진 도표이다.
 
@@ -158,11 +202,11 @@ RNN controller는 총 다섯 단계를 거쳐서 candidate cell를 generate한�
 
 ---
 
-## 7.7 Search Strategy
+## 7.6 Search Strategy
 
 ---
 
-### 7.7.1 Grid Search
+### 7.6.1 Grid Search
 
 가장 간단한 방법으로 **grid search**가 있다. 간단한 예시로 다음과 같이 Width나 Resolution에서 몇 가지 point를 지정한다.(width 3개, resolution 3개로 총 9개의 조합이 나온 예다.)
 
@@ -176,7 +220,7 @@ RNN controller는 총 다섯 단계를 거쳐서 candidate cell를 generate한�
 
 ---
 
-#### 7.7.1.1 EfficientNet
+#### 7.6.1.1 EfficientNet
 
 > [EfficientNet 논문](https://arxiv.org/pdf/1905.11946.pdf)
 
@@ -224,7 +268,7 @@ $$ \underset{d,w,r}{\max} \quad Accuracy(N(d,w,r)) $$
 
 ---
 
-### 7.7.2 random search
+### 7.6.2 random search
 
 Grid Search의 문제를 개선한 방법으로 **random search**가 제안되었다. random search는 정해진 범위 내에서 말 그대로 임의로 선택하며 수행하며, grid search보다 상대적으로 더 빠르고 효율적이다.
 
@@ -246,7 +290,7 @@ grid search는 {hyperparameter 1 3개} * {hyperparameter 2 3개}를 시도한다
 
 ---
  
-### 7.7.3 reinforcement learning
+### 7.6.3 reinforcement learning
 
 > [Introduction to Neural Architecture Search (Reinforcement Learning approach)](https://smartlabai.medium.com/introduction-to-neural-architecture-search-reinforcement-learning-approach-55604772f173)
 
@@ -278,7 +322,7 @@ $$ {\nabla}_{{\theta}_{c}}J({\theta}_{c}) = \sum_{t=1}^{T}{E_{P(a_{1:T};{\theta}
 
 ---
 
-#### 7.7.3.1 ProxylessNAS
+#### 7.6.3.1 ProxylessNAS
 
 > Proxy는 Differentiable NAS가 굉장히 큰 GPU cost(GPU hours, memory)를 필요로 해서, 이를 줄이기 위해 proxy라는 작은 단위의 task들로 나누어서 수행하면서 생긴 개념이다.
 
@@ -343,7 +387,7 @@ $$ m_{O}^{DARTS}(x) = {\sum}_{i=1}^{N}{p_{i}o_{i}(x)} = {\sum}_{i=1}^{N}{{\exp({
 
 ---
 
-### 7.7.4 Bayesian optimization
+### 7.6.4 Bayesian optimization
 
 > [3Blue1Brown youtube: Bayes theorem](https://youtu.be/HZGCoVF3YvM)
 
@@ -367,7 +411,7 @@ NAS에서 **Bayesian optimization**을 적용하면, exploitation과 exploration
 
 ---
 
-### 7.7.5 gradient-based search
+### 7.6.5 gradient-based search
 
 > [DARTS](https://arxiv.org/pdf/1806.09055.pdf)
 
@@ -401,7 +445,7 @@ $$ Loss = {Loss}_{CE} + {\lambda}_{1}{||w||}_{2}^{2} + {\lambda}_{2}\mathbb{E}[\
 
 ---
 
-### 7.7.6 Evolutionary search
+### 7.6.6 Evolutionary search
 
 **Evolutionary search**는 주어진 network를 바탕으로 이를 **mutate**하는 방식이다. depth나 layer, channel 수 등을 바꿔가며 이들을 cross-over한다.
 
