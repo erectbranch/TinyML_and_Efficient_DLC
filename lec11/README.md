@@ -88,7 +88,7 @@ NAS 개념을 다시 살펴보면, architecture search를 수행하려면 entire
 
    - 예를 들어 MobileNet-alike search space를 scale할 수 있다.(다른 **resolution** $R$ 과 **width multiplier** $W$ 를 사용한다.)
 
-   > [Witdh Multiplier, Resolution Multiplier](https://sotudy.tistory.com/15)
+   > [lec07 정리](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary01), [Witdh Multiplier, Resolution Multiplier](https://sotudy.tistory.com/15)
 
    > 기존에는 $R$ = 224, $W$ = 1.0으로 설정했을 때, 스마트폰 환경에서 좋은 성능을 보였다.
 
@@ -316,11 +316,15 @@ VWW dataset처럼 큰 resolution( $160 \times 160$ )을 갖는 data도 좋은 �
 
 ## 11.6 MicroNets
 
-**MicroNets**는 neural network의 hardware cost 측정에 기여한 논문이다.(performance 측정에서 hardware dependency를 고려해서 파악하기는 쉽지 않다.) peak memory는 SRAM과 flash usage를 측정해 model마다 쉽게 계산할 수 있지만 다른 metric들은 그렇지 않다.
+> [MicroNets 논문(2020)](https://proceedings.mlsys.org/paper/2021/file/a3c65c2974270fd093ee8a9bf8ae7d0b-Paper.pdf), [MicroNets github](https://github.com/ARM-software/ML-zoo). MicroNet 논문과 MicroNets 논문의 혼동 주의.
+
+![memory hierarchies](images/memory_hierarchies.png)
+
+**MicroNets**는 neural network의 hardware cost 측정에 기여한 논문이다.(performance 측정에서 hardware dependency를 고려해서 파악하기는 쉽지 않다.) peak memory는 간단히 SRAM과 Flash usage를 측정해서 얻을 수 있지만 다른 metric들은 그렇지 않다.
 
 > peak memory usage는 hardware independent하기 때문이다.
 
-다음은 latency와 energy consumption이 'M'odel 'Op'eration Count(**MOPs**)와 관련이 있음을 나타내는 측정 그래프이다.
+다음은 latency와 energy consumption이 'M'odel 'Op'eration Count(**MOPs**)와 linear한 관계를 갖는 것을 나타내는 측정 그래프이다.
 
 > 모두 동일한 supernet에서 sampling하여 측정한 결과이다.
 
@@ -335,5 +339,95 @@ VWW dataset처럼 큰 resolution( $160 \times 160$ )을 갖는 data도 좋은 �
     ![MicroNets energy](images/MicroNets_energy.png)
 
     - 마찬가지로 MOPs와 energy consumption이 linear relationship을 가진다.
+
+---
+
+## 11.7 ARM MCU resources
+
+> [Exploring the Implementation of Network Architecture Search(NAS) for TinyML Application 2.4절](http://essay.utwente.nl/89778/1/nieuwenhuis_MA_EEMCS.pdf)
+
+다양한 microcontroller architecture가 존재하지만, 가장 유명한 architecture는 ARM의 32-bit RISC architecture이다.
+
+> STMicroelectronics와 같은 제조업체가 라이센스를 구매해서, Cortex-M series를 생산한 뒤 memory 및 I/O peripherals를 추가해서 판매한다.
+
+> architecture마다 clock speed가 몇 십~몇 백 MHz까지 다양하다.
+
+초기 ARM 32bit MCU core로는 Cortex-M3만 있었지만 현재는 다양한 라인업이 존재한다.
+
+![ARM Cortex-M series](images/ARM_Cortex-M_series.png)
+
+- M0(+): 저전력 코어. pipeline stage과 ISA extension이 적다.
+
+- M3, M4: 유사하지만, M4 core는 **FPU** 및 **DSP**/**SIMD** instruction이 포함되어 있어서 더 큰 성능을 지닌다.
+
+- M7: 가장 높은 성능을 가진 core이지만, 반대로 power efficiency가 떨어진다.(가격 면에서도 더 비싸다는 단점이 있다.)
+
+지원하는 data type은 8bit(bytes), 16bit(halfwords), 32bit(words)이다. instruction 역시 이러한 data type을 지원하지만, words보다 작은 type에서는 0으로 채워넣어서 사용하게 된다. 
+
+---
+
+### 11.7.1 Parallelisation
+
+MCU에서는 ISA의 instruction level에서 **parallelisation**을 지원한다. **SIMD**(Single Instruction Multiple Data) instruction은 32bit word를 8bit byte로 나누어서, 8개의 byte에 동일한 연산을 수행한다.
+
+따라서 지원하는 최소 data type이 bytes인 경우, 최대 가능한 parallelisation level은 4가 된다.
+
+---
+
+### 11.7.2 Inference libraries
+
+PyTorch로 생성한 neural network는 입출력 사이의 연결들로 구성된 graph로 표현된다. 이 graph는 weights 정보와 함께 저장되지만, 단순히 graph 정보와 weights만으로는 platform(MCU 보드)에 deploy(배포)할 수 없다.
+
+이유는 graph data마다 memory에 위치한 <U>weights들을 묶어서 scheduling</U>해줘야 하기 때문이다. 이러한 역할을 수행하는 것이 **Inference library**이며, 대표적으로 TensorFlow Lite for Microcontrollers(TFLM)가 있다.
+
+ARM MCU에서는 다음과 같이 inference가 진행된다.
+
+- TFLM이 neural network의 scheduling을 수행한다.
+
+- 여러 layer의 실제 실행은, lower abstration level의 library인 **CMSIS**(Common Microcontroller Software Interface Standard)에서 처리한다.
+
+예를 들어 ARM CMSIS library는, convolution layer를 **im2col** transformation과 **GEMM**(Generic Matrix Multiplication) algorithm의 조합으로 처리한다.
+
+> im2col은 쉽게 말해 다차원의 data를 **matrix로 변환**하여, matrix multiplication으로 처리하는 algorithm이다.
+
+1. im2col은 input image를 intermediate matrix로 변환시킨다.
+
+![im2col](images/im2col.png)
+
+- filter size만큼 원본 data를 나눈 뒤, data를 matrix로 변환한다.
+
+  > 예를 들어 input image (7,7,3)이 있고 filter size(5,5,3)이라면, convolution은 총 9번의 sliding window 연산으로 진행된다. 이 경우 input image에서 (5,5,3)만큼을 떼어내서 (1,5x5x3) 크기의 행렬을 총 9개 만들게 된다.
+
+  > 즉, data 손실 없이 3차원 input data가 2차원 matrix로 변환이 되는 것이다.(물론 그만큼의 overhead가 발생한다.)
+
+2. intermediate matrix와 filter matrix를 GEMM algorithm을 통해 곱한다.
+
+> [GEMM이란?](https://jjeamin.github.io/darknet_book/part3_src/gemm.html)
+
+![GEMM](images/gemm.png)
+
+이때 SIMD instruction과 결합하면 matrix multiplication 일부를 parallel하게 수행할 수 있다.
+
+```c
+// 두개의 입력 행렬을 곱해서 출력을 얻는 GEMM algorithm
+// M: filter 개수, N: output feature map의 크기, K: filter 크기, ALPHA: scale factor
+// A: filter(lda: pointer), B: input feature maps(ldb: pointer), C: output feature maps(ldc: pointer)
+void gemm_nn(int M, int N, int K, float ALPHA,
+        float *A, int lda,
+        float *B, int ldb,
+        float *C, int ldc)
+{
+    int i,j,k;
+    #pragma omp parallel for
+    for(i = 0; i < M; ++i){
+        for(k = 0; k < K; ++k){
+            register float A_PART = ALPHA*A[i*lda+k];
+            for(j = 0; j < N; ++j){
+                C[i*ldc+j] += A_PART*B[k*ldb+j];
+            }
+        }
+    }
+}
+```
 
 ---
