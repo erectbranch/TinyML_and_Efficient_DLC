@@ -308,7 +308,9 @@ $$ \mathrm{s.t.} \, \alpha \cdot {\beta}^2 \cdot {\gamma}^2 \approx 2 $$
 
 그런데 문제는 update를 위한 R(accuracy)은 미분 가능하지 않다.
 
-$$ J({\theta}_{c}) = E_{P(a_{1:T};{\theta}_{c})}[R] $$
+```math
+J({\theta}_{c}) = E_{P(a_{1:T};{\theta}_{c})}[R]
+```
 
 - $\theta$ : validation accuracy
 
@@ -320,11 +322,15 @@ $$ J({\theta}_{c}) = E_{P(a_{1:T};{\theta}_{c})}[R] $$
 
 - $a_{1}:T$ : sample을 생성하는 데 발생한 action list
 
-$$ J({\theta}_{c}) = E_{P(a_{1:T};{\theta}_{c})}[R] $$
+```math
+J({\theta}_{c}) = E_{P(a_{1:T};{\theta}_{c})}[R]
+```
 
 따라서 다음과 같이 policy gradient method를 이용하여 미분 가능하도록 식을 수정한다.
 
-$$ {\nabla}_{{\theta}_{c}}J({\theta}_{c}) = \sum_{t=1}^{T}{E_{P(a_{1:T};{\theta}_{c})}[{\nabla}_{{\theta}_{c}} {\log}P({\alpha}_{t}|{\alpha}_{(t-1):1};{\theta}_{c})R]} $$
+```math
+{\nabla}_{{\theta}_{c}}J({\theta}_{c}) = \sum_{t=1}^{T}{E_{P(a_{1:T};{\theta}_{c})}[{\nabla}_{{\theta}_{c}} {\log}P({\alpha}_{t}|{\alpha}_{(t-1):1};{\theta}_{c})R]}
+```
 
 > 실제로는 더 approximate하며 baseline이 추가된 식을 사용한다. baseline은 지난 architecture의 평균 accuracy로 산출한다.
 
@@ -404,7 +410,9 @@ $$ \sum_{i=1}^{n}{\alpha}_i = 1 $$
 
 - edge $(i, j)$ 에서의 mixed operation은 다음과 같은 수식으로 표현할 수 있다.
 
-$$ {\bar{o}}^{(i,j)}(x) = \sum_{o \in \mathcal{O}} {{\exp({\alpha}_{o}^{(i,j)})} \over {\sum_{o' \in \mathcal{O}}{\exp({\alpha}_{o'}^{(i,j)})}}}o(x) $$
+```math
+{\bar{o}}^{(i,j)}(x) = \sum_{o \in \mathcal{O}} {{\exp({\alpha}_{o}^{(i,j)})} \over {\sum_{o' \in \mathcal{O}}{\exp({\alpha}_{o'}^{(i,j)})}}}o(x)
+```
 
 하지만 gradient를 저장하기 위해 굉장히 많은 memory를 소모하게 되면서, ProxlessNAS와 같은 대안이 등장하게 된다.
 
