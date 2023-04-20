@@ -461,7 +461,37 @@ $$ x{{\mathrm{ReLU}6(x+3)} \over {6}} $$
 
 ---
 
-### 7.2.10 accuracy-efficiency trade-off on ImageNet
+### 7.2.10 MobileNet quantization
+
+> [mixed-precision neural network quantization via learned layer-wise importance 논문](https://arxiv.org/abs/2203.08368)
+
+> [Guide to Deep Learning Model Quantization and Quantization-Aware Training](https://deci.ai/quantization-and-quantization-aware-training/)
+
+IoT device, 특히 MCU에 neural network를 deploy하기 위해서는 quantization이 사실상 필수적이다. 하지만 MobileNet은 layer마다 다른 특징을 지니는 바람에 quantization이 어렵다. 
+
+> MobileNetV2를 실행하기 위해서는 5.6M SRAM peak memory와 13.5M flash memory가 필요하지만, 대표적인 MCU인 ARM Cortex-M7의 경우 512kB SRAM, 2MB flash memory를 갖고 있어서 memory가 턱없이 부족하다.
+
+게다가 layer마다 quantization의 **sensitivity**가 달라서, 모든 layer에 동일한 bit-width를 적용하는 **fixed-precision quantization** 방법은 accuracy를 많이 손실하는 결과를 낳게 된다.
+
+따라서 **mixed-precision quantization**을 적용하는 방법들이 등장했는데, 이 방법은 layer의 quantization sensitivity마다 다른 bit-width를 적용하는 quantization 방법이다. 덕분에 더 유연하게 accuracy-efficiency trade-off를 조절할 수 있다.
+
+- quantization-insensitive layers: quantization에 큰 영향을 받지 않는 layer
+
+- quantization setsitive layers: quantization non-friendly layers
+
+보통 mixed-precision quantization은 search-based 방법을 사용하며, fine-grained quantization인 만큼 더 큰 search space를 갖게 된다. 예를 들어 $L$ 개 layer를 갖는 network가 있고, 각 layer가 bit를 n개 선택할 수 있다면, search space의 크기는 $n^{2L}$ 이 된다.
+
+> 즉, NAS 알고리즘인 만큼 search에 소요되는 시간을 줄이기 위해 search space를 수동으로 제한해야 한다. 대표적으로 HAQ, AutoQ와 같은 방법이 있다.
+
+MobileNet의 주요 layer를 세부적으로 살펴보자. 우선 DW-conv은 PW-conv에 비해 parameter 수가 적다. 그리고 DW-conv가 PW-conv에 비해 quantization에 더 susceptible하다. 그렇다면 DW-convs와 PW-convs가 4 bits quantization일 때와, 더 낮은 bit-width인 2 bits quantization로 줄였을 때의 accuracy 저하를 비교하면 어떻게 될까?
+
+- DW-conv를 2 bit로 줄였을 때가, PW-conv를 2 bit로 줄였을 때보다 훨씬 accuracy degradation이 크다.
+
+- 따라서 quantization에서 DW-conv의 importance score(중요도 점수)를 높게 설정해야 한다.
+
+---
+
+### 7.2.11 accuracy-efficiency trade-off on ImageNet
 
 다음은 ImageNet에서 여러 model이 갖는 MACs(efficiency)와 accuracy를 나타낸 도표다.
 
