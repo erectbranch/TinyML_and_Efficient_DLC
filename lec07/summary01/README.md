@@ -70,13 +70,13 @@ neural network architecture는 보통 input stem, head, 그리고 여러 stage�
 
 - **AlexNet**(2012)
 
-    ![AlexNet](images/AlexNet.png)
+    ![AlexNet](images/AlexNet_arch.png)
 
     AlexNet은 image가 3개의 적은 channel( $3 \times 224 \times 224$ )을 가지므로, 시작 stage에서 큰 kernel을 도입했다.( $11 \times 11$ (channel 96) , 그 다음은 $5 \times 5$ (channel 256) )
 
 - **VGGNet**(2014)
 
-    ![VGGNet](images/VGGNet.png)
+    ![VGGNet](images/VGGNet_arch.png)
 
     여러 개의 kernel을 쌓는 편이 큰 kernel을 하나 사용하는 것보다 더 효율적이지 않을까?라는 가정에서 시작한다.(즉, "parameter 수가 적은 network가 더 유용하다"는 가정이다.)
 
@@ -84,7 +84,7 @@ neural network architecture는 보통 input stem, head, 그리고 여러 stage�
 
     > 하지만 layer, kernel call, activation load/store 수가 늘어나므로 memory efficiency는 더 나빠지게 된다. 
 
-    ![VGGNet bottleneck](images/VGGNet_bottleneck.png)
+    ![VGGNet bottleneck](images/VGGNet_FLOP_bottleneck.png)
 
     또한 $(3 \times 3)$ convolution이 bottleneck을 유발하는 지점이 된다.
 
@@ -113,7 +113,7 @@ SqueezeNet은 다음과 같은 방법으로 parameter 수를 줄인다.
 1. 3x3 filter(9개 parameter) 대신 
 **1x1 filter**(1개 parameter)를 사용해서 parameter 수를 9배 줄인다. 
 
-  ![SqueezeNet 1x1](images/SqueezeNet_1x1_filter.png)
+    ![SqueezeNet 1x1](images/SqueezeNet_1x1_filter.png)
 
 2. input channel 수를 **squeeze**하여 parameter 수를 줄인다.
 
