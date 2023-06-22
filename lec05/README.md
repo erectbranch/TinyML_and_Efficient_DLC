@@ -2,6 +2,8 @@
 
 > [Lecture 05 - Quantization (Part I) | MIT 6.S965](https://youtu.be/91stHPsxwig)
 
+> [quantization 정리](https://gaussian37.github.io/dl-concept-quantization/)
+
 ---
 
 ## 5.1 Quantization
@@ -258,7 +260,7 @@ K-Means-based Quantization 이전/이후 필요한 memory를 계산하라.
 
     32bits floating point type 4x4 행렬의 weight를 저장한다.
     
-  $$ 32 \times (4 \times 4) = 512 $$
+    $32 \times (4 \times 4) = 512$
     
     따라서 총 512bits = 64bytes이다.
 
@@ -266,13 +268,13 @@ K-Means-based Quantization 이전/이후 필요한 memory를 계산하라.
 
     행렬 내 값은 2bit cluster index를 갖는다.
 
-    $$ 2 \times (4 \times 4) = 32$$
+    $2 \times (4 \times 4) = 32$
     
     따라서 행렬은 32 bits = 4 bytes를 갖는다.
 
     또한 codebook은 32bit floating point로 1x4 행렬을 갖는다.
 
-    $$ 32 \times (1 \times 4) = 128$$
+    $32 \times (1 \times 4) = 128$
 
     따라서 codebook은 128bits = 16bytes를 갖는다.
 
@@ -334,7 +336,7 @@ $$ r = (q - Z) \times S $$
 
    scaling factor 역할이다.
 
-이때 quantization하는 범위가 음의 정수를 포함하는가에 따라서 `unsigned int`, `signed int`를 사용할 수 있다. ReLU와 같이 음수 값을 포함하지 않는 경우에는 `unsigned int`를 주로 사용한다.
+이때 quantization하는 범위가 음의 정수를 포함하는가에 따라서 `unsigned int`, `signed int`를 사용할 수 있다. ReLU와 같이 음수 값을 제거하는 activation function을 사용하는 경우에 주로 `unsigned int`를 사용한다.
 
 ---
 
