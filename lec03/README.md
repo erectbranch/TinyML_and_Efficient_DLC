@@ -74,7 +74,7 @@ DNN이 갖는 over-parameterization으로 생기는 model inference(추론) 시 
 
 MAC과 parameter의 변화가 비례하지 않는 이유는, convolution 연산에서 다양한 항이 존재하며 각자가 미치는 영향이 model마다 다르기 때문이다.
 
-재밌는 점은 몇몇 예시에서 NeuralTalk LSTM에서 pruning은 image caption quality를 감소시키지 않고, 오히려 더 간결한 표현으로 특징을 더 잘 설명하기도 한다.
+특이한 점은 몇몇 예시에서 NeuralTalk LSTM에서 pruning은 image caption quality를 감소시키지 않고, 오히려 더 간결한 표현으로 특징을 더 잘 설명하기도 한다.
 
 ![pruning NeuralTalk LSTM](images/pruning_neuraltalk_LSTM.png)
 
@@ -110,7 +110,9 @@ $$ \underset{W}{\mathrm{argmin}}{L(\mathbf{x}; W)} $$
 
 $$ {||W_{p}||}_{0} < N $$
 
-- ${||W_{p}||}_{0}$ 은 $W_{p}$ 의 nonzero인 값을 계산하며, $N$ 은 target nonzero(threshold)를 의미한다.
+-  $N$ : target nonzero(threshold)
+
+- $W_p$ 가 nonzero인 값을 계산한다.
 
 ---
 
@@ -198,7 +200,9 @@ pruning은 크게 unstructured/structured 두 가지 방식으로 적용할 수 
 
     ThiNet(2017)에서는 'pruning된 후 channel의 output element( $\hat{x}$ )들의 합'이 '원래 channel의 output element( $\hat{y}$ )들의 합'과 차이가 적은 channel을 중요하지 않다고 판단하고 잘라낸다.
 
-$$ \underset{S}{\mathrm{argmin}} \sum_{i=1}^{m}{({\hat{y}_{i}} - \sum_{j \in S}{\hat{x}_{i,j}})^2} $$
+```math
+\underset{S}{\mathrm{argmin}} \sum_{i=1}^{m}{({\hat{y}_{i}} - \sum_{j \in S}{\hat{x}_{i,j}})^2}
+```
 
 $$ s.t. \quad |S| = C \times r, \quad S \subset \lbrace 1,2,...,C \rbrace $$
 
@@ -290,7 +294,9 @@ $$ {\delta}{L_{i}} = L(x;W) - L(x; W_{p}|w_{i}=0) \approx {1 \over 2}{h_{ii}{\de
 
 이제 다음 importance score를 이용해서 어떤 weight를 pruning해야 할지 결정할 수 있다.
 
-$$ {importance}_{w_{i}} = |{\delta}L_{i}| = {1 \over 2}{h_{ii}{w_{i}}^{2}} $$
+```math
+{importance}_{w_{i}} = |{\delta}L_{i}| = {1 \over 2}{h_{ii}{w_{i}}^{2}}
+```
 
 - 이때 $h_{ii}$ 는 non-negative하다.
 
@@ -370,9 +376,13 @@ $$ Z = XW^{T} = \sum_{c=0}^{c_{i}-1}{X_{c}{W_{c}}^{T}} $$
 
 regression-based pruning의 목표는 다음과 같이 수식으로 나타낼 수 있다.
 
-$$ {\mathrm{arg}}\underset{W, {\beta}}{\mathrm{min}}{||Z-\hat{Z}||}^{2}_{F} = || Z - \sum_{c=0}^{c_{i}-1}{||{{\beta}_{c}X_{c}{W_{c}}^{T}}||}^{2}_{F} $$
+```math
+{\mathrm{arg}}\underset{W, {\beta}}{\mathrm{min}}{||Z-\hat{Z}||}^{2}_{F} = || Z - \sum_{c=0}^{c_{i}-1}{||{{\beta}_{c}X_{c}{W_{c}}^{T}}||}^{2}_{F}
+```
 
-$$s.t. \quad {||\beta||}_{0} \le N_{c}$$
+```math
+s.t. \quad {||\beta||}_{0} \le N_{c}
+```
 
 - $\beta$ : length가 $c_i$ 인 coefficient vector. $\beta = 0$ 이라면 channel이 prune된다.
 
