@@ -28,45 +28,57 @@ neural network에 quantization을 적용하기 전/후의 weight 분포 차이�
 
 ### 5.2.1 Integer
 
-우선 **integer**(정수)를 8bit로 표현하는 방법을 살펴보자. 
+우선 **integer**(정수)를 8bit로 표현한 세 가지 예시를 살펴보자. 
 
 ![integer](images/integers.png)
 
 - 첫 번째: unsigned integer
 
-    - range: $[0, 2^{n} - 1]$
+  range: $[0, 2^{n} - 1]$
 
 - 두 번째: (signed integer) Sign-Magnitude
 
-    - range: $[-2^{n-1} - 1, 2^{n-1} - 1]$
+  range: $[-2^{n-1} - 1, 2^{n-1} - 1]$
 
-    > 00000000과 10000000은 모두 0을 표현한다.
+   > 00000000과 10000000은 모두 0을 표현한다.
 
-- 세 번째: (signed integer) Two-bit complement Representation
+- 세 번째: (signed integer) 2-bit complement Representation
 
-    - range: $[-2^{n-1}, 2^{n-1} - 1]$
+  range: $[-2^{n-1}, 2^{n-1} - 1]$
 
-    > 00000000은 0, 10000000은 $-2^{n-1}$ 을 표현한다.
+   > 00000000은 0, 10000000은 $-2^{n-1}$ 을 표현한다.
 
 ---
 
 ### 5.2.2 fixed-point number
 
-이를 fixed-point number(고정 소수점 연산), floating-point number(부동 소수점 연산)과 비교하면 차이가 극명해 진다.
+소수(**decimal**)를 표현하는 방식은 두 가지가 있다.
 
-아래는 fixed-point number를 8bit로 표현한 그림이다.
+- **fixed-point number**(고정 소수점 연산)
+
+- **floating-point number**(부동 소수점 연산)
+
+아래는 8bit fixed-point number를 나타낸 그림이다.
 
 ![fixed-point](images/fixed_point.png)
 
-- 두 번째와 세 번째 연산의 차이는, 소수점( $2^{-4}$ ) 의 위치를 나중에 곱해준 부분이다.
+- 맨 앞 1bit는 sign bit로 사용한다.
+
+- 3bits로 integer(정수)를 표현한다.
+
+- 4bits로 fraction(소수)을 표현한다.
+
+> 두 번째와 세 번째 연산의 차이: 소수점( $2^{-4}$ ) 의 위치를 나중에 곱하였다.
+
+위와 같은 예시를 `fixed<w,b>`로 표현할 수 있다. `w`가 총 bit width, `b`가 fraction bit width이다.
+
+> 32bit 예시: 1bit sign bit, 15bit integer, 16bit fraction
 
 ---
 
 ### 5.2.3 floating-point number
 
-다음은 32bit **floating-point** number를 표현한 그림을 보자.(가장 보편적인 **IEEE 754** 방법)
-
-> 32bit(4byte)는 single precision(단정도), 64bit(8byte)는 double precision(배정도)이다.
+다음은 32bit **floating-point** number의 예시다.(가장 보편적인 **IEEE 754** 방법)
 
 ![32bit floating-point](images/32bit_floating_point.png)
 
@@ -74,179 +86,305 @@ $$ (-1)^{sign} \times (1 + \mathrm{Fraction}) \times 2^{\mathrm{Exponent} - 1} $
 
 - sign: 부호를 나타내는 1bit
 
-- exponent: 지수를 나타내는 8bit
+- **exponent**: 지수를 나타내는 8bit
 
 - fraction(mantissa): 가수를 나타내는 23bit
 
-예를 들어 숫자 -314.625를 IEEE 754 표준에 따라 표현하면 다음과 같다.
+> 32bit(4byte)는 single precision(단정도), 64bit(8byte)는 double precision(배정도)이다.
 
-1. 음수이므로 sign bit = 1
+### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 1: IEEE 754 표준에 따라 숫자 표현하기 &nbsp;&nbsp;&nbsp;</span>
 
-2. fraction
+숫자 -314.625를 IEEE 754 표준에 따라 표현하라.
 
-    - -314.625의 절댓값 $314.625$ 를 2진수로 변환하면 ${100111010.101}_{(2)}$ 가 된다.
+### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
 
-    - 2진수의 소수점을 옮겨서 일의 자리 수와 소수점으로 표현되게 만든다. 그리고 소수점 부분을 fraction 23bit 부분에 맨 앞부터 채워준다.
+1. 음수이므로 **sign bit**는 1이다.
 
-    > 남는 자리는  0으로 채운다.
+2. **fraction**
+
+    -314.625의 절댓값 $314.625$ 를 2진수로 변환하면 ${100111010.101}_{(2)}$ 가 된다.
+
+    - 소수점을 옮겨서 일의 자리 수, 소수점 형태로 만든다. 
+    
+    - 소수점 부분만을 fraction 23bit 부분에 맨 앞부터 채운다.
+
+      > 남는 자리는  0으로 채운다.
 
 $$ 1.00111010101 \times 2^{8} $$
 
-3. exponent
+3. **exponent**
 
-    - bias를 계산해야 한다. bias = $2^{k-1}$ 로 k는 exponent의 bit 수이다. 즉, 현재는 $2^{8-1} = 127$ 이 된다.
+    bias를 계산해야 한다. (bias = $2^{k-1}$ )
+    
+    - $k$ : exponent 부분의 bit 수를 나타낸다. 
+    
+    $$2^{8-1} = 127$$
 
-    - 8 + 127 = 135를 2진수로 변환하면 ${10000111}_{(2)}$ 이 된다.
+    8 + 127 = 135를 2진수로 변환하면 ${10000111}_{(2)}$ 이 된다.
 
     - 변환한 2진수를 8bit exponent 부분에 채워준다.
 
-    > 결국 소수점에 관한 정보를 exponent에 담는 것이다.
+결과는 다음과 같다.
 
-이번에는 여러 floating-point number 표현법을 비교해보자. neural network는 <U>fraction보다도 exponent에 더 민감</U>하다는 점에 유의하자. 따라서 underflow, overflow, NaN을 더 잘 처리하기 위해서는 exponent을 최대한 보존해서 정확도를 유지하는 것이 중요하다.
-
-> 더 작은 bit를 사용하면서 memory와 latency는 줄이며 accuracy는 보존하는 것이 목표이다.
-
-![floating point ex](images/floating_point_ex.png)
-
-- Half Precision(FP16)
-
-- Brain Float(BF16): IEEE 754와 비교하면 Fraction은 7bit로 작지만, Exponent는 8bit로 동일하다. 
-
-- TensorFloat(TF32): Fraction은 10, Exponent는 8bit이다. 이는 FP16와 동일한 수치 범위를 지원하면서 정밀도를 높인 버전이다.
+| sign bit | exponent | fraction |
+| :---: | :---: | :---: | 
+| 1 | 10000111 | 00111010101000000000000 | 
 
 ---
 
-## 5.3 Neural Network Quantization
+### 5.2.4 floating-point number comparison
 
-그렇다면 과연 어느 정도의 bit수를 갖도록 quantization하는 것이 효율적일까?
+다양한 floating-point number 표현법을 비교해보자. 특히 neural network에서는 <U>fraction보다도 exponent에 더 민감</U>하기 떄문에, exponent 정보를 최대한 보존하는 표현법이 등장했다.
+
+- underflow, overflow, NaN을 더 잘 처리하기 위해서는, exponent을 최대한 보존하여 정확도를 유지해야 한다.
+
+- 더 작은 bit를 사용하면서 memory, latency는 줄이고, accuracy는 최대한 보존하는 것이 목표.
+
+![floating point ex](images/floating_point_ex.png)
+
+- **Half Precision**(FP16)
+
+    exponent 5 bit, fraction은 10 bit
+
+- Brain Float(BF16)
+
+    IEEE FP32와 비교했을 때, exponent 7bit로 줄였지만 fraction은 8bit로 유지했다. 
+
+- TensorFloat(TF32)
+    
+    exponent 10bit, fraction 8bit이다. 
+    
+    > FP16과 동일한 exponent(10bit), FP32와 동일한 fraction(8bit)를 지원한다.
+
+    > BERT 모델에서 TF32 V100을 이용한 학습이, FP32 A100을 이용한 학습에 비해 6배 speedup을 달성했다.
+
+---
+
+## 5.3 Efficient Weights Quantization
+
+그렇다면 quantization bits는 어느 정도가 효율적일까? 아래는 CNN에서 다양한 precision으로 quantization했을 때 정확도를 나타낸 도표다.
 
 ![quantization bits](images/quantization_bits.png)
 
-- 일반적으로 Conv layer에서는 4bits, FC layer에서는 2bits를 이상을 사용해야 한다.
+- Conv layer: 4bits 이상
 
-여기에 **Huffman Coding**을 적용한다면, 여기서 더 memory usage를 줄이면서 quantization을 적용할 수도 있다.
+- FC layer: 2bits 이상
+
+---
+
+### 5.3.1 Huffman Coding
+
+> [Huffman coding 정리](https://velog.io/@junhok82/%ED%97%88%ED%94%84%EB%A7%8C-%EC%BD%94%EB%94%A9Huffman-coding)
+
+추가로 **Huffman Coding** 알고리즘을 적용하면 memory usage를 더 줄일 수 있다.
+
+> Unix의 파일 압축, JPEG, MP3 압축에서 주로 사용된다.
+
+우선 압축을 하는 원리를 살펴보자. 예시로 A, B, C라는 알파벳을 압축하여 표현할 것이다. 순전히 ASCII code로 표현하려고 한다면 8bits x 3으로 24bits를 사용해야 한다. 하지만 Huffman coding을 이용해 가변 길이의 code로 만들 것이다.
+
+우선 a, b, c를 다음과 같이 압축하여 정의했다고 하자.
+
+| a | b | c |
+| :---: | :---: | :---: |
+| 01 | 101 | 010 |
+
+- a와 c의 접두어 부분이 겹친다.(`01`)
+
+위처럼 시작 부분이 겹치는 경우 **prefix code**(접두어 코드) 방식으로 가변 코드를 만들 수 없다. 반면 아래 예시를 보자.
+
+| a | b | c |
+| :---: | :---: | :---: |
+| 01 | 10 | 111 |
+
+- 겹치는 접두어가 없다.
+
+이 경우 `01 10 111` 총 7bits로 압축할 수 있다.
+
+여기서 숫자를 결정짓는 것은 '문자의 빈도 수'이다. 빈도 수가 높은 문자일수록 짧은 길이의 code를 부여하고, 빈도 수가 낮은 문자일수록 긴 길이의 code를 부여한다.
+
+이를 neural network에 적용하면 다음과 같다.
 
 - 자주 나오는 weights: bit 수를 적게 사용해서 표현한다.
 
 - 드문 weights: bit 수를 더 사용해서 표현한다.
 
-참고로 Deep Compression 논문에서는 'Pruning + K-Means-based quantization + Huffman Coding'을 적용하여 LeNet-5에서 약 39배 Compression ratio를 달성했다.
-
-> [Deep Compression 논문](https://arxiv.org/pdf/1510.00149.pdf)
+대표적으로 [Deep Compression 논문](https://arxiv.org/pdf/1510.00149.pdf)에서는 'Pruning + K-Means-based quantization + Huffman Coding'을 적용하여 LeNet-5 모델에서 약 39배 Compression ratio를 달성했다.
 
 ![Deep Compression](images/deep_compression.png)
 
-이제 다양한 quantization 예시를 보자. 아래와 같은 floating-point number로 구성된 matrix가 있을 때, 이를 quantization하는 다양한 방법을 알아보자.
+---
+
+## 5.4 Neural Network Quantization
+
+ImageNet dataset으로 훈련한 AlexNet에서 pruning+quantization, pruning, quantization 방법별 'accuracy와 compression ratio'를 비교해 보자.
+
+![accuracy vs compression rate](images/acc_loss_and_model_compression.png)
+
+- 가로: Compression Ratio, 세로: Accuracy loss
+
+- 두 방법을 동시에 적용했을 때 accuracy의 보존율이 높다.
+
+이제 neural network 도메인에서 다양한 quantization 방법을 살펴보자. 아래와 같은 floating-point number로 구성된 matrix를 quantization한다고 가정하자.
 
 ![floating-point matrix](images/floating-point_matrix.png)
 
-> 32bit float의 weight라고 하자.
+- 저장: Floating-Point Weights
 
-- storage: Floating-Point Weights
-
-- Computation: Floating-Point Arithmetic
+- 연산: Floating-Point Arithmetic
 
 ---
 
-### 5.3.1 K-Means-based Quantization
+### 5.4.1 K-Means-based Quantization
 
-**K-Means-based weight quantization**은 여러 bucket을 갖는 codebook을 만들어서 quantization을 수행한다.
+**K-Means-based weight quantization**이란 여러 <U>bucket을 갖는 codebook</U>(**centroids**, 무게중심)을 만들어서 quantization하는 방식이다.
 
 > 예를 들어 Computer Graphics에서는, 65536개의 스펙트럼으로 이루어진 원래 색상을 256개의 bucket을 갖는 codebook을 만들어서 quantization을 수행한다.
 
 ![K-Means-based_Quantization](images/K-Means-based_Quantization.png)
 
-- storage: Integer Weights, Floating-Point Codebook
+- 저장: **Integer** Weights, Floating-Point Codebook
 
-- Compute: Floating-Point Arithmetic
+- 연산: Floating-Point Arithmetic
 
-행렬에 담긴 2bit cluster index와 centroids(codebook)로 구성된 것이 특징이다. quantization 이전/이후의 필요한 memory를 비교해 보자.
+> 예제에서 codebook의 cluster index는 0~3까지의 2bit로 표현된다.
 
-- before: floating point로 값을 저장했으면, 32bit \* (4*4)로 총 512bit(64byte)가 필요했다.
+### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 2: K-Means-based Quantization의 메모리 사용량 &nbsp;&nbsp;&nbsp;</span>
 
-- after: 2bit \* (4*4) = 32bit(4byte)에 32bit \* 4 = 128bit(16byte), 즉 20byte만 있으면 된다.(약 3.2배 작아졌다.)
+K-Means-based Quantization 이전/이후 필요한 memory를 계산하라.
 
-> 예시 행렬보다 weight가 많은 행렬에서 더 큰 효과를 볼 수 있다.(약 32/N배 작아진다.)
+### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
 
-weight들을 다시 reconstruct한 뒤 error를 살펴보면 다음과 같다.
+- before
 
-![K-Means error](images/K-Means_error.png)
+    32bits floating point type 4x4 행렬의 weight를 저장한다.
+    
+  $$ 32 \times (4 \times 4) = 512 $$
+    
+    따라서 총 512bits = 64bytes이다.
 
-여기서 추가로 centroids(codebook)을 fine-tuning하는 것도 가능하다.
+- after
 
-![Fine-tuning quantized weights(K-means)](images/K-means_fine_tune.png)
+    행렬 내 값은 2bit cluster index를 갖는다.
 
-이번에는 ImageNet dataset을 사용하는 AlexNet에서 quantization을 했을 때의 'accuracy와 compression ratio'를 비교해 보자.
+    $$ 2 \times (4 \times 4) = 32$$
+    
+    따라서 행렬은 32 bits = 4 bytes를 갖는다.
 
-![accuracy vs compression rate](images/acc_loss_and_model_compression.png)
+    또한 codebook은 32bit floating point로 1x4 행렬을 갖는다.
 
-- 가로 축은 Compression Ratio, 세로 축은 Accuracy loss를 의미한다.
+    $$ 32 \times (1 \times 4) = 128$$
 
-- 왼쪽으로 갈수록 Quantization, Pruning이 더 많이 적용된 것이다.
+    따라서 codebook은 128bits = 16bytes를 갖는다.
 
-neural network에서 K-Means-based weight quantization을 적용하면 다음과 같은 layer 순서로 진행된다.
+    그러므로 quantization 이후 필요한 메모리 사용량은 20byte이다.
+    
+양자화 전후를 비교했을 때, 64/20=3.2로 약 3.2배 메모리 사용량이 감소했다.
 
-![K-Means-based Weight Quantization](images/K-Means-based_Quantization.png)
-
-- In Storage: storage에 저장되어 있었던 quantized weights
-
-- During Computation: runtime inference 중 weight들은 lookup table에 따라서 decompressed된다.(2bit int to 32bit float)
-
-하지만 이러한 K-Means-based weight quantization 방법은 <U>오직 storage cost만 줄일 수 있다</U>는 한계를 지닌다. 실제 computation과 memory access는 여전히 floating-point를 사용한다.
+> 예시보다 weight가 많은 행렬에서 더 큰 효과를 볼 수 있다.(약 32/N배 감소한다.)
 
 ---
 
-### 5.3.2 Linear Quantization
+#### 5.4.1.1 K-Means-based Quantization Error
 
-이번에는 **Linear Quantization** 방법을 살펴보자. linear quantization 역시 codebook을 사용해서 quantized weights를 만들어낸다. 이때 **centroids**가 linear한 특징을 갖는다.(스탭 크기가 일정하다.)
+위 양자화 예시에서 weight를 다시 reconstruct한 뒤, 기존과 비교하여 error를 계산해 보자.
+
+![K-Means error](images/K-Means_error.png)
+
+이처럼 quantization 시 필연적으로 error가 발생하게 된다. 하지만 추가로 centroids(codebook)을 fine-tuning하는 방식으로 error를 줄일 수 있다.
+
+![Fine-tuning quantized weights(K-means)](images/K-means_fine_tune.png)
+
+그러나 K-Means-based weight quantization은, weight만 integer type으로 바꾼 뒤, 실제 추론 상황에서는 다시 floating-point로 바꾸어야 한다는 단점이 있다.
+
+> runtime inference 중 weight는 lookup table에 따라서 decompressed된다.(예제: 2bit int to 32bit float)
+
+따라서 <U>오직 storage cost만 줄일 수 있다</U>는 한계를 지닌다. 실제 computation 과정, memory access에서는 여전히 floating-point를 사용한다.
+
+---
+
+### 5.4.2 Linear Quantization
+
+이번에는 **Linear Quantization** 방법을 살펴보자. 마찬가지로 linear quantization도 codebook을 사용해서 quantized weights를 만들어낸다.
+
+하지만 이때 **centroids**가 linear하다는 특징을 갖는다.(일정한 step size를 갖는다.)
+
+![uniform quantization](images/uniform_quantization.png)
+
+예시 weight 행렬에 linear quantization을 적용하는 과정을 살펴보자.
 
 ![linear quantization](images/linear_quantization.png)
 
-> zero point, scale 계산법은 추후 살필 것이다.
+> zero point, scale 계산법은 뒤에서 살필 것이다.
 
-위 그림의 식은 다음과 같이 나타낼 수 있다.
+우선 위 그림의 나열 순서대로 수식을 표현하면 다음과 같다.
+
+> FP weight, quantized weight, zero point, scale
 
 $$ r = (q - Z) \times S $$
 
 - $r$ : (floating-point) real number
 
-- $q$ : (integer) quantized number
+- $q$ : (**integer**) quantized number
 
-- $Z$ : (integer) zero point. quantization parameter로, real number $r=0$ 에 정확히 mapping될 수 있도록 조절된다.
+- $Z$ : (**integer**) zero point. 
 
-- $S$ : (floating-point) scale(scaling factor)
+  real number $r=0$ 에 정확히 mapping될 수 있도록 조절하는 역할이다. **offset**으로도 지칭한다.
 
-real number와 quantized number가 mapping되는 방식을 보면 scale이 어떻게 적용되는지 알 수 있다.
+- $S$ : (floating-point) scale
+
+   scaling factor 역할이다.
+
+이때 quantization하는 범위가 음의 정수를 포함하는가에 따라서 `unsigned int`, `signed int`를 사용할 수 있다. ReLU와 같이 음수 값을 포함하지 않는 경우에는 `unsigned int`를 주로 사용한다.
+
+---
+
+#### 5.4.2.1 zero point, scale 
+
+이제 real number를 quantized number에 mapping하면서, quantization parameter인 zero point, scale을 계산해 보자.
+
+수식은 기본적으로 최대, 최소 실수값을 가지고 계산한다.
+
+> 주로 outlier(이상치)를 제거(**clipping**)한 범위의 최대, 최소값을 사용한다.
 
 ![linear quantization mapping](images/linear_quantization_mapping.png)
-
-방금 식을 다시 살펴보면 real number의 max, min 값도 알 수 있다.
 
 $$ r_{max} = S(q_{max} - Z) $$
 
 $$ r_{min} = S(q_{min} - Z) $$
 
-이 둘의 값을 이용해서 scale을 계산할 수 있다.
+위 식을 정리하면 scaling factor에 대한 식을 얻을 수 있다.
 
 $$ S = {{r_{max} - r_{min}} \over {q_{max} - q_{min}}} $$
 
-예를 들어 앞서 본 weight matrix를 예시로 scale 값을 계산하면 다음과 같다.
+### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 3: linear quantization &nbsp;&nbsp;&nbsp;</span>
+
+예시 weight matrix에서 zero point, scale 값을 구하여라.
+
+![floating-point matrix](images/floating-point_matrix.png)
+
+### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
+
+우선 weight 행렬에서 FP 최대값은 2.12, FP 최소값은 -1.08이다. 또한 integer은 각각 1과 -2에 대응된다. 이를 식에 대입하면 다음과 같이 scaling factor를 구할 수 있다.
 
 $$ S = {{2.12 - (-1.08)} \over {1 - (-2)}} = 1.07 $$
 
-S를 구했으므로 앞서 $r_{min}$ 혹은 $r_{max}$ 값에 대입하는 것으로 $Z$ 를 구할 수 있다. 이때 정수가 되도록 round 연산을 적용하는 것에 유의해야 한다.
+$S$ 를 구했으므로 앞서 $r_{min}$ 혹은 $r_{max}$ 값에 대입하는 것으로 $Z$ 를 구할 수 있다. 
+
+> 이때 $Z$ 가 정수가 되도록 round 연산을 적용해야 한다.
 
 $$ Z = \mathrm{round}{\left( q_{min} - {{r_{min}} \over S} \right)} $$
 
-예제에 식을 적용하면 다음과 같다.
+값을 대입하면 다음과 같다.
 
 $$ Z = \mathrm{round}{\left( -2 - {{-1.08} \over {1.07}} \right)} = 1 $$
 
+따라서 zero point는 1이다.
+
 ---
 
-#### 5.3.1.1 linear quantized matrix multiplication
+#### 5.4.2.2 linear quantized matrix multiplication
 
-이러한 linear quantization은 real number를 integer로 변환하는 **affine mapping**으로 볼 수 있다. 행렬 연산의 관점에서 이를 살펴보자.
+이러한 linear quantization을 행렬 연산 관점에서, real number를 integer로 변환하는 **affine mapping**으로 볼 수 있다.
 
 $$ Y = WX $$
 
@@ -264,7 +402,7 @@ $$ q_{Y} = {{S_{W}S_{X}} \over {S_{Y}}}(q_{W}q_{X} - Z_{W}q_{X} - Z_{X}q_{W} - Z
 
 - $q_{W}q_{X} - Z_{W}q_{X} - Z_{X}q_{W} - Z_{W}Z_{X}$ : N-bit Integer multiplication과 32-bit Integer Addition/Subtraction 연산이다.
 
-    - 여기서 $-Z_{W}q_{W} + Z_{W}Z_{X}$ 는 precompute된 항이다.
+    - 여기서 $-Z_{W}q_{W} + Z_{W}Z_{X}$ 는 이미 계산하여 얻은 항이다.
 
 - $Z_{Y}$ : N-bit Integer addition 연산이다.
 
