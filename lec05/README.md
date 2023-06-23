@@ -2,6 +2,10 @@
 
 > [Lecture 05 - Quantization (Part I) | MIT 6.S965](https://youtu.be/91stHPsxwig)
 
+> [A White Paper on Neural Network Quantization](https://arxiv.org/abs/2106.08295)
+
+> [tinyML Talks: A Practical Guide to Neural Network Quantization](https://youtu.be/KASuxB3XoYQ)
+
 > [quantization 정리](https://gaussian37.github.io/dl-concept-quantization/)
 
 ---
@@ -10,9 +14,19 @@
 
 ![quantized signal](images/quantized_signal.png)
 
-continuous 혹은 large set of values 특성을 가진 input을 discrete set으로 변환하는 것을 **quantization**(양자화)라고 지칭한다.
+continuous 혹은 large set of values 특성을 가진 연속적인 입력을 discrete set으로 변환하는 것을 **quantization**(양자화)라고 지칭한다.
 
 ![quantized image](images/quantized_image.png)
+
+quantization을 통해 얻을 수 있는 몇 가지 이점은 다음과 같다.
+
+- memory usage
+
+- power consumption
+
+- latency
+
+- silicon area
 
 neural network에 quantization을 적용하기 전/후의 weight 분포 차이를 살펴보자.
 
@@ -20,7 +34,7 @@ neural network에 quantization을 적용하기 전/후의 weight 분포 차이�
 
 ![discrete weight](images/discrete-weight.png)
 
-> fine-tuning을 적용하면 여기서 조금 변화가 생긴다.
+> fine-tuning을 적용하면 여기서 조금 더 변화가 생긴다.
 
 ---
 
@@ -178,11 +192,25 @@ $$ 1.00111010101 \times 2^{8} $$
 
 > [Huffman coding 정리](https://velog.io/@junhok82/%ED%97%88%ED%94%84%EB%A7%8C-%EC%BD%94%EB%94%A9Huffman-coding)
 
-추가로 **Huffman Coding** 알고리즘을 적용하면 memory usage를 더 줄일 수 있다.
-
 > Unix의 파일 압축, JPEG, MP3 압축에서 주로 사용된다.
 
-우선 압축을 하는 원리를 살펴보자. 예시로 A, B, C라는 알파벳을 압축하여 표현할 것이다. 순전히 ASCII code로 표현하려고 한다면 8bits x 3으로 24bits를 사용해야 한다. 하지만 Huffman coding을 이용해 가변 길이의 code로 만들 것이다.
+추가로 **Huffman Coding** 알고리즘을 적용하면 memory usage를 더 줄일 수 있다.
+
+- 자주 나오는 weights: bit 수를 적게 사용해서 표현한다.
+
+- 드문 weights: bit 수를 더 사용해서 표현한다.
+
+대표적으로 [Deep Compression 논문](https://arxiv.org/pdf/1510.00149.pdf)에서는 'Pruning + K-Means-based quantization + Huffman Coding'을 적용하여 LeNet-5 모델에서 약 39배 Compression ratio를 달성했다.
+
+![Deep Compression](images/deep_compression.png)
+
+### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 2: Huffman Coding &nbsp;&nbsp;&nbsp;</span>
+
+A, B, C 알파벳을 Huffman Coding을 이용해 압축하여 표현하라.
+
+### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
+
+순전히 ASCII code로 표현하려고 한다면 8bits x 3으로 24bits를 사용해야 한다. 하지만 Huffman coding을 이용해 가변 길이의 code로 만들 것이다.
 
 우선 a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
@@ -202,17 +230,11 @@ $$ 1.00111010101 \times 2^{8} $$
 
 이 경우 `01 10 111` 총 7bits로 압축할 수 있다.
 
-여기서 숫자를 결정짓는 것은 '문자의 빈도 수'이다. 빈도 수가 높은 문자일수록 짧은 길이의 code를 부여하고, 빈도 수가 낮은 문자일수록 긴 길이의 code를 부여한다.
+여기서 숫자를 결정짓는 것은 '문자의 빈도 수'이다. 
 
-이를 neural network에 적용하면 다음과 같다.
+- 빈도 수가 높은 문자일수록 짧은 길이의 code를 부여한다.
 
-- 자주 나오는 weights: bit 수를 적게 사용해서 표현한다.
-
-- 드문 weights: bit 수를 더 사용해서 표현한다.
-
-대표적으로 [Deep Compression 논문](https://arxiv.org/pdf/1510.00149.pdf)에서는 'Pruning + K-Means-based quantization + Huffman Coding'을 적용하여 LeNet-5 모델에서 약 39배 Compression ratio를 달성했다.
-
-![Deep Compression](images/deep_compression.png)
+- 빈도 수가 낮은 문자일수록 긴 길이의 code를 부여한다.
 
 ---
 
@@ -328,15 +350,13 @@ $$ r = (q - Z) \times S $$
 
 - $q$ : (**integer**) quantized number
 
-- $Z$ : (**integer**) zero point. 
+- $Z$ : (**integer**) **zero point**
 
   real number $r=0$ 에 정확히 mapping될 수 있도록 조절하는 역할이다. **offset**으로도 지칭한다.
 
-- $S$ : (floating-point) scale
+- $S$ : (floating-point) **scale factor**
 
-   scaling factor 역할이다.
-
-이때 quantization하는 범위가 음의 정수를 포함하는가에 따라서 `unsigned int`, `signed int`를 사용할 수 있다. ReLU와 같이 음수 값을 제거하는 activation function을 사용하는 경우에 주로 `unsigned int`를 사용한다.
+이때 quantization하는 범위가 음의 정수를 포함하는가에 따라서 `unsigned int`, `signed int`를 사용할 수 있다. ReLU와 같이 음수 값을 제거하는 activation function을 사용하는 경우 주로 `unsigned int`를 사용한다.
 
 ---
 
@@ -384,28 +404,128 @@ $$ Z = \mathrm{round}{\left( -2 - {{-1.08} \over {1.07}} \right)} = 1 $$
 
 ---
 
-#### 5.4.2.2 linear quantized matrix multiplication
+## 5.5 Symmetric vs Asymmetric Quantization
 
-이러한 linear quantization을 행렬 연산 관점에서, real number를 integer로 변환하는 **affine mapping**으로 볼 수 있다.
+![symmetric, asymmetric, unsigned quantization](images/symmetric_asymmetric_signed.png)
 
-$$ Y = WX $$
+> 위 예시에서는 데이터 분포를 봤을 때, symmetric signed quantization이 더 정밀하게 표현할 수 있다.
 
-$$ S_{Y}(q_{Y} - Z_{Y}) =  S_{W}(q_{W} - Z_{W}) \cdot S_{X}(q_{X} - Z_{X}) $$
+- **symmetric quantization** : zero point가 0인 경우
+
+    `signed int`: zero point가 0에 정확히 매핑된다.
+
+    `unsigned int`: ReLU와 같이 unsigned 출력이 나오는 경우 유리하다.
+
+- **asymmetric quantization** : zero point가 0이 아닌 경우
+
+    - FP32 데이터 분포가 대칭적이지 않으면, asymmetric이 더 정밀하게 표현할 수 있다.
+
+    - 계산속도가 더 빠른 `unsigned int`를 사용하는 편이 유리하다.
+
+
+---
+
+## 5.6 Linear Quantized Fully-Connected Layer
+
+이러한 linear quantization을 행렬 연산 관점에서 실수를 정수로 매핑하는 **affine mapping**(아핀변환)으로 볼 수 있다.
+
+$$ r = S(q - Z) $$
+
+> affine mapping은 간단히 말해 linear transform(선형 변환) 후 translation(이동)을 수행하는 변환이다. translation이 있기 때문에 non-linear transform이다. 
+
+fully-connected layer에서 linear quantization을 적용하면 아래와 같이 수식이 바뀌게 된다.(bias $b$ 는 무시한다.)
+
+$$ Y = WX + b $$
+
+$$ \downarrow $$
+
+$$ S_{Y}(q_{Y} - Z_{Y}) =  S_{W}(q_{W} - Z_{W}) \cdot S_{X}(q_{X} - Z_{X}) + S_b(q_b - Z_b) $$
+
+$$ \downarrow Z_w = 0 $$
+
+$$ S_{Y}(q_{Y} - Z_{Y}) =  S_{W}S_{X}(q_{W}q_{X} - Z_{X}q_{W})  + S_b(q_b - Z_b) $$
+
+$$ \downarrow Z_b = 0, \, S_b = S_W S_X $$
+
+$$ S_{Y}(q_{Y} - Z_{Y}) =  S_{W}S_{X}(q_{W}q_{X} - Z_{X}q_{W}+ q_b) $$
+
+- bias, weight의 zero point를 모두 0으로 두어 단순화(symmetric)
+
+- scaling factor는 weight, bias 동일( $S_b = S_W S_X$ )
 
 이를 $q_{Y}$ 에 관한 식으로 정리하면 다음과 같다.
 
-$$ q_{Y} = {{S_{W}S_{X}} \over {S_{Y}}}(q_{W} - Z_{W})(q_{X} - Z_{X}) + Z_{Y} $$
 
-이 식을 전개하면 세 가지 항으로 연산을 나눠서 볼 수 있다.
+$$ q_{Y} = {{S_{W}S_{X}} \over {S_{Y}}}(q_{W}q_{X} + q_b - Z_{W}q_{X}) + Z_{Y} $$
 
-$$ q_{Y} = {{S_{W}S_{X}} \over {S_{Y}}}(q_{W}q_{X} - Z_{W}q_{X} - Z_{X}q_{W} - Z_{W}Z_{X}) + Z_{Y} $$
+- precompute항
 
-- ${S_{W}S_{X}} \over {S_{Y}}$ : N-bit integer로 rescale한다. (0, 1) 범위의 값을 갖는다.
+    아래 precompute항을 $q_{bias}$ 로 치환할 수 있다.
 
-- $q_{W}q_{X} - Z_{W}q_{X} - Z_{X}q_{W} - Z_{W}Z_{X}$ : N-bit Integer multiplication과 32-bit Integer Addition/Subtraction 연산이다.
+$$ q_b - Z_X q_W $$
 
-    - 여기서 $-Z_{W}q_{W} + Z_{W}Z_{X}$ 는 이미 계산하여 얻은 항이다.
+precompute항을 치환 시 식은 다음과 같이 표현된다.
 
-- $Z_{Y}$ : N-bit Integer addition 연산이다.
+$$ q_{Y} = {{S_{W}S_{X}} \over {S_{Y}}}(q_{W}q_{X} + q_{bias}) + Z_{Y} $$
+
+항별로 연산이 어떻게 진행되는지 보자.
+
+- Rescale to N-bit int
+
+$${S_{W}S_{X}} \over {S_{Y}}$$
+
+-  N-bit Integer multiplication. 32-bit Integer Addition
+
+$$q_{W}q_{X} + q_{bias}$$
+
+- N-bit Integer addition
+
+$$Z_{Y}$$
+
+> Note: $q_b$ , $q_{bias}$ 모두 32 bits이다.
+
+---
+
+## 5.7 Linear Quantized Convolution Layer
+
+$$ Y = \mathrm{Conv} (W, X) + b $$
+
+$$ \downarrow $$
+
+$$ q_{Y} = {{S_{W}S_{X}} \over {S_{Y}}}(\mathrm{Conv}(q_{W}, q_{X}) + q_{bias}) + Z_{Y} $$
+
+- Rescale to N-bit int
+
+$${S_{W}S_{X}} \over {S_{Y}}$$
+
+-  N-bit Integer multiplication. 32-bit Integer Addition
+
+$$\mathrm{Conv}(q_{W}q_{X}) + q_{bias}$$
+
+- N-bit Integer addition
+
+$$Z_{Y}$$
+
+> Note: $q_b$ , $q_{bias}$ 모두 32 bits이다.
+
+이러한 on-device fixed-point inference 계산은 다음과 같은 과정을 따라 진행된다.
+
+![CNN quantized computation graph](images/cnn_quantized_computational_graph.png)
+
+---
+
+## 5.8 Simulated Quantization
+
+하지만 fixed-point operation을 미리 general purpose hardware(예: CPU, GPU)로 시뮬레이션할 수 있다면 다양한 quantization scheme을 실험해 볼 수 있다.
+
+> 따라서 GPU 가속도 가능하다.
+
+이러한 시뮬레이션이 가능하게끔 딥러닝 프레임워크에서 quantization operations(**quantizer**)를 제공하고 있다.
+
+![simulated quantization](images/simulated_quantization.png)
+
+- 좌측: fixed-point operations을 이용한 quantized on-device inference
+
+- 우측: floating-point operations을 이용한 **simulated quantization**
 
 ---
