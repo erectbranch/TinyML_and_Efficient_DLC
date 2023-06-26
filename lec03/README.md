@@ -6,19 +6,25 @@
 
 ![AI model size](images/model_size.png)
 
-지금의 AI model size는 너무나 크다. 무엇보다도 memory는 computation보다 더 expensive하다.
+지금의 AI model size는 너무나 크다. 무엇보다도 메모리 비용은 연산 비용과 비교했을 때 더 expensive하다.
 
 ![energy cost](images/energy_cost.png)
 
-data movement가 많아지면 memory reference가 더 생길 수밖에 없다. 결국 더 많은 energy를 필요로 하게 되는 셈이다. 그렇다면 이런 cost를 줄일 수 있는 방법은 없을까?
+또한 data movement가 많으면 많을수록 memory reference도 필요하고, 결국 더 많은 energy를 필요로 한다. 그렇다면 이런 cost를 어떻게 줄일 수 있을까?
 
-> model/activation size 줄이기, workload 줄이기(data를 충분히 빠르게 compute resources에 공급하기), compiler/scheduler 개선하기, locality를 늘리기, cache에 더 많은 data를 넣기 등을 떠올릴 수 있다. 
+- model/activation size 줄이기
 
-DNN이 갖는 over-parameterization으로 생기는 model inference(추론) 시 높은 cost와 memory footprint를 해결하기 위한 방법으로 pruning을 사용할 수 있다.
+- workload 줄이기(data를 빠르게 compute resources에 공급)
 
-> 사실 pruning 자체는 1990년 이미 제시된 기법이다. 1993년에는 pruning 이후 남은 weight들을 fine-tuning하는 방법을 제시했다.
+- compiler/scheduler 개선하기
 
-> 본 정리는 algorithm 관점에서 over-parameterized model의 data movement를 줄이는 데 초점을 맞춘다.
+- locality를 활용하기
+
+- cache에 더 많은 data를 보관하기
+
+그중에서도 DNN이 갖는 over-parameterization으로 인한, 추론 시의 high cost와 memory footprint를 해결하기 위한 방법으로 **pruning**(가지치기)을 살펴볼 것이다.
+
+> pruning 자체는 1990년 제시된 기법이다. 1993년에는 pruning 이후 weight를 fine-tuning하는 방법을 제시했다.
 
 ---
 
@@ -26,97 +32,157 @@ DNN이 갖는 over-parameterization으로 생기는 model inference(추론) 시 
 
 > 인간의 두뇌에서 성장기를 거치면서 synapses per neuron 숫자가 감소하는 것과 비슷하게, model에서도 synapses와 neurons을 줄여주는 방법이다.
 
-그런데 neuron을 줄이기 위해서는 어떤 neuron이 중요한지, 그렇지 않은지를 인식할 필요가 있다. 다음은 pruning을 표현한 그림이다.
-
-> 이미 training이 완료된 model에서 weight의 중요도를 파악해서 제거하는 과정이므로, 다른 절차 없이 pretrained model만 가지고 있으면 얼마든지 pruning을 수행해 볼 수 있다.(게다가 fine-tuning도 굉장히 빠른 시간으로 수행할 수 있다.)
+그런데 pruning을 이용해 neuron을 줄이기 위해서는 어떤 neuron이 중요한지 그렇지 않은지를 인식할 필요가 있다. 반대로 말하면 pretrained model에서 weight의 중요도만 알고 있다면 얼마든지 pruning을 적용할 수 있다.(+fine-tuning)
 
 ![pruning](images/pruning.png)
 
-- train connectivity: 굉장히 큰 over-parameterized target network를 training한다.
+- Train Connectivity
 
-- prune connections: 특정 기준에 따라 각 weight(unit)의 importance를 산정한 다음, 중요하지 않은 weight를 pruning한다.
+    over-parameterized target network를 학습한다.
 
-- train weights: pruning 이후 얻은 accuracy lost를 fine-tuning 과정으로 복구한다.
+- Prune Connections
 
-> 하지만 pruning의 문제점을 지적하는 논문에서는 pruning을 진행해서 얻은 model을 fine-tuning하기보다는, 그 남겨진 <U>구조</U>을 바탕으로 random initialization을 진행하는 것이 더 바람직하다고 주장한다. pruning 후 남은 weight들이 optimal한(최적의) 결과값이 아닐 수 있다는 것이다.
+    특정 기준에 따라 weight(unit)의 중요도를 산정한 다음, 중요하지 않은 weight를 **pruning**한다.
 
-> 다시 말해 pruning을 weight의 importance를 찾아가는 도구보다는, <U>효과적으로 network structure를 탐색하는 도구</U>로 바라본다. 예를 들어 convolution layer에서 filter를 잘라내는 pruning을, filter 수에 따른 최적의 network을 탐색하는 시각으로 볼 수 있다.
+- Train Weights
+
+    pruning 이후 accuracy lost는 **fine-tuning**으로 보완한다.
+
+하지만 일부 논문에서는 pruning 후 fine-tuning보다, 남겨진 <U>구조</U>을 바탕으로 random initialization을 진행하는 것이 더 바람직하다고 주장한다. pruning 후 남은 weight들이 optimal하지 않을 수 있다고 지적한다.
+
+> 이 관점에서는 pruning을 네트워크 구조를 효과적으로 탐색하는 도구로 바라본다.
+
+---
+
+### 3.1.1 Pruning and Fine-tuning
 
 다음은 AlexNet에 pruning을 적용했을 때의 accuracy loss를 나타낸 표다.
 
 ![pruning accuracy loss](images/pruning_fine_tuning.png)
 
-- 보라색 선: 80%의 parameter를 pruning했을 때 accuracy가 4% 이상 감소했다.(50% 정도까지는 크게 차이가 없다.) 본래 정규 분포를 이루던 data는 다음과 같이 변한다.
+- Pruning(보라색 선)
+
+    - 50%까지는 accuracy loss가 적다.
+
+    - 80%부터 4% 이상의 accuracy loss가 발생한다.
+    
+    본래 정규 분포를 이루던 weight 분포는 pruning 후 다음과 같이 변한다.
 
     ![pruning parameters 1](images/pruning_parameters.png)
 
-- 초록색 선: pruning을 거치고 남은 weights(20%)를 가지고 다시 train한다.(fine-tuning) re-train 이후 남은 data 분포는 다음과 같이 smooth하게 변한다.
+- Pruning+Fine-tuning(초록색 선)
+
+    - 남은 20% weights를 가지고 fine-tuning한다.
+    
+    fine-tuning 후 남은 weight 분포는 다음과 같이 smooth하게 바뀐다.
 
     ![fine tuning parameters](images/fine_tuning_parameters.png)
 
-- 빨간색 선: 이 과정를 다시 iterative하게 적용하면서, 거의 accuracy를 잃지 않고 약 90%까지 pruning이 가능하다.
+- Iterative Pruning and Fine-tuning(빨간색 선): 
 
-<br/>
+    위 과정를 반복하여 적용 시, 매우 적은 accuracy lost를 유지하며 weight를 약 90%까지 pruning할 수 있다.
 
-다음은 여러 neural network에 pruning을 적용하고 난 뒤의 결과를 요약한 표다.
+---
 
-| Neural Network | pruning 이전 parameters | pruning 이후 parameters | 감소치 | MACs 감소치 |
+### 3.1.2 Neural Network Pruning
+
+다음은 여러 network에 pruning을 적용하고 난 뒤의 결과를 나타낸 표다.
+
+| Neural Network | pruning 전<br/>\#Parameters | pruning 후<br/>\#Parameters | Reduction | MACs<br/>Reduction |
 | :---: | :---: | :---: | :---: | :---: |
 | AlexNet | 61M | 6.7M | 9배 | 3배 |
-| VCG-16 | 138M | 10.3M | 12배 | 5배 |
+| VGG-16 | 138M | 10.3M | 12배 | 5배 |
 | GoogleNet | 7M | 2.0M | 3.5배 | 5배 |
 | ResNet50 | 26M | 7.47M | 3.4배 | 6.3배 |
 | SqueezeNet | 1M | 0.38M | 3.2배 | 3.5배 |
 
-> AlexNet, VCG-16은 fully-connected라서 특히 pruning으로 감소하는 parameter가 많다. 하지만 다른 model들은 이미 어느 정도 compressed된 model이다.
+AlexNet, VGG-16과 다르게, compressed model에서는 큰 효과를 보지 못했다. 이런 경우 **quantization**(양자화)와 같은 수단이 더 효과적일 수 있다.
 
-> SqueezeNet 수준으로 작은 model에서는 quantization과 같은 방법이 efficiency를 높이는 좋은 수단으로 쓰일 수 있다.
+> MACs와 \#Parameters 감소 비율이 비례하지 않는 이유: lec02 정리 참조
 
-MAC과 parameter의 변화가 비례하지 않는 이유는, convolution 연산에서 다양한 항이 존재하며 각자가 미치는 영향이 model마다 다르기 때문이다.
-
-특이한 점은 몇몇 예시에서 NeuralTalk LSTM에서 pruning은 image caption quality를 감소시키지 않고, 오히려 더 간결한 표현으로 특징을 더 잘 설명하기도 한다.
+특이하게도 NeuralTalk LSTM 같은 모델에서는, pruning이 image caption quality를 감소시키지 않고 오히려 더 간결한 표현으로 특징을 더 잘 설명하기도 한다.
 
 ![pruning NeuralTalk LSTM](images/pruning_neuraltalk_LSTM.png)
 
-물론 너무 적극적으로 pruning을 하면서 accuracy를 손상시켜서는 안 된다. 따라서 얼마나 pruning을 적용할 것인지를 잘 결정해야 한다.(분석+경험적인 도출)
-
-> 참고로 현재는 hardware에서 sparsity matrix 구현을 지원하고 있다. 특정 조건 하에 dense matrix를 sparse matrix로 바꿔서 연산을 수행하고 speedup을 얻는다.
-
-![hardware support for sparsity](images/a100_gpu_sparsity.png)
-
-참고로 이처럼 pruning 실험을 검증하고 비교할 때는 **training budget**을 고려한다. training budget이란 pruning 후 도출된 model을 처음부터 새로 training시킬 때 어느 정도의 epoch를 적용할지를 의미한다. 원래의 큰 model과 같은 epoch로 학습시킨다면, 작은 model에서는 그보다 더 적은 계산이 이루어질 것이므로 공정하지 않은 비교가 될 수 있다.
-
-따라서 model의 FLOPs를 파악하여 계산량을 일치시킨 뒤(작은 model의 epoch를 추가) 진행할 수 있다. 이 방법을 **Scratch-B**라고 한다. 반대로 큰 model과 작은 model을 같은 epoch로 학습시키는 것은 **Scratch-E**라고 지칭한다.
-
-> 하지만 FLOPs만이 아닌 model의 특성도 고려해서 결정해야 한다. 예를 들어 ImageNet에서 큰 model과 작은 model 사이의 FLOPs 차이가 2배가 넘는다고 해도, epoch를 2배보다 늘리는 건 실질적으로 별 도움이 안된다.(그렇다고 해서 full convergence를 시도하는 건 별로 좋은 방법이 아니다.)
+> 물론 너무 적극적으로 pruning을 하여 accuracy를 손상시켜서는 안 된다. 얼마나 pruning을 적용할 것인지를 잘 분석하여 결정해야 한다.
 
 ---
 
-## 3.1.2 formulate pruning
+### 3.1.3 Pruning in the Industry
+
+- NVIDIA: hardware 수준에서 sparsity matrix을 이용한 가속을 지원하고 있다.
+
+  특정 조건을 만족하면 dense matrix를 sparse matrix로 바꿔서 연산을 가속할 수 있다.(speedup)
+
+    - **2:4 sparsity**: 4개의 parameter로 이루어진 그룹에서 paramter 2개가 0이면 가능하다.
+
+        ![hardware support for sparsity](images/a100_gpu_sparsity.png)
+
+- Xilinx: pruning을 통해 정확도 감소를 최소화하면서 model complexity를 5배\~50배까지 줄이는 AI Optimizer를 지원한다.
+
+    ![Xilinx AI Optimizer](images/Xilinx_AI_optimizer.png)
+
+---
+
+### 3.1.4 Training Budget
+
+> [Rethinking the Value of Network Pruning 논문](https://arxiv.org/abs/1810.05270)
+
+위 논문에서는 기존의 pruning 방식에서 크게 두 가지 문제점을 지적한다.
+
+- over-parameterized target network를 학습시키는 과정 자체가 꼭 필요하지 않다.
+
+- 큰 모델을 pruning 후 남은 weight는 작은 모델에서도 optimal하다는 보장은 없다.
+
+따라서 pruning 후 얻은 weight보다도 모델의 구조 자체가 더 유의미하다고 주장한다. 따라서 논문에서는 pruning을 통해 모델을 구한 뒤 from scratch로 학습시킨다.
+
+> 단, **ImageNet**과 같은 <U>큰 데이터셋</U>에서는 모델을 from scratch로 학습시키면 오래 걸릴 뿐더러, <U>fine-tuning보다 저조한 성능을 보이므로</U>에 주의해야 한다.
+
+그런데 이때 scratch로 학습한 이후 기존의 큰 모델과 비교하기 위해서는 **training budget**을 고려해야 한다. 크게 두 가지 방식을 고려할 수 있다. 
+
+- **Scratch-E**
+
+    큰 모델을 학습했을 때와 같은 epoch을 학습시킨다.
+
+- **Scratch-B**
+
+    Scratch-E 방식으로 학습할 경우, 작은 모델에서 한 epoch에 더 적은 연산이 수행된다.(FLOPs) 따라서 연산량을 맞춘 뒤 학습을 진행한다. 
+
+---
+
+## 3.2 formulate pruning
 
 ![formulate pruning](images/fomulate_pruning.png)
 
-일반적으로 neural network의 train은 SGD(Stochastic Gradient Descent)을 이용해 loss function를 최소화한다.
+loss function을 **SGD**(Stochastic Gradient Descent)을 이용해 최소화하는 일반적인 학습 과정은 다음과 같은 수식으로 나타낼 수 있다.
 
 $$ \underset{W}{\mathrm{argmin}}{L(\mathbf{x}; W)} $$
 
 - $\mathbf{x}$ : input
 
+- $L$ : objective function
+
 - $W$ : original weights
+
+그런데 여기서 pruning은 \#parameters를 threshold를 두어 제한한다. 정확히는 0이 아닌 \#parameters가 threshold보다 적어야 한다.
+
+$$ \underset{W_p}{\mathrm{argmin}}{L(\mathbf{x}; W_p)} $$
+
+$$ s.t. {||W_{p}||}_{0} \le N $$
+
+> s.t.: subject to
 
 - $W_{p}$ : pruned weights
 
-그런데 여기서 pruning은 parameter의 개수를 제한하게 된다. (0이 아닌) parameters 개수가 threshold보다 작아야 함을 수식으로 표현하면 다음과 같다.
+- ${||W_{p}||}_{0}$ : $W_{p}$ 의 L0 norm
 
-$$ {||W_{p}||}_{0} < N $$
+    엄밀히는 norm이 아니며, 벡터에서 0이 아닌 원소의 개수를 의미한다.(\#nonzeros)
 
--  $N$ : target nonzero(threshold)
-
-- $W_p$ 가 nonzero인 값을 계산한다.
+- $N$ : threshold
 
 ---
 
-## 3.2 pruning granularity
+## 3.3 pruning granularity
 
 ![pruning pattern](images/pruning_pattern.png)
 
@@ -156,7 +222,7 @@ pruning은 크게 unstructured/structured 두 가지 방식으로 적용할 수 
 
 ---
 
-## 3.3 pruning at different granularities
+## 3.4 pruning at different granularities
 
 아래 convolutional layer의 예시 그림을 보자. filter의 weights는 다음과 같이 4개의 dimension을 가지고 있다.
 
@@ -214,13 +280,13 @@ $$ s.t. \quad |S| = C \times r, \quad S \subset \lbrace 1,2,...,C \rbrace $$
 
 ---
 
-## 3.4 pruning criterion
+## 3.5 pruning criterion
 
 그렇다면 어떻게 synapse/neuron의 importance를 알 수 있을까?
 
 ---
 
-## 3.4.1 magnitude-based pruning
+## 3.5.1 magnitude-based pruning
 
 다음 예시를 보자.
 
@@ -268,7 +334,7 @@ $$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
 
 ---
 
-### 3.4.2 second-order-based pruning
+### 3.5.2 second-order-based pruning
 
 다른 접근 방법으로 pruning synapses의 loss function을 기준으로 삼을 수 있다.
 
@@ -304,7 +370,7 @@ $$ {\delta}{L_{i}} = L(x;W) - L(x; W_{p}|w_{i}=0) \approx {1 \over 2}{h_{ii}{\de
 
 ---
 
-### 3.4.3 selection of neurons to prune
+### 3.5.3 selection of neurons to prune
 
 - neuron pruning in linear layer
 
@@ -330,7 +396,7 @@ $$ {\delta}{L_{i}} = L(x;W) - L(x; W_{p}|w_{i}=0) \approx {1 \over 2}{h_{ii}{\de
 
 ---
 
-### 3.4.4 percentage-of-zero-based pruning
+### 3.5.4 percentage-of-zero-based pruning
 
 다음 예시를 보자. ReLU activation을 거쳐 나온 output activations이다.
 
@@ -362,7 +428,7 @@ channel 2가 제일 0의 비율이 많다. 이 channel을 pruning할 수 있다.
 
 ---
 
-### 3.4.5 regression-based pruning
+### 3.5.5 regression-based pruning
 
 loss function을 고려하는 대신 regression을 기반으로 한 heuristic한 방법으로, 'original output'과 'pruning한 output'의 차이가 제일 적은 channel을 pruning한다.
 
@@ -386,6 +452,6 @@ s.t. \quad {||\beta||}_{0} \le N_{c}
 
 - $\beta$ : length가 $c_i$ 인 coefficient vector. $\beta = 0$ 이라면 channel이 prune된다.
 
-- $N_{c}$ : nonzero channel의 수
+- $N_{c}$ : nonzero channel 수
 
 ---
