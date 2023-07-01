@@ -2,53 +2,78 @@
 
 > [Lecture 10 - Knowledge Distillation | MIT 6.S965](https://youtu.be/IIqf-oUTHe0)
 
-![challenge](images/challenge.png)
+높은 연산 능력과 메모리를 가진 cloud 기반 model을, edge에서 사용할 수 있도록 **knowledge transfer**하는 방법을 알아볼 것이다.
 
-큰 computation 능력과 memory를 가진 cloud 기반 model에서, edge에서 사용할 수 있는 model로 **knowledge transfer**을 진행하려면 어떻게 해야 할까?
+![challenge](images/challenge.png)
 
 ---
 
-## 10.1 cloud AI vs tiny AI: NetAug
+## 10.1 cloud AI vs tiny AI
 
-cloud AI와 tiny AI의 training curve 차이를 보자.
+cloud 모델과 tiny 모델에서의 training curve 차이를 보자.
 
 ![ResNet50, MobileNetV2](images/ResNet50_vs_MobileNetV2.png)
 
+> 가로: epoch, 세로: accuracy
+
+- cloud model(ResNet50)
+  
+  epoch이 늘어나자 training accuracy가 80%를 넘는다.
+
+- edge model(MobileNetV2-Tiny)
+
+  epoch이 늘어도 training accuracy가 50% 정도에 가깝다.
+
+이처럼 edge model은 capacity가 작은 만큼 cloud model처럼 높은 accuracy를 달성하기 어렵다. 또한 학습 중 몇 가지 테크닉을 사용함에 있어서 주의해야 한다.
+
+- **data augmentation**(데이터 증강), **dropout**(드롭아웃)과 같은 기법은 오히려 역효과가 발생한다.
+
+  capacity 제약으로 인해 under-fitting이 자주 발생하기 때문
+
+  - data augmentation: 기존 데이터를 가지고 여러 방법으로 데이터를 늘리는 방법이다. 
+  
+    > mirroring, random cropping, rotation, shearing, local wrapping 등
+
+
+---
+
+### 10.1.1 Network Augmentation
+
 > [NETWORK AUGMENTATION FOR TINY DEEP LEARNING(2022)](https://arxiv.org/pdf/2110.08890.pdf)
 
-> 가로 축은 epoch, 세로 축은 accuracy
+따라서 논문에서는 data augment의 대적점으로, **network augmentation**(reverse dropout)을 소개한다.(**NetAug**)
 
-- cloud model(ResNet50): epoch가 늘면서 training accuracy가 80%가 넘는 결과를 보인다..
+아래 훈련 예시를 보자. 
 
-- edge model(MobileNetV2-Tiny): epoch가 늘어도 training accuracy가 50% 정도에 가까운 결과를 보인다.
+- standard stochastic gradient descent
 
-들어가기 앞서 잠시 위 그림이 나온 논문을 설명하고 넘어간다. 논문에서는 over-fitting을 방지하기 위한 regulation 테크닉, 예를 들면 **data augmentation**(데이터 증강), **dropout**과 같은 기법이 large neural network에서는 효과적이지만 tiny neural network에서는 오히려 역효과가 발생한다고 주장한다.
-
-> data augmentation은 dataset을 여러가지 방법을 통해 augment하는 방법이다. mirroring, random cropping, rotation, shearing, local wrapping 등
-
-따라서 noise를 추가하여 capacity를 잡아먹는 data augmentation보다는 model을 augment(reverse dropout)하는 것이 필요하다. tiny model은 반대로 capacity의 제약으로 인해 under-fitting이 자주 발생하기 때문이다. 논문에서는 Network Augmentation을 **NetAug**로 지칭하며 소개한다.
-
-예시로 model training 단순히 standard stochastic gradient descent를 이용한다고 가정해 보자. training은 loss function $L$ 이 최소가 되는 $W_{t}$ 를 찾아나가는 과정이다.
+- loss function( $L$ 이 최소가 되는 $W_{t}$ 를 찾는다 )
 
 $$ {W_{t}}^{n+1} = {W_{t}}^{n} - {\eta}{{{\partial}{\mathcal{L}}({W_{t}}^{n})} \over {{\partial}({W_{t}}^{n})}} $$
 
 - ${\eta}$ : learning rate
 
-하지만 tiny neural network에서는 capacity의 제약 때문에, large neural network보다 local mimimums에 stuck될 가능성이 크다.
+그러나 tiny model이 local mimimums에 갖히지 않도록, NetAug에서는 augmented loss function로 다음 ${\mathcal{L}}_{aug}$ 을 사용한다.
 
-여기에 NetAug 버전의 augmented loss function ${\mathcal{L}}_{aug}$ 은 다음과 같다.
+```math
+{\mathcal{L}}_{aug} = {\mathcal{L}}(W_{t}) + {\alpha}_{1}{\mathcal{L}}([W_{t}, W_{1}] + \cdots + {\alpha}_{i}{\mathcal{L}}([W_{t}, W_{i}]))
+```
 
-$$ {\mathcal{L}}_{aug} = {\mathcal{L}}(W_{t}) + {\alpha}_{1}{\mathcal{L}}([W_{t}, W_{1}] + \cdots + {\alpha}_{i}{\mathcal{L}}([W_{t}, W_{i}])) $$
+- ${\mathcal{L}}(W_{t})$
 
-- ${\mathcal{L}}(W_{t})$ : base supervision(기존 model이 training을 진행하면서 제공하는 어떠한 label(정답))
+  **base supervision**: 기존 model이 training하며 제공하는 label
 
-- 나머지 항 : auxiliary(보조) supervision. 일종의 sub-model처럼 작동한다.
+- 나머지 항
 
-  - $[W_{t}, W_{i}]$ : tiny neural network의 weight $W_{t}$ 와 새 weights $W_{i}$ 를 포함하는 augmented model을 의미한다.
+  **auxiliary supervision**: 일종의 sub-model처럼 작동한다.
 
-  - ${\alpha}_{i}$ : augmented model마다 loss 영향을 조절하는 scaling hyper-parameter
+  - $[W_{t}, W_{i}]$ : tiny model 기존 weight $W_{t}$ 에 새 weights $W_{i}$ 를 추가
 
-이때 모든 augmented model의 weight를 sharing하며, 제일 큰 largest augmented model만 계속 유지한다.(one-shot NAS와 마찬가지로 weight-sharing 전략을 사용하는 것이다.)
+  - ${\alpha}_{i}$ : loss 영향을 조절하는 scaling hyper-parameter
+
+이때 모든 augmented model가 갖는 weight를 공유하며, 제일 큰 largest augmented model만 계속 유지한다.
+
+> one-shot NAS와 마찬가지로 weight sharing 전략을 사용
 
 ![Learning curves on ImageNet](images/NetAug_ImageNet_Learning_curve.png)
 
@@ -56,9 +81,7 @@ $$ {\mathcal{L}}_{aug} = {\mathcal{L}}(W_{t}) + {\alpha}_{1}{\mathcal{L}}([W_{t}
 
 > 빨간색 실선: NetAug를 적용한 learning curve
 
-- MbV2-Tiny에서 NetAug를 적용한 결과를 보면, 해당 기법이 under-fitting을 줄이고 training과 validation accuracy를 높인 걸 알 수 있다.
-
-- 하지만 반대로 ResNet50과 같은 큰 model에서는 over-fitting을 발생시킨다.(높은 training accuracy, 낮은 validation accuracy)
+NetAug를 적용한 결과를 보면, 해당 기법이 under-fitting을 줄이고 train/validation accuracy를 높인 걸 알 수 있다. 하지만 반대로 ResNet50과 같은 큰 model에서는 over-fitting을 발생시켰다.
 
 ---
 
@@ -221,7 +244,13 @@ feature map이 가까울수록(cosine distance가 작을수록) teacher feature 
 
 feature map을 이용하기 때문에 어떠한 mapping function을 정의해서 feature map을 통과시킨다. 각각 teacher model과 student model에서 통과시킨 결과물에 L2 loss를 적용해서 차이를 구한다.
 
-그렇다면 어떻게 mapping이 되는지 한 번 살펴보자. CNN에서는 3차원 grid 구조(channel 수, height, weight 값을 갖는)인 activation tensor $A \in R^{C \times H \times W} $ 가 있다. 이 중에서도 예를 들어 image $32 \times 32$ 처럼 두 차원으로 **spatial dependence**를 표현하고, 마지막 차원이 각 channel( $C$ )의 independent한 성질을 나타내는 것이다.
+그렇다면 어떻게 mapping이 되는지 한 번 살펴보자. 
+
+- 3차원 grid 구조 activation tensor 
+
+$$A \in R^{C \times H \times W}$$
+
+이 중에서도 예를 들어 image $32 \times 32$ 처럼 두 차원으로 **spatial dependence**를 표현하고, 마지막 차원이 각 channel( $C$ )의 independent한 성질을 나타낸다.
 
 따라서 activation-based mapping function $\mathcal{F}$ 는 3D tensor를 input으로 받고, output으로 다음과 같이 flatten된 2D tensor를 반환한다.
 
@@ -231,11 +260,17 @@ $$ \mathcal{F} : R^{C \times H \times W} \rightarrow R^{H \times W} $$
 
 이러한 spatial attention mapping function은 다양하게 정의할 수 있는데, 논문에서도 아래 3가지 방법을 소개하고 있다.
 
-- 절댓값의 합: $F_{sum}(A) = {\sum}_{i=1}^{C}{|A_{i}|}$
+- 절댓값의 합
 
-- 절댓값의 p 거듭제곱 합: $F_{sum}^{p}(A) = {\sum}_{i=1}^{C}{|A_{i}|}^{p}$ ( 이때 $p > 1$ )
+$$F_{sum}(A) = {\sum}_{i=1}^{C}{|A_{i}|}$$
 
-- 절댓값의 p 거듭제곱 값 중 최댓값: $F_{max}^{p}(A) = \max_{i=1,c}{|A_{i}|}^{p}$ ( 이때 $p > 1$ )
+- 절댓값의 p 거듭제곱 합( 이때 $p > 1$ )
+
+$$F_{sum}^{p}(A) = {\sum}_{i=1}^{C}{|A_{i}|}^{p}$$
+
+- 절댓값의 p 거듭제곱 값 중 최댓값:( 이때 $p > 1$ )
+
+$$F_{max}^{p}(A) = \max_{i=1,c}{|A_{i}|}^{p}$$
 
 > $i$ 는 channel index, $p$ 는 승수로 연산 후에 더해준다는 의미이다. 수학적으로 거듭제곱을 **power**라는 단어로 표현한다.
 
