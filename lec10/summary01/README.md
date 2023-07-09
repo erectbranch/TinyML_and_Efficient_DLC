@@ -262,15 +262,21 @@ $$ \mathcal{F} : R^{C \times H \times W} \rightarrow R^{H \times W} $$
 
 - 절댓값의 합
 
-$$F_{sum}(A) = {\sum}_{i=1}^{C}{|A_{i}|}$$
+```math
+F_{sum}(A) = {\sum}_{i=1}^{C}{|A_{i}|}
+```
 
 - 절댓값의 p 거듭제곱 합( 이때 $p > 1$ )
 
-$$F_{sum}^{p}(A) = {\sum}_{i=1}^{C}{|A_{i}|}^{p}$$
+```math
+F_{sum}^{p}(A) = {\sum}_{i=1}^{C}{|A_{i}|}^{p}
+```
 
 - 절댓값의 p 거듭제곱 값 중 최댓값:( 이때 $p > 1$ )
 
-$$F_{max}^{p}(A) = \max_{i=1,c}{|A_{i}|}^{p}$$
+```math
+F_{max}^{p}(A) = \max_{i=1,c}{|A_{i}|}^{p}
+```
 
 > $i$ 는 channel index, $p$ 는 승수로 연산 후에 더해준다는 의미이다. 수학적으로 거듭제곱을 **power**라는 단어로 표현한다.
 
