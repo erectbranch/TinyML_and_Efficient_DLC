@@ -10,39 +10,11 @@
 
 ---
 
-## 5.1 Quantization
-
-![quantized signal](images/quantized_signal.png)
-
-continuous 혹은 large set of values 특성을 가진 연속적인 입력을 discrete set으로 변환하는 것을 **quantization**(양자화)라고 지칭한다.
-
-![quantized image](images/quantized_image.png)
-
-quantization을 통해 얻을 수 있는 몇 가지 이점은 다음과 같다.
-
-- memory usage
-
-- power consumption
-
-- latency
-
-- silicon area
-
-neural network에 quantization을 적용하기 전/후의 weight 분포 차이를 살펴보자.
-
-![continuous weight](images/continuous-weight.png)
-
-![discrete weight](images/discrete-weight.png)
-
-> fine-tuning을 적용하면 여기서 조금 더 변화가 생긴다.
+## 5.1 Numeric Data Types
 
 ---
 
-## 5.2 Numeric Data Types
-
----
-
-### 5.2.1 Integer
+### 5.1.1 Integer
 
 우선 **integer**(정수)를 8bit로 표현한 세 가지 예시를 살펴보자. 
 
@@ -66,7 +38,7 @@ neural network에 quantization을 적용하기 전/후의 weight 분포 차이�
 
 ---
 
-### 5.2.2 fixed-point number
+### 5.1.2 fixed-point number
 
 소수(**decimal**)를 표현하는 방식은 두 가지가 있다.
 
@@ -92,7 +64,7 @@ neural network에 quantization을 적용하기 전/후의 weight 분포 차이�
 
 ---
 
-### 5.2.3 floating-point number
+### 5.1.3 floating-point number
 
 다음은 32bit **floating-point** number의 예시다.(가장 보편적인 **IEEE 754** 방법)
 
@@ -148,7 +120,7 @@ $$ 1.00111010101 \times 2^{8} $$
 
 ---
 
-### 5.2.4 floating-point number comparison
+### 5.1.4 floating-point number comparison
 
 다양한 floating-point number 표현법을 비교해보자. 특히 neural network에서는 <U>fraction보다도 exponent에 더 민감</U>하기 떄문에, exponent 정보를 최대한 보존하는 표현법이 등장했다.
 
@@ -173,6 +145,128 @@ $$ 1.00111010101 \times 2^{8} $$
     > FP16과 동일한 exponent(10bit), FP32와 동일한 fraction(8bit)를 지원한다.
 
     > BERT 모델에서 TF32 V100을 이용한 학습이, FP32 A100을 이용한 학습에 비해 6배 speedup을 달성했다.
+
+---
+
+## 5.2 Quantization
+
+![quantized signal](images/quantized_signal.png)
+
+continuous 혹은 large set of values 특성을 가진 연속적인 입력을 discrete set으로 변환하는 것을 **quantization**(양자화)라고 지칭한다.
+
+![quantized image](images/quantized_image.png)
+
+다음은 quantization을 통해 얻을 수 있는 몇 가지 이점이다.
+
+- memory usage
+
+- power consumption
+
+- latency
+
+- silicon area
+
+neural network에 quantization을 적용하기 전/후의 weight 분포 차이를 살펴보자.
+
+![continuous weight](images/continuous-weight.png)
+
+![discrete weight](images/discrete-weight.png)
+
+> fine-tuning을 적용하면 여기서 조금 더 변화가 생긴다.
+
+---
+
+### 5.2.1 Matrix operations with quantized weights
+
+우선 $WX + b$ 꼴의 행렬 연산이 어떻게 컴퓨터에서 진행되는지 살펴보자.
+
+```math
+W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.00 & 0.18 & 0.90 & 0.28 \\ 0.57 & 0.96 & 0.80 & 0.81 \end{bmatrix} \quad X = \begin{bmatrix} 0.41 & 0.25 & 0.73 & 0.66 \\ 0.00 & 0.41 & 0.41 & 0.57 \\ 0.42 & 0.24 & 0.71 & 1.00 \\ 0.39 & 0.82 & 0.17 & 0.35 \end{bmatrix} \quad b = \begin{bmatrix} 0.1 \\ 0.2 \\ 0.3 \\ 0.4 \end{bmatrix}
+```
+
+아래 그림은 MAC 연산을 수행하는 array를 표현한 예시다.
+
+![MAC array](images/MAC_array.png)
+
+$$ A_{i} = \sum_{j}{C_{i,j}} + b_i $$
+
+1. $C_{i,j}$ 자리에 먼저 행렬 $W$ 값이 load돤다.
+
+$$ A_{i} = W_i \cdot \mathrm{x_1} + W_i \cdot \mathrm{x_2} + W_i \cdot \mathrm{x_3} + W_i \cdot \mathrm{x_4} $$
+
+2. 한 사이클마다 행렬 $X$ 에서 다음 input value를 가져온다.
+
+```math
+\begin{bmatrix} 0.41 \\ 0.00 \\ 0.42 \\ 0.39 \end{bmatrix}
+```
+
+3. 연산이 끝나면 행렬 $X$ 의 다음 열을 가져와서 순차적으로 계산한다.
+
+그런데 이 과정에 **weight, bias quantization**을 추가하면 어떻게 될까?
+
+- 우선 floating-point tensor를 **scale-factor** $s_{X}$ 가 곱해진 형태의 integer tensor 로 변환한다.
+
+    $$ X_{fp32} \approx s_{X}X_{int} = \hat{X} $$
+
+    - $\hat{X}$ : scaled quantized tensor
+
+```math
+W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.00 & 0.18 & 0.90 & 0.28 \\ 0.57 & 0.96 & 0.80 & 0.81 \end{bmatrix} \approx {{1} \over {255}}\begin{bmatrix} 247 & 163 & 189 & 255 \\ 148 & 214 & 214 & 207 \\ 0 & 46 & 229 & 71 \\ 145 & 245 & 204 & 207 \end{bmatrix} = s_{W}W_{uint8}
+```
+
+- **최소값 0→0**, **최대값 1.00→255**, `uint8` 타입으로 매핑되었다.
+
+나머지 행렬도 변환하면 다음과 같다.
+
+```math
+\hat{X} = {{1} \over {255}} \begin{bmatrix} 105 & 64 & 186 & 168 \\ 0 & 105 & 105 & 145 \\ 107 & 61 & 181 & 255 \\ 99 & 209 & 43 & 89 \end{bmatrix}
+```
+
+- **최소값 0→0**, **최대값 1.00→255**, `uint8` 타입으로 매핑되었다.
+
+```math
+\hat{b} = {{1} \over {255^2}}\begin{bmatrix} 650 \\ 1300 \\ 1951 \\ 650 \end{bmatrix} 
+```
+
+- `int32` 타입으로 매핑되었다.
+
+  **overflow**를 피하기 위해서는 이처럼 <U>더 큰 bit width를 사용</U>해야 한다.
+
+- $\hat{W}, \hat{X}$ 가 가지고 있는 ${{1} \over {255}}$ 가 서로 곱해지면 ${{1} \over {255^2}}$ 가 되므로, quantized bias $\hat{b}$ 는 scaling factor로 ${{1} \over {255^2}}$ 를 사용한다.
+
+이제 실제 연산 과정을 보자. 우선 $\hat{W}, \hat{X}$ 에서 scaling factor를 제외한 값을 행렬 연산 한 뒤에, 결과값에 ${{1} \over {255^2}}$ 를 곱해서 scale을 다시 맞춰준다.
+
+![quantized MAC array](images/quantized_MAC_array_ex.png)
+
+하지만 이렇게 얻은 `int32` activation 값을 이보다 더 낮은 정밀도인 `int8`로 바꾸고 싶다. 이것이 **activation quantization**이며, 다음과 같이 결과값 $\hat{Out}$ 을 `uint8`로 양자화할 수 있다.
+
+```math
+\hat{Out} = {{1} \over {136671 \cdot 255}} \begin{bmatrix} 134 & 185 & 206 & 255 \\ 111 & 167 & 186 & 242 \\ 60 & 65 & 96 & 134 \\ 109 & 172 & 187 & 244 \end{bmatrix}
+```
+
+- 최대값 136671이 scaling factor에 쓰인 점에 주목하자.
+
+---
+
+## 5.2.2 Symmetric vs Asymmetric Quantization
+
+![symmetric, asymmetric, unsigned quantization](images/symmetric_asymmetric_signed.png)
+
+> 위 예시의 데이터 분포에서는 symmetric signed quantization이 더 정밀하게 데이터를 표현할 수 있다.
+
+- **symmetric quantization** : zero point가 0인 경우
+
+    `signed int`: zero point가 0에 정확히 매핑된다.
+
+    `unsigned int`: ReLU와 같이 unsigned 출력이 나오는 경우 유리하다.
+
+- **asymmetric quantization** : zero point가 0이 아닌 경우
+
+    - FP32 데이터 분포가 대칭적이지 않으면, asymmetric이 더 정밀하게 표현할 수 있다.
+
+    - 표현력은 뛰어나지만 computation overhead가 발생한다.
+
+    - 계산속도가 더 빠른 `unsigned int`를 사용하는 편이 유리하다.
 
 ---
 
@@ -354,15 +448,15 @@ $$ r = (q - Z) \times S $$
 
   real number $r=0$ 에 정확히 mapping될 수 있도록 조절하는 역할이다. **offset**으로도 지칭한다.
 
-- $S$ : (floating-point) **scale factor**
+- $S$ : (floating-point) **scaling factor**
 
 이때 quantization하는 범위가 음의 정수를 포함하는가에 따라서 `unsigned int`, `signed int`를 사용할 수 있다. ReLU와 같이 음수 값을 제거하는 activation function을 사용하는 경우 주로 `unsigned int`를 사용한다.
 
 ---
 
-#### 5.4.2.1 zero point, scale 
+#### 5.4.2.1 zero point, scaling factor
 
-이제 real number를 quantized number에 mapping하면서, quantization parameter인 zero point, scale을 계산해 보자.
+이제 real number를 quantized number에 mapping하면서, quantization parameter인 zero point, scaling factor을 계산해 보자.
 
 수식은 기본적으로 최대, 최소 실수값을 가지고 계산한다.
 
@@ -380,7 +474,7 @@ $$ S = {{r_{max} - r_{min}} \over {q_{max} - q_{min}}} $$
 
 ### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 3: linear quantization &nbsp;&nbsp;&nbsp;</span>
 
-예시 weight matrix에서 zero point, scale 값을 구하여라.
+예시 weight matrix에서 zero point, scaling factor 값을 구하여라.
 
 ![floating-point matrix](images/floating-point_matrix.png)
 
@@ -404,28 +498,37 @@ $$ Z = \mathrm{round}{\left( -2 - {{-1.08} \over {1.07}} \right)} = 1 $$
 
 ---
 
-## 5.5 Symmetric vs Asymmetric Quantization
+### 5.4.2 Sources of quantization error
 
-![symmetric, asymmetric, unsigned quantization](images/symmetric_asymmetric_signed.png)
+이러한 양자화 과정에서 quantization error를 증가시키는 주범을 찾아보자.
 
-> 위 예시에서는 데이터 분포를 봤을 때, symmetric signed quantization이 더 정밀하게 표현할 수 있다.
+![quant error example 1](images/quant_error_ex_1.png)
 
-- **symmetric quantization** : zero point가 0인 경우
+- round: 정수 **반올림**
 
-    `signed int`: zero point가 0에 정확히 매핑된다.
+- clip: 정해둔 **범위 사이로 값을 매핑**(=CLAMP)
 
-    `unsigned int`: ReLU와 같이 unsigned 출력이 나오는 경우 유리하다.
+    예를 들어 `int8`이면 -128~127 혹은 0~255 사이로 값을 매핑한다.
 
-- **asymmetric quantization** : zero point가 0이 아닌 경우
+그림에서 주목할 점은 다음과 같다.
 
-    - FP32 데이터 분포가 대칭적이지 않으면, asymmetric이 더 정밀하게 표현할 수 있다.
+- fp domain에서 <U>매우 가까운 두 값</U>은, 동일한 integer domain의 grid로 축소된다.
 
-    - 계산속도가 더 빠른 `unsigned int`를 사용하는 편이 유리하다.
+- $q_{max}$ 이후 fp32 <U>outlier</U>는, 모두 integer $2^{b} - 1$ 값으로 매핑된다.
 
+양자화 값을 다시 복원해 보자.
+
+![quant error example 2](images/quant_error_ex_2.png)
+
+- quantization error는 round, clip error의 합이다.
+
+하지만 위 예시처럼 항상 clip error가 round error보다 큰 것은 아니다. 예를 들어 다음과 같이 $q_{max}$ 값을 늘렸다면 round error가 더 커지게 된다. 이러한 **trade-off** 관계를 고려하여 quantization range를 정해야 하는 것이다.
+
+![quant error example 3](images/quant_error_ex_3.png)
 
 ---
 
-## 5.6 Linear Quantized Fully-Connected Layer
+## 5.5 Linear Quantized Fully-Connected Layer
 
 이러한 linear quantization을 행렬 연산 관점에서 실수를 정수로 매핑하는 **affine mapping**(아핀변환)으로 볼 수 있다.
 
@@ -486,7 +589,7 @@ $$Z_{Y}$$
 
 ---
 
-## 5.7 Linear Quantized Convolution Layer
+## 5.6 Linear Quantized Convolution Layer
 
 $$ Y = \mathrm{Conv} (W, X) + b $$
 
@@ -514,11 +617,11 @@ $$Z_{Y}$$
 
 ---
 
-## 5.8 Simulated Quantization
+## 5.7 Simulated Quantization
 
 하지만 fixed-point operation을 미리 general purpose hardware(예: CPU, GPU)로 시뮬레이션할 수 있다면 다양한 quantization scheme을 실험해 볼 수 있다.
 
-> 따라서 GPU 가속도 가능하다.
+> GPU 가속을 이용해 다양한 조건의 양자화를 검증 가능하다.
 
 이러한 시뮬레이션이 가능하게끔 딥러닝 프레임워크에서 quantization operations(**quantizer**)를 제공하고 있다.
 
