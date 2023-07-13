@@ -190,7 +190,7 @@ W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.
 
 $$ A_{i} = \sum_{j}{C_{i,j}} + b_i $$
 
-1. $C_{i,j}$ 자리에 먼저 행렬 $W$ 값이 load돤다.
+1. $C_{i,j}$ 자리에 먼저 행렬 $W$ 값이 load된다.
 
 $$ A_{i} = W_i \cdot \mathrm{x_1} + W_i \cdot \mathrm{x_2} + W_i \cdot \mathrm{x_3} + W_i \cdot \mathrm{x_4} $$
 
@@ -204,11 +204,13 @@ $$ A_{i} = W_i \cdot \mathrm{x_1} + W_i \cdot \mathrm{x_2} + W_i \cdot \mathrm{x
 
 그런데 이 과정에 **weight, bias quantization**을 추가하면 어떻게 될까?
 
-- 우선 floating-point tensor를 **scale-factor** $s_{X}$ 가 곱해진 형태의 integer tensor 로 변환한다.
+- 우선 floating-point tensor를 **scaling factor** $s_{X}$ 가 곱해진 형태의 integer tensor 로 변환한다.
 
-    $$ X_{fp32} \approx s_{X}X_{int} = \hat{X} $$
+```math
+X_{fp32} \approx s_{X}X_{int} = \hat{X}
+```
 
-    - $\hat{X}$ : scaled quantized tensor
+- $\hat{X}$ : scaled quantized tensor
 
 ```math
 W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.00 & 0.18 & 0.90 & 0.28 \\ 0.57 & 0.96 & 0.80 & 0.81 \end{bmatrix} \approx {{1} \over {255}}\begin{bmatrix} 247 & 163 & 189 & 255 \\ 148 & 214 & 214 & 207 \\ 0 & 46 & 229 & 71 \\ 145 & 245 & 204 & 207 \end{bmatrix} = s_{W}W_{uint8}
@@ -508,7 +510,7 @@ $$ Z = \mathrm{round}{\left( -2 - {{-1.08} \over {1.07}} \right)} = 1 $$
 
 - clip: 정해둔 **범위 사이로 값을 매핑**(=CLAMP)
 
-    예를 들어 `int8`이면 -128~127 혹은 0~255 사이로 값을 매핑한다.
+    예를 들어 `int8`이면 -128\~127 혹은 0\~255 사이로 값을 매핑한다.
 
 그림에서 주목할 점은 다음과 같다.
 
@@ -621,7 +623,7 @@ $$Z_{Y}$$
 
 하지만 fixed-point operation을 미리 general purpose hardware(예: CPU, GPU)로 시뮬레이션할 수 있다면 다양한 quantization scheme을 실험해 볼 수 있다.
 
-> GPU 가속을 이용해 다양한 조건의 양자화를 검증 가능하다.
+> GPU 가속을 이용해 다양한 조건의 양자화를 검증할 수 있다.
 
 이러한 시뮬레이션이 가능하게끔 딥러닝 프레임워크에서 quantization operations(**quantizer**)를 제공하고 있다.
 
