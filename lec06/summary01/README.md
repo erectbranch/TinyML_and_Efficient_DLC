@@ -221,11 +221,11 @@ $$ \tilde{W} = \lfloor | W | + \delta \rceil , \, \delta \in [0,1] $$
 
 따라서 activation quantization을 위해서는 적절한 범위를 탐색할 필요가 있다.
 
+![dynamic range](images/dynamic_range_activation.png)
+
 - clipping threshold인 $q_{min}$ , $q_{max}$ 값을 파악해야 한다.
 
 - threshold를 설정하면 scaling factor와 zero point를 계산 가능하다. 이를 statistics한 방식으로 찾는다.
-
-   ![dynamic range](images/dynamic_range_for_activation.png)
 
 ```math
 {\hat{r}}^{(t)}_{max, min} = \alpha \cdot {r}^{(t)}_{max, min} + (1-\alpha) \cdot {\hat{r}}^{(t-1)}_{max, min}
