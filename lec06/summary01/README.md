@@ -71,7 +71,9 @@ CNN에서 output channel별 weight가 갖는 값의 범위를 나타낸 아래 �
 
 $$ {|r|}_{max} = 2.12 $$
 
-$$ S = {{|r|}_{max} \over {q_{max}}} = {{2.12} \over {2^{2-1} - 1}} = 2.12 $$
+```math
+S = {{|r|}_{max} \over {q_{max}}} = {{2.12} \over {2^{2-1} - 1}} = 2.12
+```
 
 - quantized, reconstructed
 
@@ -87,25 +89,33 @@ $$ {||W-Sq_{W}||}_{F} = 2.28 $$
 
 $${|r|}_{max} = 2.09$$
 
-$$ S = {{|r|}_{max} \over {q_{max}}} = {{2.09} \over {2^{2-1} - 1}} = 2.09 $$
+```math
+S = {{|r|}_{max} \over {q_{max}}} = {{2.09} \over {2^{2-1} - 1}} = 2.09
+```
 
 - 2행
 
 $${|r|}_{max} = 2.12$$
 
-$$ S = {{|r|}_{max} \over {q_{max}}} = {{2.12} \over {2^{2-1} - 1}} = 2.12 $$
+```math
+S = {{|r|}_{max} \over {q_{max}}} = {{2.12} \over {2^{2-1} - 1}} = 2.12
+```
 
 - 3행
 
 $${|r|}_{max} = 1.92$$
 
-$$ S = {{|r|}_{max} \over {q_{max}}} = {{1.92} \over {2^{2-1} - 1}} = 1.92 $$
+```math
+S = {{|r|}_{max} \over {q_{max}}} = {{1.92} \over {2^{2-1} - 1}} = 1.92
+```
 
 - 4행
 
 $${|r|}_{max} = 1.87$$
 
-$$ S = {{|r|}_{max} \over {q_{max}}} = {{1.87} \over {2^{2-1} - 1}} = 1.87 $$
+```math
+S = {{|r|}_{max} \over {q_{max}}} = {{1.87} \over {2^{2-1} - 1}} = 1.87
+```
 
 - quantized, reconstructed
 
@@ -177,9 +187,13 @@ $$ \tilde{W} = \lfloor | W | + \delta \rceil , \, \delta \in [0,1] $$
 
 위 양자화 값을 최적화하는 과정을 수행한다.
 
-$$ \mathrm{argmin}_{V} {|| Wx - \tilde{W}x ||}^{2}_{F} + \lambda f_{reg}(V) $$
+```math
+\mathrm{argmin}_{V} {|| Wx - \tilde{W}x ||}^{2}_{F} + \lambda f_{reg}(V)
+```
 
-$$ \mathrm{argmin}_{V} {|| Wx - \lfloor \lfloor {W} \rfloor + h(V)\rceil x ||}^{2}_{F} + \lambda f_{reg}(V) $$
+```math
+\mathrm{argmin}_{V} {|| Wx - \lfloor \lfloor {W} \rfloor + h(V)\rceil x ||}^{2}_{F} + \lambda f_{reg}(V)
+```
 
 - $x$ : input
 
@@ -211,9 +225,11 @@ $$ \mathrm{argmin}_{V} {|| Wx - \lfloor \lfloor {W} \rfloor + h(V)\rceil x ||}^{
 
 - threshold를 설정하면 scaling factor와 zero point를 계산 가능하다. 이를 statistics한 방식으로 찾는다.
 
-    ![dynamic range](images/dynamic_range_for_activation.png)
+   ![dynamic range](images/dynamic_range_for_activation.png)
 
-$$ {\hat{r}}^{(t)}_{max, min} = \alpha \cdot {r}^{(t)}_{max, min} + (1-\alpha) \cdot {\hat{r}}^{(t-1)}_{max, min} $$
+```math
+{\hat{r}}^{(t)}_{max, min} = \alpha \cdot {r}^{(t)}_{max, min} + (1-\alpha) \cdot {\hat{r}}^{(t-1)}_{max, min}
+```
 
 이제 각 activation quantization을 위한 패러미터를 구하는 방법을 알아보자.
 
@@ -251,7 +267,9 @@ $$ \underset{{|r|}_{max}}{\min} \mathbb{E}[{(X - Q(X))}^{2}] $$
 
     ![KL divergence](images/KL_divergence.png)
 
-$$ D_{KL}(P||Q) = {\sum}_{i}^{N}P(x_{i})\log{{P(x_{i})} \over {Q(x_{i})}} $$
+```math
+D_{KL}(P||Q) = {\sum}_{i}^{N}P(x_{i})\log{{P(x_{i})} \over {Q(x_{i})}}
+```
 
 ---
 
