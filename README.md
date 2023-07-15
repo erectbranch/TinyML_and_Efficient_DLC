@@ -17,11 +17,11 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 - **효율적인 추론 방법 공부**
 
-  > DNN 연산에 있어서 효율성을 높일 수 있는 알고리즘을 공부한다.
+  > 딥러닝 연산에 있어서 효율성을 높일 수 있는 알고리즘을 공부한다.
 
-- **제한된 성능에서의 DNN 모델 구성**
+- **제한된 성능에서의 딥러닝 모델 구성**
 
-  > 디바이스의 제약에 맞춘 효율적인 DNN 모델을 구성한다.
+  > 디바이스의 제약에 맞춘 효율적인 딥러닝 모델을 구성한다.
 
 </br>
 
@@ -40,6 +40,14 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   > integer, fixed-point, floating-point(IEEE 754 single/half precision, BF16, TF32)
 
   > K-Means-based weight quantization, huffman coding, linear quantization(zero point, scale)
+
+- [Post Training Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec06/summary01)
+
+  > Weight Quantiztion: Per-Tensor Activation Per-Channel Activation, Weight Equalization, Adative Rounding
+
+  > Activation Quantization: During training(EMA), calibration batches(min-max, Mean Squared Error, KL-divergence)
+
+  > Bias Quantization
 
 - [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary01)
 
