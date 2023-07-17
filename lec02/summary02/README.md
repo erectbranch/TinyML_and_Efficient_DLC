@@ -50,7 +50,7 @@ $$ Latency \approx \max(T_{computation}, T_{memory}) $$
 
   분모는 hardware 특성, 분자는 NN 특성이다.
 
-$$ \approx {{\#Operations \, of \, NN} \over {\#Opeartions \, that \, Processor \, can \, Process \, Per \, Second}} $$
+$$ \approx {{Number \, of \, Operations \, of \, NN} \over {Number \, of \, Opeartions \, that \, Processor \, can \, Process \, Per \, Second}} $$
 
 - $T_{memory}$
 
@@ -86,9 +86,9 @@ $$ \approx {{Input \, activation \, size + Output \, activation \, size} \over {
 
   $W^{T}$ : 입력 채널 수( $c_i$ )와 출력 채널 수( $c_o$ )를 곱하면 된다.
 
-  ![linear layer](images/linear_layer.png)
+  ![linear layer](images/linear.png)
 
-$$\#Param = c_o \cdot c_i $$
+$$ c_o \cdot c_i $$
 
 - Convolution
 
@@ -244,9 +244,9 @@ $$ = 932,264 $$
 
 - Peak \#Activations 
 
-  $$\approx \#input \, activation + \#output \, activation $$
+$$\approx input \, activations + output \, activations $$
 
-  $$= 150,528 + 290,400 = 440,928$$
+$$= 150,528 + 290,400 = 440,928$$
 
 ---
 
@@ -278,7 +278,7 @@ $$ MACs = m \cdot n $$
 
 - Linear Layer
 
-  ![linear layer](images/linear_layer.png)
+  ![linear layer](images/linear.png)
 
 $$ c_o \cdot c_i $$
 
