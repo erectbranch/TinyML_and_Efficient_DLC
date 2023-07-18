@@ -27,6 +27,14 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 ## 🚩 정리한 문서 목록
 
+### 📖 Basics of Deep Learning
+
+- [Efficiency Metrics](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec02/summary02)
+
+  > latency, storage, energy
+
+  > Memory-Related(\#parameters, model size, \#activations), Computation(MACs, FLOP)
+
 ### 📔 Efficient Inference
 
 - [Pruning](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec03)
@@ -101,6 +109,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 ---
 ## Efficient Inference
+
 ---
 
 ### Lecture 3: Pruning and Sparsity (Part I)
