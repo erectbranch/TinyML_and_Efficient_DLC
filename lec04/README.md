@@ -76,21 +76,22 @@ R = \begin{cases} -Error, & if \, satisfies \, constrains \\ -\infty , & if \, n
 
     - **Action**: 각 레이어가 갖는 **sparsity ratio**.(pruning ratio)
 
-    ```math
-    a \in [0,1)
-    ```
+```math
+a \in [0,1)
+```
 
 - Embedding
 
     강화 학습을 위해서는 network architecture를 embedding해야 한다.
 
-    ```math
-    s_t = [N, C, H, W, i]
-    ```
-
-    - s : **state**. 11개 feature를 갖는다.
+    - $s$ : **state**. 11개 feature를 갖는다.
 
         layer index $i$ , channel number, kernel sizes, FLOPs, ...
+
+
+```math
+s_t = [N, C, H, W, i]
+```
 
 - Agent
 
@@ -156,18 +157,18 @@ fine-tuning 중 loss term에 **regularization** 항을 추가하는 것으로, w
 
 - L1 Regularization
 
-    ```math
-    L' = L(x; W) + \lambda |W|
-    ```
-
     - $L$: data loss
 
     - $\lambda$: regularization strength
 
+```math
+L' = L(x; W) + \lambda |W|
+```
+
 - L2 Regularization
 
-    ```math
-    L' = L(x; W) + \lambda ||W||^2
-    ```
+```math
+L' = L(x; W) + \lambda ||W||^2
+```
 
 ---
