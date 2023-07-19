@@ -69,20 +69,24 @@ pruning ratio를 정하기 위해서는, 우선 해당 레이어가 pruning에 �
       > latency constraints는 latency lookup table(LUT)을 미리 만들어서 구현한다.
 
 ```math
-R = \begin{cases} -Error, & if \, satisfies \, constrains \\ -\infin , & if \, not \end{cases}
+R = \begin{cases} -Error, & if \, satisfies \, constrains \\ -\infty , & if \, not \end{cases}
 ```
 
 - actor
 
     - **Action**: 각 레이어가 갖는 **sparsity ratio**.(pruning ratio)
 
-    $$ a \in [0,1) $$
+    ```math
+    a \in [0,1)
+    ```
 
 - Embedding
 
     강화 학습을 위해서는 network architecture를 embedding해야 한다.
 
-    $$ s_t = [N, C, H, W, i] $$
+    ```math
+    s_t = [N, C, H, W, i]
+    ```
 
     - s : **state**. 11개 feature를 갖는다.
 
@@ -152,7 +156,9 @@ fine-tuning 중 loss term에 **regularization** 항을 추가하는 것으로, w
 
 - L1 Regularization
 
-    $$ L' = L(x; W) + \lambda |W| $$
+    ```math
+    L' = L(x; W) + \lambda |W|
+    ```
 
     - $L$: data loss
 
@@ -160,6 +166,8 @@ fine-tuning 중 loss term에 **regularization** 항을 추가하는 것으로, w
 
 - L2 Regularization
 
-    $$ L' = L(x; W) + \lambda ||W||^2 $$ 
+    ```math
+    L' = L(x; W) + \lambda ||W||^2
+    ```
 
 ---
