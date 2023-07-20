@@ -172,13 +172,12 @@ $$ s.t. {||W_{p}||}_{0} \le N $$
 
 > s.t.: subject to
 
+> L0-norm은 엄밀히는 norm이 아니며, 벡터에서 0이 아닌 원소의 개수를 의미한다.(\#nonzeros)
+
 - $W_{p}$ : pruned weights
 
-- ${||W_{p}||} { }_{0}$ : $W_{p}$ 의 L0 norm
-
-    엄밀히는 norm이 아니며, 벡터에서 0이 아닌 원소의 개수를 의미한다.(\#nonzeros)
-
 - $N$ : threshold
+
 
 ---
 
