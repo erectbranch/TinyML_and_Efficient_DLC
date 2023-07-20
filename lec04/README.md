@@ -145,7 +145,7 @@ pruning 후 정확도를 회복하는 fine-tuning 과정에서는, 이미 해당
 
 ---
 
-## 4.3 Regularization
+### 4.2.1 Regularization
 
 fine-tuning 중 loss term에 **regularization** 항을 추가하는 것으로, weight를 더 sparse하게 만들 수 있다.
 
@@ -170,5 +170,61 @@ L' = L(x; W) + \lambda |W|
 ```math
 L' = L(x; W) + \lambda ||W||^2
 ```
+
+---
+
+## 4.3 Lottery Ticket Hypothesis
+
+> [The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks 논문](https://arxiv.org/abs/1803.03635)
+
+그렇다면 sparse neural network를 from scratch부터 다시 학습하면 어떨까?(가중치를 무작위로 초기화한 뒤 다시 학습) 이러한 의문에 대한 답을 간단히 요약하면 다음과 같다.
+
+- pruning을 통해 얻은 architecture는, 다시 학습하면 더 낮은 정확도를 얻을 가능성이 크다.
+
+- 하지만 찾기는 어려워도 기존의 dense model보다 적은 패러미터를 가지면서, 더 적은 iteration 학습만으로도 동일한 성능을 갖는 sub-network(=**winning ticket**)가 존재할 가능성이 있다.
+
+다음은 The Lottery Ticket Hypothesis 논문에서 weight를 비율에 따라 pruning한 뒤 모델을 다시 학습한 결과이다.
+
+![Lottery Ticket Hypothesis graph](images/lottery_ticket_hypothesis_graph.png)
+
+- 왼쪽: MNIST, 오른쪽: CIFAR-10 데이터셋
+
+- 굉장히 aggressive한 pruning ratio로도(오직 weight를 1%만 남겨도) 정확도 회복이 가능하다.
+
+---
+
+### 4.3.1 Iterative Magnitude Pruning
+
+이러한 winning ticket 모델은 **Iterative Magnitude Pruning** 방법을 통해 찾아낼 수 있다.
+
+1. dense model 학습 $\rightarrow$ pruning $\rightarrow$ 동일한 sparsity pattern을 가지며 다른 weight를 갖는 모델이 되도록 무작위 초기화
+
+    > 이를 **sparsity mask**라고 한다.
+
+    ![iterative magnitude pruning 1](images/iterative_magnitude_pruning_1.png)
+
+2. 해당 모델을 다시 재학습 $\rightarrow$ pruning
+
+    ![iterative magnitude pruning 2](images/iterative_magnitude_pruning_2.png)
+
+3. 2번을 통해 얻은 모델을 동일한 sparsity pattern을 갖는 무작위 가중치 모델로 초기화
+
+    ![iterative magnitude pruning 3](images/iterative_magnitude_pruning_3.png)
+
+4. 2번과 3번 과정을 반복하며 winning ticket를 찾는다.
+
+단, 이러한 Iterative Magnitude Pruning 방법은 수렴할 때까지 계속 학습해야 한다는 단점을 갖는다.
+
+---
+
+### 4.3.2 Scaling Limitation
+
+> [Stabilizing the Lottery Ticket Hypothesis 논문](https://arxiv.org/abs/1903.01611)
+
+단, MNIST, CIFAR-10과 같이 작은 데이터셋과 달리, ImageNet과 같이 거대한 데이터셋에서는 from scratch( $W_{t=0}$ )부터 학습하면 정확도가 복구되지 않는다. 
+
+대신 적은 $k$ 번 횟수만큼 training iteration을 거친 뒤의 가중치( $W_{t=k}$ )를 사용하는 것으로, pruned sub-networks의 정확도를 회복할 수 있다.
+
+![scaling limitation](images/lottery_imagenet.png)
 
 ---
