@@ -174,7 +174,7 @@ $$ s.t. {||W_{p}||}_{0} \le N $$
 
 - $W_{p}$ : pruned weights
 
-- ${||W_{p}||}_{0}$ : $W_{p}$ 의 L0 norm
+- ${||W_{p}||} { }_{0}$ : $W_{p}$ 의 L0 norm
 
     엄밀히는 norm이 아니며, 벡터에서 0이 아닌 원소의 개수를 의미한다.(\#nonzeros)
 
@@ -184,47 +184,39 @@ $$ s.t. {||W_{p}||}_{0} \le N $$
 
 ## 3.3 pruning granularity
 
-![pruning pattern](images/pruning_pattern.png)
+그렇다면 pruning은 어떤 단위로 적용하는 것이 좋을까? 예를 들어 $8 \times 8$ 크기를 갖는 2D weights matrix가 있다고 하자.
 
-현대 computation에서 GPU는 pixel 개별이 아닌 pixel chunk 단위로 효율적으로 계산한다. 마찬가지로 pruning 과정에서 weight들을 개별로 쪼개지 않고(그림의 상단), chunk와 같이 특정한 pattern으로 만든다면(그림의 하단) 더 효율적인 연산이 가능하다.
+먼저 unstructured/structured 두 가지 방식 중 하나를 적용할 수 있다.
 
-예를 들어 8x8 형태의 2D weights matrix가 있다고 하자.
+1. **Unstructured**(Fine-grained pruning)
 
-![8x8 weights matrix](images/8_8_matrix.png)
+    weight element 단위를 pattern 없이 pruning한다.
 
-pruning은 크게 unstructured/structured 두 가지 방식으로 적용할 수 있다.
+   ![unstructured](images/8_8_matrix_unstructed.png)
 
-> 미리 layer마다 pruning할 비율을 정하는 predefined(사실상 structured)나, training 과정에서 탐색하는 automatic으로 분류할 수도 있다.
+    - weight마다 prune 여부를 결정할 수 있기 때문에 flexible하고 compression ratio가 높다.
 
-1. **unstructured pruning**
+        > 그러나 큰 model에서는 structured보다 accuracy가 떨어지는 경향이 있다.
 
-![unstructured](images/8_8_matrix_unstructed.png)
+    - 하지만 너무 불규칙하기 때문에 GPU 가속을 적용하기 어렵다.
 
-- weight element 단위로 no pattern으로 pruning한다.
+        > 해당 sparse matrix에 특화된 hardware(FPGA 등)를 설계한 뒤 acceleration을 수행하면 좋은 결과를 얻을 수 있다.
 
-- weight 개별로 prune 여부를 결정할 수 있기 때문에, flexible하고 compression ratio가 높다.
+    - weight position을 저장해야 하는 overhead가 발생한다.
 
-- 하지만 특성상 GPU로 accelerate하기에는 어렵다. matrix가 너무 불규칙하기 때문이다.(weight들의 position도 올바르게 저장해야 되기 때문에 overhead가 발생한다.)
+2. **Structured**(Coarse-grained pruning)
 
-    > sparse matrix를 효율적으로 계산하도록 조정하지 않으면 추론에서 이득을 얻을 수 없다.(일반적인 라이브러리에서는 추가적인 조정이 꼭 필요하다.)
+    ![structured](images/8_8_matrix_structured.png)
 
-    > 물론 해당 sparse matrix에 특화된 hardware(FPGA 등)를 설계한 뒤 acceleration을 수행하면 좋은 결과를 얻을 수 있다.
+    - row와 같은 pattern 단위로 pruning하는 방법이다.
 
-    > 대체로 작은 model에서는 structured와 비슷한 accuracy를 가질 수 있지만, 대체로 큰 model에서는 structured pruning보다 accuracy가 떨어지는 경향이 있다.
-
-2. **structured pruning**
-
-![structured](images/8_8_matrix_structured.png)
-
-- entire row를 pruning하는 less flexible한 방법이다.
-
-- 예제 그림에서는 8x8 matrix를 특수한 설계 없이 간단히 5x8 matrix로 바꿨다. 이처럼 쉽게 accelerate가 가능하다.
+    - 쉽게 GPU를 이용한 가속이 가능하다.
 
 ---
 
 ## 3.4 pruning at different granularities
 
-아래 convolutional layer의 예시 그림을 보자. filter의 weights는 다음과 같이 4개의 dimension을 가지고 있다.
+2D convolutional layer 예시를 보자. filter는 4차원 weight로 구성된다.
 
 ![convolution](images/convolution.png)
 
@@ -236,57 +228,51 @@ pruning은 크게 unstructured/structured 두 가지 방식으로 적용할 수 
 
 - $k_{w}$ : kernel size width
 
-4개의 dimension이므로 더 많은 pruning granularity가 존재한다. 아래 그림은 $c_{o} = 3, c_{i} = 2, k_{h} = 3, k_{w} = 3$ 에서의 weight matrix다.
-
-![convolutional layer pruning ex](images/convolution_layer_pruning_ex_1.png)
+dimension이 4개나 있는 만큼 다양한 pruning granularity가 존재한다. 
 
 ![convolutional layer pruning ex 2](images/convolution_layer_pruning_ex_2.png)
 
-그렇다면 이런 다양한 pruning에서 어떤 방법이 제일 효과적일까?
+- **Fine-grained**
 
-- 극단적인 압축률을 목표로 하는 경우 fine-grained pruning(unstructured)을 선택하고, 이에 specialized hardware를 사용하면 최적의 결과를 얻을 수 있다.
+    - 극단적인 압축률을 얻을 수 있다. 
+    
+    - specialized hardware를 사용하여 최적의 결과를 얻을 수 있다.
 
-- CPU에서의 acceleration을 원한다면 channel-level이 제일 적합하다.
+- **Pattern-based**
 
-- pattern-based pruning
-
-    다음은 Ampere GPU 이상이면 지원하는 **pattern-based pruning**: N:M sparsity 예시다. N:M sparsity란 M개의 element당 element N개가 prune되는 것을 의미한다.
+    Ampere GPU 이상이면 지원하는 **pattern-based pruning**: N:M sparsity가 대표적이다. (N:M sparsity: M개의 element당 element N개가 pruned)
 
     - 2:4 sparsity case(50% sparsity)
 
-    ![pattern-based pruning](images/pattern_based_pruning.png)
+        ![pattern-based pruning](images/pattern_based_pruning.png)
 
-    accuracy는 거의 유지하면서 거의 ~2x speedup 성능을 지닌다.
+    > accuracy는 거의 유지하면서 거의 ~2x speedup 성능을 지닌다.
 
-- channel pruning
+- **Channel-level**
 
-    **channel pruning**은 importance가 작은 channel들을 자르는 방법이다. CPU 관점에서 봤을 때 제일 작업 부하가 적다. 이렇게 channel 수를 줄이는 것으로 direct하게 speedup을 구현할 수 있지만, 대신 compression ratio는 낮은 편이다.
+    - CPU 관점에서 제일 작업 부하가 적어서 유리한 방식이다. 
+    
+    - channel 수를 줄이는 것으로 direct하게 speedup을 구현할 수 있다.
+    
+    - 대신 compression ratio는 낮은 편이다.
 
-    ![channel pruning](images/channel_pruning.png)
+    - channel을 모두 uniform하게 pruning하기보다는, channel마다 특정한 pruning ratio를 적용하는 편이 좋다.
 
-    ThiNet(2017)에서는 'pruning된 후 channel의 output element( $\hat{x}$ )들의 합'이 '원래 channel의 output element( $\hat{y}$ )들의 합'과 차이가 적은 channel을 중요하지 않다고 판단하고 잘라낸다.
-
-```math
-\underset{S}{\mathrm{argmin}} \sum_{i=1}^{m}{({\hat{y}_{i}} - \sum_{j \in S}{\hat{x}_{i,j}})^2}
-```
-
-$$ s.t. \quad |S| = C \times r, \quad S \subset \lbrace 1,2,...,C \rbrace $$
-
-참고로 channel pruning이 모든 channel size를 일정하게 줄이는 uniform shrink보다 더 효율적이다.
-
-![uniform shrink < channel prune](images/uniform_vs_channel_pruning.png)
-
-![uniform shrink < channel prune 2](images/uniform_vs_channel_pruning_2.png)
+        ![channel pruning](images/channel_pruning.png)
 
 ---
 
 ## 3.5 pruning criterion
 
-그렇다면 어떻게 synapse/neuron의 importance를 알 수 있을까?
+그렇다면 어떤 weight가 중요한지를 어떻게 알 수 있을까?
 
 ---
 
-## 3.5.1 magnitude-based pruning
+### 3.5.1 magnitude-based pruning
+
+단순히 weight의 절댓값을 바탕으로 중요도를 정할 수 있다.(**L1-norm**)
+
+$$ Importance = |W| $$
 
 다음 예시를 보자.
 
@@ -296,49 +282,50 @@ $$ f(\cdot) = ReLU(\cdot), W = [10, -8, 0.1] $$
 
 $$ \rightarrow y = ReLU(10 x_{0} - 8 x_{1} + 0.1 x_{2}) $$
 
-간단한 판단 기준으로 절댓값의 크기(**L1-norm**)를 사용할 수 있다.
-
-$$ Importance = |W| $$
-
-magnitude-based pruning에서는 단순히 절댓값(L1-norm)이 큰 weight가 더 important하다. 위 예시를 예로 들면 weight가 제일 작은 $x_{2}$ 가 바로 prune할 대상이 된다.
-
-각 element별로 이 기준을 적용한다면 다음과 같이 pruning할 수 있다.
-
-![heuristic pruning criterion](images/magnitude-based_pruning_ex_1.png)
-
-혹은 row 전체를 기준으로 적용할 수도 있다. 이 경우 importance는 다음과 같다.
-
-$$ Importance = \sum_{i \in S}{|w_{i}|} $$
-
-![heuristic pruning criterion 2](images/magnitude-based_pruning_ex_2.png)
-
-row 전체에 L1 norm 대신 L2 norm을 적용할 수도 있다.
-
-$$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
-
-![heuristic pruning criterion 3](images/magnitude-based_pruning_ex_3.png)
-
-그렇다면 training 중에서 neural network가 더 sparse하게 만들 수는 없을까? channel output에 곱해지는 scaling factor을 기준으로 삼아서 filter pruning을 적용할 수도 있다.
-
-다음의 L1-norm based filter pruning 예시를 보자. 
-
-![filter pruning](images/filter_pruning.png)
-
-- 각 filter에 속한 weight들의 절댓값의 합(L1-norm)을 구한다.
-
-    > scaling factor는 batch normalization과 연관이 깊다.
-
-여기서 작은 scaling factor를 갖는 channel을 pruning할 수 있다.(절댓값이 작은 filter가 덜 중요하다는 가정이다.)
-
-![filter pruning 2](images/filter_pruning_2.png)
+위 예시에서는 weight가 제일 작은 $x_{2}$ 가 prune할 대상이 된다.
 
 ---
 
-### 3.5.2 second-order-based pruning
+#### 3.5.1.1 magnitude-based pruning examples
 
-다른 접근 방법으로 pruning synapses의 loss function을 기준으로 삼을 수 있다.
+- Element-wise
 
-- loss function에 Taylor series 근사를 적용하면 수식은 다음과 같다,
+    ![heuristic pruning criterion](images/magnitude-based_pruning_ex_1.png)
+
+- Row-wise(L1-norm)
+
+    ![heuristic pruning criterion 2](images/magnitude-based_pruning_ex_2.png)
+
+
+$$ Importance = \sum_{i \in S}{|w_{i}|} $$
+
+- Row-wise(L2-norm)
+
+    ![heuristic pruning criterion 3](images/magnitude-based_pruning_ex_3.png)
+
+$$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
+
+---
+
+### 3.5.2 Scaling-based Pruning
+
+channel output에 곱해지는 scaling factor을 기준으로 삼아서, 각 filter마다 pruning을 적용할 수도 있다.
+
+> scaling factor는 trainable parameter로 batch normalization과 연관이 깊다.
+
+1. 각 filter마다 weight의 L1-norm을 구한다
+
+    ![filter pruning](images/filter_pruning.png)
+
+2. 작은 scaling factor를 갖는 channel을 pruning한다.
+
+    ![filter pruning 2](images/filter_pruning_2.png)
+
+---
+
+### 3.5.3 second-order-based pruning
+
+loss function을 기준으로 pruning을 적용할 수도 있다. loss function에 Taylor series 근사를 적용한 수식은 다음과 같다,
 
 $$ \delta L = L(x; W) - L(x; W_{p} = W - \delta W) $$
 
@@ -348,17 +335,25 @@ $$ = \sum_{i}{g_{i}{\delta}w_{i}} + {1 \over 2}\sum_{i}{h_{ii}{\delta}{w_{i}^{2}
 
 - second order derivative $h_{i,j} = {{\partial}^{2}L \over {{\partial}w_{i}{\partial}w_{j}}}$
 
-우선 third order derivative항( $O({||{\delta}W||}^{3})$ )은 매우 작다고 가정하고 제거할 수 있다.(objective function $L$ 은 거의 **quadratic**(2차 방정식)에 가깝다.)
+위 수식을 수정해 보자.
 
-또한 neural network traning은 기본적으로 수렴한다. first-order term $g_{i}$ 은 0에 가깝게 수렴하므로 무시할 수 있다.
+- third order derivative항( $O({||{\delta}W||}^{3})$ )은 매우 작다고 가정하고 제거할 수 있다.
 
-cross terms( $h_{ij}{\delta}w_{i}{\delta}w_{j}$ )에서는 parameter들은 서로 independent하다. 이 term도 무시할 수 있다.
+    (objective function $L$ 은 거의 **quadratic**(2차 방정식)에 가깝다.)
 
-따라서 이들을 제거하고 나서 남는 항은 다음과 같다.
+- neural network traning은 기본적으로 수렴한다. 
+
+    따라서 first-order term $g_{i}$ 이 0에 가깝게 수렴하므로 무시할 수 있다.
+
+- cross terms( $h_{ij}{\delta}w_{i}{\delta}w_{j}$ )에서는 parameter들이 서로 independent하다.
+
+    따라서 무시할 수 있다.
+
+따라서 이들을 제거하면 남는 항은 다음과 같다.
 
 $$ {\delta}{L_{i}} = L(x;W) - L(x; W_{p}|w_{i}=0) \approx {1 \over 2}{h_{ii}{\delta}{w_{i}}^{2}} $$
 
-이제 다음 importance score를 이용해서 어떤 weight를 pruning해야 할지 결정할 수 있다.
+이를 importance score로 사용하여, 어떤 weight를 pruning해야 할지 결정할 수 있다.
 
 ```math
 {importance}_{w_{i}} = |{\delta}L_{i}| = {1 \over 2}{h_{ii}{w_{i}}^{2}}
@@ -366,73 +361,45 @@ $$ {\delta}{L_{i}} = L(x;W) - L(x; W_{p}|w_{i}=0) \approx {1 \over 2}{h_{ii}{\de
 
 - 이때 $h_{ii}$ 는 non-negative하다.
 
-하지만 **Hessian matrix**(헤세 행렬. 이계도함수를 행렬로 표현한 것)은 계산이 복잡하기 때문에 overhead가 발생하게 된다.
-
----
-
-### 3.5.3 selection of neurons to prune
-
-- neuron pruning in linear layer
-
-    어떤 neuron이 중요한지 확인하기 위한 좋은 수단으로 magnitude-based pruning을 사용할 수 있다. 다음은 linear layer에서 한 neuron을 pruning한 모습이다.
-
-    ![neuron pruning in linear layer](images/neuron_pruning_linear_layer.png)
-
-    pruning된 neuron과 연관된 모든 connection이 사라지므로, weight matrix에서 row 하나가 아예 사라지게 된다.
-
-    ![neuron pruning weight matrix](images/neuron_pruning_weight_matrix.png)
-
-- channel pruning in convolution layer
-
-    다은은 convolution layer에서의 channel pruning을 적용한 그림이다. 
-
-    ![channel pruning in convolution layer](images/channel_pruning_convolution_layer.png)
-
-    output의 channel을 pruning한다는 것은, 그 이전 단계에서 해당 output channel을 구성한 filter를 자르는 것과 동일하다.
-
-    ![channel pruning weight matrix](images/channel_pruning_weight_matrix.png)
-
-    그림처럼 3x3 filter가 row 단위로 사라지게 된 모습을 확인할 수 있다.
+> 하지만 **Hessian matrix**(헤세 행렬. 이계도함수를 행렬로 표현한 것)의 계산이 복잡하기 때문에 computation overhead가 발생하게 된다.
 
 ---
 
 ### 3.5.4 percentage-of-zero-based pruning
 
-다음 예시를 보자. ReLU activation을 거쳐 나온 output activations이다.
+다음은 ReLU activation을 거친 output activations 예시다.(ReLU activation을 거치기 때문에 0을 갖는 값들이 생긴다.)
 
 ![channel pruning ex](images/channel_pruning_ex_1.png)
 
-- ReLU activation을 거치기 때문에 0을 갖는 값들이 생긴다.
-
 - 2개의 batch(2개의 서로 다른 image)
 
-- 각 image는 4x4 resolution에 3 channel을 갖는다.
+    즉, batch dimension을 갖는다.
 
-이제 각 image에서 어떤 channel을 pruning할지 결정해야 한다. 그런데 batch dimension이 있기 때문에, 한 batch에 적용되는 prune pattern이 다른 batch에도 적용되므로 batch 양쪽을 다 고려해서 선택해야 한다.
+- 각 image는 4x4 resolution, 3 channel을 갖는다.
 
-기본적으로는 **Average Percentage of Zeros**(APoZ), 즉 channel에 있는 0의 비율을 기준으로 판단한다.
+이런 경우 prune pattern을 정할 때, batch 양쪽을 다 고려해서 선택해야 한다. 보통은 **Average Percentage of Zeros**(APoZ), 즉 channel이 갖는 0의 비율을 기준으로 판단한다.
 
-- 두 batch의 channel 0: 4x4 resolution 2개에, 0이 총 5+6개 존재한다.
+- 두 batch의 channel 0: 4x4 resolution 2개, 0이 총 5+6개 존재한다.
 
 $$ {{5+6} \over {2 \cdot 4 \cdot 4}} = {11 \over 32} $$
 
-- 두 batch의 channel 1: 4x4 resolution 2개에, 0이 총 5+7개 존재한다.
+- 두 batch의 channel 1: 4x4 resolution 2개, 0이 총 5+7개 존재한다.
 
 $$ {{5+7} \over {2 \cdot 4 \cdot 4}} = {12 \over 32} $$
 
-- 두 batch의 channel 2: 4x4 resolution 2개에, 0이 총 6+8개 존재한다.
+- 두 batch의 channel 2: 4x4 resolution 2개, 0이 총 6+8개 존재한다.
 
 $$ {{6+8} \over {2 \cdot 4 \cdot 4}} = {14 \over 32} $$
 
-channel 2가 제일 0의 비율이 많다. 이 channel을 pruning할 수 있다.
+channel 2가 제일 0의 비율이 많으므로, channel 2를 pruning한다.
 
 ---
 
 ### 3.5.5 regression-based pruning
 
-loss function을 고려하는 대신 regression을 기반으로 한 heuristic한 방법으로, 'original output'과 'pruning한 output'의 차이가 제일 적은 channel을 pruning한다.
+regression을 기반으로 한 heuristic한 방법으로, 'original output'과 'pruning 후 output' 오차가 제일 적은 channel을 pruning할 수 있다.
 
-다음과 같이 original output $Z$ 와 pruning을 거친 $\hat{Z}$ 가 있다.
+다음과 같이 original output $Z$ 와 pruning을 거친 $\hat{Z}$ 가 있다고 하자.
 
 ![original output](images/original_output.png)
 
@@ -440,7 +407,7 @@ $$ Z = XW^{T} = \sum_{c=0}^{c_{i}-1}{X_{c}{W_{c}}^{T}} $$
 
 ![pruned output](images/pruned_output.png)
 
-regression-based pruning의 목표는 다음과 같이 수식으로 나타낼 수 있다.
+regression-based pruning의 목표는 다음과 같은 수식으로 나타낼 수 있다.
 
 ```math
 {\mathrm{arg}}\underset{W, {\beta}}{\mathrm{min}}{||Z-\hat{Z}||}^{2}_{F} = || Z - \sum_{c=0}^{c_{i}-1}{||{{\beta}_{c}X_{c}{W_{c}}^{T}}||}^{2}_{F}
@@ -450,7 +417,9 @@ regression-based pruning의 목표는 다음과 같이 수식으로 나타낼 �
 s.t. \quad {||\beta||}_{0} \le N_{c}
 ```
 
-- $\beta$ : length가 $c_i$ 인 coefficient vector. $\beta = 0$ 이라면 channel이 prune된다.
+- $\beta$ 
+
+    length가 $c_i$ 인 coefficient vector. $\beta = 0$ 일 때 channel이 prune된다.
 
 - $N_{c}$ : nonzero channel 수
 
