@@ -166,7 +166,7 @@ continuous 혹은 large set of values 특성을 가진 연속적인 입력을 di
 
 - silicon area
 
-neural network에 quantization을 적용하기 전/후의 weight 분포 차이를 살펴보자.
+neural network에 quantization을 적용하기 전/후의 weight 분포 차이를 살펴보자. continuous space가 discrete space로 매핑된다.
 
 ![continuous weight](images/continuous-weight.png)
 
@@ -190,9 +190,9 @@ W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.
 
 $$ A_{i} = \sum_{j}{C_{i,j}} + b_i $$
 
-1. $C_{i,j}$ 자리에 먼저 행렬 $W$ 값이 load된다.
-
 $$ A_{i} = W_i \cdot \mathrm{x_1} + W_i \cdot \mathrm{x_2} + W_i \cdot \mathrm{x_3} + W_i \cdot \mathrm{x_4} $$
+
+1. $C_{i,j}$ 자리에 먼저 행렬 $W$ 값을 load한다.
 
 2. 한 사이클마다 행렬 $X$ 에서 다음 input value를 가져온다.
 
@@ -200,39 +200,37 @@ $$ A_{i} = W_i \cdot \mathrm{x_1} + W_i \cdot \mathrm{x_2} + W_i \cdot \mathrm{x
 \begin{bmatrix} 0.41 \\ 0.00 \\ 0.42 \\ 0.39 \end{bmatrix}
 ```
 
-3. 연산이 끝나면 행렬 $X$ 의 다음 열을 가져와서 순차적으로 계산한다.
+3. 연산 후 행렬 $X$ 의 다음 열을 가져와서 순차적으로 계산한다.
 
 그런데 이 과정에 **weight, bias quantization**을 추가하면 어떻게 될까?
 
-- 우선 floating-point tensor를 **scaling factor** $s_{X}$ 가 곱해진 형태의 integer tensor 로 변환한다.
+1. floating-point tensor 대신 **scaling factor** $s_{X}$ 가 곱해진 형태의 integer tensor 를 사용한다.
 
 ```math
 X_{fp32} \approx s_{X}X_{int} = \hat{X}
 ```
 
+```math
+\hat{X} = {{1} \over {255}} \begin{bmatrix} 105 & 64 & 186 & 168 \\ 0 & 105 & 105 & 145 \\ 107 & 61 & 181 & 255 \\ 99 & 209 & 43 & 89 \end{bmatrix}
+```
+
 - $\hat{X}$ : scaled quantized tensor
+
+- **최소값 0→0**, **최대값 1.00→255**, `uint8` 타입으로 매핑되었다.
+
+2. weight tensor도 scaling factor $s_{W}$ 를 곱한 integer tensor를 사용한다.
 
 ```math
 W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.00 & 0.18 & 0.90 & 0.28 \\ 0.57 & 0.96 & 0.80 & 0.81 \end{bmatrix} \approx {{1} \over {255}}\begin{bmatrix} 247 & 163 & 189 & 255 \\ 148 & 214 & 214 & 207 \\ 0 & 46 & 229 & 71 \\ 145 & 245 & 204 & 207 \end{bmatrix} = s_{W}W_{uint8}
 ```
 
-- **최소값 0→0**, **최대값 1.00→255**, `uint8` 타입으로 매핑되었다.
-
-나머지 행렬도 변환하면 다음과 같다.
-
-```math
-\hat{X} = {{1} \over {255}} \begin{bmatrix} 105 & 64 & 186 & 168 \\ 0 & 105 & 105 & 145 \\ 107 & 61 & 181 & 255 \\ 99 & 209 & 43 & 89 \end{bmatrix}
-```
-
-- **최소값 0→0**, **최대값 1.00→255**, `uint8` 타입으로 매핑되었다.
+3. bias tensor는 `int32` 타입으로 매핑된다.
 
 ```math
 \hat{b} = {{1} \over {255^2}}\begin{bmatrix} 650 \\ 1300 \\ 1951 \\ 650 \end{bmatrix} 
 ```
 
-- `int32` 타입으로 매핑되었다.
-
-  **overflow**를 피하기 위해서는 이처럼 <U>더 큰 bit width를 사용</U>해야 한다.
+-  **overflow**를 피하기 위해서는 이처럼 <U>더 큰 bit width를 사용</U>해야 한다.
 
 - $\hat{W}, \hat{X}$ 가 가지고 있는 ${{1} \over {255}}$ 가 서로 곱해지면 ${{1} \over {255^2}}$ 가 되므로, quantized bias $\hat{b}$ 는 scaling factor로 ${{1} \over {255^2}}$ 를 사용한다.
 
@@ -250,7 +248,7 @@ W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.
 
 ---
 
-## 5.2.2 Symmetric vs Asymmetric Quantization
+### 5.2.2 Symmetric vs Asymmetric Quantization
 
 ![symmetric, asymmetric, unsigned quantization](images/symmetric_asymmetric_signed.png)
 
@@ -272,15 +270,41 @@ W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.
 
 ---
 
+### 5.2.3 Uniform vs Non-uniform Quantization
+
+quantization의 step size를 uniform(균일)하게 정하거나, non-uniform하게 정하는가에 따라서도 표현력이 달라진다.
+
+![uniform vs non uniform](images/uniform_vs_non_uniform.png)
+
+- **uniform quantization**: (a)
+
+    - 표현력은 non-uniform보다 떨어지지만 구현이 더 쉽다.
+
+- **non-uniform quantization**: (b)
+
+    - 분포에 따라 step size가 결정된다. 
+    
+    - 예시) **logarithmic quantization**: (c) 
+    
+      same storage에서 더 넓은 범위의 값의 표현이 가능하다.
+
+$$ Q(x) = Sign(x)2^{round(\log_{2}|x|)} $$
+
+---
+
 ## 5.3 Efficient Weights Quantization
 
-그렇다면 quantization bits는 어느 정도가 효율적일까? 아래는 CNN에서 다양한 precision으로 quantization했을 때 정확도를 나타낸 도표다.
+그렇다면 quantization bits는 어느 정도가 효율적일까? CNN의 main operation에 해당되는 convolution(MAC), Fully-Connected(FC) layer를 quantization했을 때 정확도를 나타낸 도표를 살펴보자.
 
 ![quantization bits](images/quantization_bits.png)
 
 - Conv layer: 4bits 이상
 
 - FC layer: 2bits 이상
+
+참고로 대표적인 CNN 모델에서 Conv, FC layer이 갖는 비중은 다음과 같다.
+
+![CNN models Conv, FC layers](images/conv_fc_cnn.png)
 
 ---
 
@@ -356,7 +380,11 @@ ImageNet dataset으로 훈련한 AlexNet에서 pruning+quantization, pruning, qu
 
 ### 5.4.1 K-Means-based Quantization
 
+> [Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding 논문(2015)](https://arxiv.org/abs/1510.00149)
+
 **K-Means-based weight quantization**이란 여러 <U>bucket을 갖는 codebook</U>(**centroids**, 무게중심)을 만들어서 quantization하는 방식이다.
+
+> clustering 기법 자체를 non-uniform quantization의 일종으로 볼 수 있다.(quantization level 수 = cluster 수)
 
 > 예를 들어 Computer Graphics에서는, 65536개의 스펙트럼으로 이루어진 원래 색상을 256개의 bucket을 갖는 codebook을 만들어서 quantization을 수행한다.
 
@@ -366,7 +394,7 @@ ImageNet dataset으로 훈련한 AlexNet에서 pruning+quantization, pruning, qu
 
 - 연산: Floating-Point Arithmetic
 
-> 예제에서 codebook의 cluster index는 0~3까지의 2bit로 표현된다.
+> 예제에서 codebook의 cluster index는 0~3까지 있으므로 2bit로 표현된다.
 
 ### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 2: K-Means-based Quantization의 메모리 사용량 &nbsp;&nbsp;&nbsp;</span>
 
@@ -414,11 +442,23 @@ K-Means-based Quantization 이전/이후 필요한 memory를 계산하라.
 
 ![Fine-tuning quantized weights(K-means)](images/K-means_fine_tune.png)
 
-그러나 K-Means-based weight quantization은, weight만 integer type으로 바꾼 뒤, 실제 추론 상황에서는 다시 floating-point로 바꾸어야 한다는 단점이 있다.
+---
 
-> runtime inference 중 weight는 lookup table에 따라서 decompressed된다.(예제: 2bit int to 32bit float)
+#### 5.4.1.2 K-Means-based Quantization Limitations
 
-따라서 <U>오직 storage cost만 줄일 수 있다</U>는 한계를 지닌다. 실제 computation 과정, memory access에서는 여전히 floating-point를 사용한다.
+그러나 K-Means-based weight quantization은 다음과 같은 단점을 갖는다.
+
+1. 실제 추론 상황에서는 다시 floating point를 사용한다.
+
+   다시 말해 runtime inference에서 weight는 lookup table을 바탕으로 decompressed된다.(예시에서는 2bit integer가 다시 32bit floating point로 decompressed됐다.)
+
+    - 따라서 <U>오직 storage cost만 줄일 수 있다</U>는 한계를 지닌다.
+
+2. codebook을 reconstruction하기 위한 time complexity, computation이 크다.
+
+3. cluster에 있는 weight가 memory상에서 연속적이지 않기 떄문에, memory access에서 긴 지연이 발생하게 된다.
+
+4. activation은 입력에 따라 다양하게 변하기 때문에, actiavation quantization에 clustering-based approach는 적합하지 않다.
 
 ---
 
