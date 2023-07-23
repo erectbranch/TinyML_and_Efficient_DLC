@@ -2,330 +2,359 @@
 
 > [Lecture 10 - Knowledge Distillation | MIT 6.S965](https://youtu.be/IIqf-oUTHe0)
 
-높은 연산 능력과 메모리를 가진 cloud 기반 model을, edge에서 사용할 수 있도록 **knowledge transfer**하는 방법을 알아볼 것이다.
+**knowledge transfer**이란 복잡한 모델(cloud model)을 이용해 단순한 모델(edge model)을 훈련시킴으로써, <U>generalization과 accuracy 성능이 복잡한 모델에 근접한 단순한 모델을 얻어내는 방법</U>이다.
 
 ![challenge](images/challenge.png)
 
----
-
-## 10.1 cloud AI vs tiny AI
-
-cloud 모델과 tiny 모델에서의 training curve 차이를 보자.
+cloud model과 tiny model의 training curve 차이를 보자.
 
 ![ResNet50, MobileNetV2](images/ResNet50_vs_MobileNetV2.png)
 
 > 가로: epoch, 세로: accuracy
 
-- cloud model(ResNet50)
-  
-  epoch이 늘어나자 training accuracy가 80%를 넘는다.
+- ResNet50(cloud model)
+ 
+  training accuracy가 80%를 넘는다.
 
 - edge model(MobileNetV2-Tiny)
 
-  epoch이 늘어도 training accuracy가 50% 정도에 가깝다.
-
-이처럼 edge model은 capacity가 작은 만큼 cloud model처럼 높은 accuracy를 달성하기 어렵다. 또한 학습 중 몇 가지 테크닉을 사용함에 있어서 주의해야 한다.
-
-- **data augmentation**(데이터 증강), **dropout**(드롭아웃)과 같은 기법은 오히려 역효과가 발생한다.
-
-  capacity 제약으로 인해 under-fitting이 자주 발생하기 때문
-
-  - data augmentation: 기존 데이터를 가지고 여러 방법으로 데이터를 늘리는 방법이다. 
+  training accuracy가 50% 정도에 가깝다. 
   
-    > mirroring, random cropping, rotation, shearing, local wrapping 등
+  edge model은 작은 capacity를 갖는 만큼 높은 정확도를 얻기 힘들다.
 
+또한 작은 capacity를 갖기 때문에, edge model에서 overfitting을 방지하기 위한 몇 가지 학습 기법은 오히려 역효과를 가져올 수 있다.
 
----
+- **data augmentation**(데이터 증강), **dropout**(드롭아웃) 등
 
-### 10.1.1 Network Augmentation
-
-> [NETWORK AUGMENTATION FOR TINY DEEP LEARNING(2022)](https://arxiv.org/pdf/2110.08890.pdf)
-
-따라서 논문에서는 data augment의 대적점으로, **network augmentation**(reverse dropout)을 소개한다.(**NetAug**)
-
-아래 훈련 예시를 보자. 
-
-- standard stochastic gradient descent
-
-- loss function( $L$ 이 최소가 되는 $W_{t}$ 를 찾는다 )
-
-$$ {W_{t}}^{n+1} = {W_{t}}^{n} - {\eta}{{{\partial}{\mathcal{L}}({W_{t}}^{n})} \over {{\partial}({W_{t}}^{n})}} $$
-
-- ${\eta}$ : learning rate
-
-그러나 tiny model이 local mimimums에 갖히지 않도록, NetAug에서는 augmented loss function로 다음 ${\mathcal{L}}_{aug}$ 을 사용한다.
-
-```math
-{\mathcal{L}}_{aug} = {\mathcal{L}}(W_{t}) + {\alpha}_{1}{\mathcal{L}}([W_{t}, W_{1}] + \cdots + {\alpha}_{i}{\mathcal{L}}([W_{t}, W_{i}]))
-```
-
-- ${\mathcal{L}}(W_{t})$
-
-  **base supervision**: 기존 model이 training하며 제공하는 label
-
-- 나머지 항
-
-  **auxiliary supervision**: 일종의 sub-model처럼 작동한다.
-
-  - $[W_{t}, W_{i}]$ : tiny model 기존 weight $W_{t}$ 에 새 weights $W_{i}$ 를 추가
-
-  - ${\alpha}_{i}$ : loss 영향을 조절하는 scaling hyper-parameter
-
-이때 모든 augmented model가 갖는 weight를 공유하며, 제일 큰 largest augmented model만 계속 유지한다.
-
-> one-shot NAS와 마찬가지로 weight sharing 전략을 사용
-
-![Learning curves on ImageNet](images/NetAug_ImageNet_Learning_curve.png)
-
-> 파란색 점선: NetAug를 적용하지 않은 기존 learning curve
-
-> 빨간색 실선: NetAug를 적용한 learning curve
-
-NetAug를 적용한 결과를 보면, 해당 기법이 under-fitting을 줄이고 train/validation accuracy를 높인 걸 알 수 있다. 하지만 반대로 ResNet50과 같은 큰 model에서는 over-fitting을 발생시켰다.
+> data augmentation란 기존 데이터를 가지고 여러 방법으로 데이터를 늘리는 방법이다. mirroring, random cropping, rotation, shearing, local wrapping 등
 
 ---
 
-## 10.2 summary of knowledge distillation
+## 10.1 Knowledge Distillation
+
+> [Distilling the Knowledge in a Neural Network 논문(2015)](https://arxiv.org/abs/1503.02531)
 
 > [distiller documentation: knowledge distillation](https://intellabs.github.io/distiller/knowledge_distillation.html)
 
-> 처음 **Knowledge Transfer**(KT)라는 개념이 존재하던 때는 얕은 model밖에 transfer가 불가능했지만, **Knowledge Distillation**(KD)가 등장하고 나서부터 큰 teacher model에서 작은 student model로 knowledge를 transfer할 수 있게 되었다.
-
-knowledge distillation은 2015년 발표된 논문으로, knowledge를 teacher network에서 student network로 transfer하는 방법이다.
-
-> 예를 들어 student network는 MCU나 라즈베리 파이와 같은 embedded device에서 사용할 model일 수 있다.
+**Knowledge Distillation**(KD, 지식 증류)란 커다란 teacher network를 이용한 학습을 통해, teacher가 갖고 있는 knowledge를 student network로 전달하는 방법이다.
 
 ![knowledge distillation](images/knowledge_distillation.png)
 
-- input(예: 이미지, 자연어, 음성)은 teacher network와 student network에 모두에 입력된다. 
+- Input (예: 이미지, 자연어, 음성)
 
-- teacher model과 student model의 prediction logits를 **distillation loss**에 반영한다.
+  teacher network와 student network 양쪽에 전달된다. 이를 바탕으로 각각 predication logits을 산출한다.
 
-  > cross entropy loss( $E(-p_{t}\log{p_{s}})$ )나 L2 loss( $E({|| p_{t} - p_{s} ||}_{2}^{2})$ )를 사용할 수 있다.
+- Classification Loss
 
-위 그림의 classification loss에서 볼 수 있듯 distillation은 class 예측 확률을 바탕으로 한다. 그러나 teacher model에서 accuracy가 높을수록 정답이 아닌 다른 class에 해당될 확률은 0에 매우 가깝게 된다. 따라서 다른 class에 해당될 확률 정보가 사라지는 문제가 발생한다.
-
-이를 해결하기 위해 논문에서는 **softmax temperature** 개념을 도입한다.
-
-$$ p_{i} = {{\exp({z_{i} \over T})} \over {\sum_{j}{\exp({z_{i} \over T})}}} $$
-
-- $p_{i}$: class $i$에 해당될 확률
-
-- $z_{i}$: class $i$에 해당될 확률을 계산하기 위한 logits
-
-- $T$ = 1이면 원래의 softmax와 동일하다. $T$ 가 커질수록 softmax의 확률 분포가 더 soft해져서, teacher의 prediction 정보를 student에게 더 잘 전달할 수 있다.
-
-> 논문에서는 이렇게 student에게 전달하는 information을 
-**dark knowledge**라고 부른다.
-
-또한 동시에 student model은 (teacher model의 soft-labels)와 더불어 정답에 해당되는 label을 찾도록 train된다. 이는 student model의 loss, 다시 말해 student's predicted class probabilities와 ground-truth labels 간의 **standard loss**( $T = 1$ 인 일반 softmax )도 계산한다는 뜻이다.
-
-> **ground-truth**란 실험자가 정한 '정답'으로, 실험자가 model이 답으로 내놓기를 원하는 정답이다. 예를 들어 data가 '고양이 분장을 한 사람' 사진이라도, 이 data의 ground-truth 값은 '고양이'로 정할 수 있는 것이다.(hard labels/targets로 부르기도 한다.)
-
-위 distillation loss와 student loss를 종합한 전체 loss function은 다음과 같이 나타낼 수 있다.
-
-$$ \mathcal{L}(x; W) = {\alpha} * \mathcal{H}(z_{s}; T = 1) + {\beta} * \mathcal{H}({\sigma}(z_{t};T = {\tau}), {\sigma}(z_{s};T = {\tau})) $$
-
-- $x$ 는 input, $W$ 는 student model parameter를 나타낸다.
-
-- $z_{s}$ , $z_{t}$ : 각각 student model과 teacher model의 logits
-
-- $\mathcal{H}$ : cross-entropy loss
-
-- $\sigma$ : softmax function
-
-- knowledge distillation에서 추가로 생긴 parameter는 다음과 같다.
-
-  - $\alpha$ : weight for student loss
-
-  - $\beta$ : weight for distillation loss
-
-  - $\tau$ : temperature for distillation loss
-
-  > temperature로는 주로 1 ~ 20 사이의 값을 사용한다. 
+  일반적으로 산출하는 classification loss.
   
-  > 다만 <U>teacher model과 student model의 크기 차이가 크면 대체로 온도가 낮을수록 효과가 좋다.</U> 온도가 높을수록 teacher model의 information은 많아지지만, 매우 작은 model에서 이 모든 정보를 capture하지 못하기 때문이다. 
+  즉, student's predicted class probabilities와 ground-truth labels 간의 standard loss이다.
+  
+  > ground-truth: 실험자가 정한 '정답'이다.(model이 답으로 내놓기를 원하는 class). hard labels/targets로 구분해서 부르기도 한다.
 
-![knowledge distillation 2](images/knowledge_distillation_2.png)
+- **Distillation Loss**
 
-위 식에서 본 것처럼 knowledge distillation에서는 $\alpha$ 와 $\beta$ parameter를 통해 distillation loss와 student loss의 가중치를 둬서 loss 반영을 조절한다.( 가중 평균으로 $\beta = 1 - \alpha$ 관계. ) 일반적으로 distillation loss의 가중치, 즉 $\beta$ 가 $\alpha$ 보다 훨씬 클 때 최적의 결과를 얻는다.
+  teacher model과 student model 각각 예측한 logits를 바탕으로 **distillation loss**를 산정한다.
+  
+  대표적으로 cross-entropy loss나 L2 loss를 바탕으로 계산한다.
+
+  - cross-entropy loss: $E(-p_{t}\log{p_{s}})$ 
+
+  - L2 loss: $E({|| p_{t} - p_{s} ||}_{2}^{2})$
 
 ---
 
-### 10.2.1 intuition of knowledge distillation
+### 10.1.1 intuition of knowledge distillation
 
-이제 예시를 보며 knowledge distillation이 어떻게 진행되는지 파악해 보자. 아래는 고양이 그림을 입력으로 주었을 때 teacher model과 student model의 prediction 결과를 보여준다.(개 고양이의 binary classification 문제)
+아래는 개 고양이의 binary classification 문제에서 고양이 그림을 입력으로 주었을 때, teacher model과 student model 각각의 prediction 결과을 나타낸다.
 
 ![knowledge distillation ex 1](images/knowledge_distillation_ex_1.png)
 
-- teacher: cat의 logits는 5, dog의 logits는 1로, softmax를 적용하면 cat의 probability는 0.982이다.
+- Teacher
 
-- student: cat의 logits는 3, dog의 logits는 2으로, softmax를 적용하면 cat의 probability는 0.731이다.
+  - cat: logits 5
 
-예시에서 student model은 teacher에 비해 input image가 cat이라는 confidence가 부족하다. 이를 teacher model의 information을 받아 해결할 것이다.
+  - dog: logits 1
+  
+  - softmax를 적용하면 cat의 probability는 0.982이다.
 
-teacher model의 probabilities에 softmax temperature를 적용해 보자.
+$${{e^5} \over {e^5 + e^1}} = 0.982$$
+
+- Student
+
+  - cat: logits 3, 
+  
+  - dog: logits 2
+  
+  - softmax를 적용하면 cat의 probability는 0.731이다.
+
+$${{e^3} \over {e^3 + e^2}} = 0.731$$
+
+결과를 보면 student model은 예측은 맞았지만, teacher에 비하면 input image가 cat이라는 confidence가 부족하다. 이를 teacher model의 information을 받아 해결할 것이다.
+
+> teacher model이 갖는 information을 논문에서는 **dark knowledge**라고 지칭한다.
+
+---
+
+### 10.1.2 Softmax Temperatrue
+
+하지만 teacher model의 confidence가 높을수록, 정답이 아닌 다른 class에 해당될 확률에 대한 information가 0에 매우 가깝게 된다. 따라서 다른 class에 해당될 information을 보존하기 위해 **temperature**라는 개념이 등장한다.
+
+$$ p(z_i, T) = {{\exp({z_{i} \over T})} \over {\sum_{j}{\exp({z_{j} \over T})}}} $$
+
+- $z_{i}$: logits
+
+- $i, j = 0, 1, 2, ..., C - 1$
+
+  - $C$ : \#classes
+
+- $T$ : temperature
+
+  - $T$ 가 클수록 distribution이 soft하게 변한다.
+
+  - $T=1$ 일 때 standard softmax이다.
+
+teacher model과 student model의 모델 사이즈 차이가 크다면, 대체로 낮은 temperature가 더 효율적이다. 매우 작은 model이 teacher model의 모든 information을 capture하지 못하기 때문이다.
+
+
+### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 1: Softmax Temperature &nbsp;&nbsp;&nbsp;</span>
+
+10.1.1절 예시에서 Teacher가 입력을 cat으로 예측한 확률을, softmax temperature를 이용하여 $T=1 , T=10$ 일 때를 각각 구하라.
+
+### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
 
 ![knowledge distillation ex 2](images/knowledge_distillation_ex_2.png)
 
-- $T = 1$ : 이전과 동일한 standard softmax이다.
+- $T = 1$
 
-- $T = 10$ : softmax의 확률 분포가 더 soft해져서, teacher의 prediction information이 더 담기게 된다.
+  **standard softmax**이다. 고양이일 확률은 다음과 같다.
+
+$${{e^{5 \over 1}} \over {e^{5 \over 1} + e^{1 \over 1}}} = 0.982$$
+
+- $T = 10$
+
+  고양이일 확률은 다음과 같다.
+
+$${{e^{5 \over 10}} \over {e^{5 \over 10} + e^{1 \over 10}}} = 0.599$$
 
 ---
 
-## 10.3 matching intermediate weights
+## 10.2 What to match?
 
-반면 final prediction을 matching시키기보다, intermediate weights(혹은 intermediate feature map)를 matching시키는 방법도 있다. 
+10.1절의 KD는 teacher, student 사이의 output logits를 match하는 것으로, student의 less confidence 문제를 해결했다. 하지만 logits이 아닌 다른 종류의 정보도 teacher와 student 사이에서 match시킬 수 있다.
+
+---
+
+### 10.2.1 Matching intermediate weights
+
+> [FitNets: Hints for Thin Deep Nets 논문(2015)](https://arxiv.org/abs/1412.6550)
+
+intermediate weights를 match하는 방법을 살펴보자. teacher, student의 각 레이어가 서로 match된다.
 
 ![matching intermediate weights](images/matching_intermediate_weights_1.png)
 
-- teacher model의 각 layer는 student model의 각 layer와 match된다. 
-
-- match 대상은 weight가 될 수 있고, activation, gradient 등이 될 수도 있다.
-
-그 중에서 intermediate weights를 matching시키는 한 방법을 살펴보자. 앞서 prediction을 바탕으로 cross-entropy distillation loss을 적용한 것과 달리, teacher weights와 student weights 사이에 **L2 loss**를 적용한다.
-
-> (보통 student model의 dimension이 더 작기 때문에) dimensionalities를 맞추기 위해 linear transform도 적용된다.(projection)
+대표적으로 FitNets 논문에서는 teacher model와 이보다 더 깊고 폭이 좁은 student model(FitNet) 사이에서 intermediate weights를 match시킨다.
 
 ![matching intermediate weights 2](images/matching_intermediate_weights_2.png)
 
-- dimensionalities를 맞추기 위해 projection을 진행한 뒤, teacher과 student의 weights 사이에 L2 loss를 적용한다.
+> 논문에서는 intermediate hidden layers를 줄여 hints로 지칭한다.
+
+- teacher model이 더 넓은 모델이기 때문에, student보다 더 많은 output을 갖는다.
+
+  이러한 teacher, student shape 차이를 보정하기 위한 regressor를 추가한다.(FC layer로 구현. layer weight $W_r$ 도 함께 학습된다.)
+
+  ![matching intermediate weights 3](images/matching_intermediate_weights_3.png)
+
+- 이후 teacher, student weights 사이에서 L2 loss를 산출한다.
 
 ---
 
-## 10.4 matching intermediate features
+### 10.2.2 Matching intermediate features
 
-teacher model과 student model은 서로 비슷한 feature distribution을 가져야 되기 때문에, feature distribution을 비교해서 knowledge transfer을 진행하는 방법이다.
+> [Like What You Like: Knowledge Distill via Neuron Selectivity Transfer 논문(2017)](https://arxiv.org/abs/1707.01219)
 
-아래는 loss function을 **MMD**(Maximum Mean Discrepancy. 최대 평균 불일치)를 사용하는 Like What You Like(2017) 논문 내용이다. 아래와 같이 두 distribution가 있을 때, 이 둘의 거리를 잴 수 있다.
+teacher model과 student model은 서로 비슷한 feature distribution을 가져야 할 것이라는 직관에 따른 방법이다.
+
+---
+
+#### 10.2.2.1 Minimizing Maximum Mean Discrepancy
+
+Like What You Like 논문에서는 loss function으로 **MMD**(Maximum Mean Discrepancy. 최대 평균 불일치)를 사용하여 teacher, student feature map 사이의 discrepancy를 사용한다.
 
 ![matching intermediate features](images/matching_intermediate_features.png)
 
-- before matching(distillation 전): teacher model과 student model의 feature distribution이 매우 다르다.
+- after matching: teacher model과 student model의 feature distribution이 비슷해진다.
 
-- after matching(distillation 후): teacher model과 student model의 feature distribution이 비슷해진다.
-
-feature map 간의 평균 discrepancy(불일치)를 줄이기 위해서는 기본적으로 cosine distance를 줄이면 된다.
-
-> [cosine distance 소개](https://seongkyun.github.io/study/2019/04/01/cosine_distance/)
-
-feature map이 가까울수록(cosine distance가 작을수록) teacher feature map과 student feature map이 유사해진다.
-
-> [MMD와 kernel trick](https://www.youtube.com/watch?v=kT4MtGfRcN0)
-
-> 아래 식을 보면 알 수 있듯, sample들을 추출해서 평균을 낸 다음 teacher sample과 student sample 둘의 차이를 구해서 거리를 잰다.
+이때 MMD란, teacher와 student의 feature map distribution을 **Reproducing Kernel Hilbert Space**(RKHS)로 mapping한 뒤, 둘의 distance를 바탕으로 discrepancy를 측정하는 방법이다.
 
 ![MMD](images/MMD.png)
 
-혹은 다른 방법으로 feature maps 사이의 L2 distance를 최소화할 수 있다. Paraphrasing Complex Network 논문(2018)에서는 다음과 같이 feature map을 비교한다.
+---
 
-> [paraphrasing complex network 세미나](https://tv.naver.com/v/5440966)
+#### 10.2.2.2 Minimizing the L2 distance
+
+> [Paraphrasing Complex Network: Network Compression via Factor Transfer 논문(2018)](https://arxiv.org/abs/1802.04977)
+
+> [NAVER Engineeraing: paraphrasing complex network 세미나](https://tv.naver.com/v/5440966)
+
+혹은 feature maps 사이의 L2 distance를 계산하는 접근법을 사용할 수 있다.
 
 ![paraphrasing complex network](images/paraphrasing_complex_network.png)
 
-- teacher network의 마지막 feature map 이후에 Paraphraser라는 convolution node를 추가해서 feature map을 다른 차원으로 projection한다.
+- **Paraphraser**
 
-  - $m \rightarrow m \times k$ ( $k$ 는 일반적으로 0.5 ) 만큼 channel 수를 squeeze한다.
+  teacher network 마지막 feature map에 추가되는 convolution node.
 
-- student network 마지막 feature map 이후에 Translator라는 node를 추가해서 이 결과를 위와 비교한다.
+  기존 output dimension(channel) $m$ 을, $k$ (일반적으로 0.5)를 곱한 $m \times k$ 로 줄인다. 이 과정에서 좋은 feature map을 추출한다.
+
+  > Paraphraser는 선생님의 입장에서 학생에게 쉽게 설명하는 것으로 비유한다.
+
+  - 원래 $m$ 차원 output과의 reconstruction loss를 바탕으로 supervise된다.
+
+  - Translator와 차이를 구한 뒤 다시 $m$ 차원으로 복원한다.
+
+- **Translator**
+
+  student network 마지막 feature map에 추가되는 1 layer MLP node.
+
+  마찬가지로 $m \times k$ 차원으로 줄어든다.(factor를 얻기 위함)
+
+  > Translator는 학생 입장에서 선생님의 말을 이해하는 것으로 비유한다.
+
+Paraphraser와 Translator 사이의 factor(L1 loss)를 줄여나가는 방향으로 학습을 진행한다.
 
 > 논문에서는 Factor Transfer(FT)라는 명칭을 쓴다. autoencoder와 비슷하게 볼 수 있다.
 
-> 이름의 유래는 Paraphraser는 선생님의 입장에서 학생에게 쉽게 설명하는 것이고, Translator는 학생 입장에서 선생님의 말을 이해하는 것이다.
-
 ---
 
-## 10.5 matching intermediate attention maps
+### 10.2.3 Matching intermediate attention maps
 
-> [Paying More Attention to Attention](https://arxiv.org/abs/1612.03928)
+> [Paying More Attention to Attention 논문(2017)](https://arxiv.org/abs/1612.03928)
+
+feature maps의 gradient는 **attention map**으로 해석할 수 있다. 따라서 attention map을 이용하면 teacher와 student의 gradient를 match할 수 있다.
 
 ![attention transfer](images/attention_transfer.png)
 
-feature map을 이용하기 때문에 어떠한 mapping function을 정의해서 feature map을 통과시킨다. 각각 teacher model과 student model에서 통과시킨 결과물에 L2 loss를 적용해서 차이를 구한다.
-
-그렇다면 어떻게 mapping이 되는지 한 번 살펴보자. 
-
-- 3차원 grid 구조 activation tensor 
+- 3D grid activation tensor
 
 $$A \in R^{C \times H \times W}$$
 
-이 중에서도 예를 들어 image $32 \times 32$ 처럼 두 차원으로 **spatial dependence**를 표현하고, 마지막 차원이 각 channel( $C$ )의 independent한 성질을 나타낸다.
+- 2D attention map
 
-따라서 activation-based mapping function $\mathcal{F}$ 는 3D tensor를 input으로 받고, output으로 다음과 같이 flatten된 2D tensor를 반환한다.
+  ![attention mapping](images/attention_mapping.png)
 
-![attention mapping](images/attention_mapping.png)
+  3D grid activation tensor를 입력으로 받아, mapping function을 거쳐 spatial activation map을 출력한다.
 
 $$ \mathcal{F} : R^{C \times H \times W} \rightarrow R^{H \times W} $$
 
-이러한 spatial attention mapping function은 다양하게 정의할 수 있는데, 논문에서도 아래 3가지 방법을 소개하고 있다.
+- CNN feature map $x$ 의 attention을 수식으로 표현하면 다음과 같다.
 
-- 절댓값의 합
+  - $L$ : learning objective
+
+$$ {{\partial L} \over {\partial x_{i,j}}} $$
+
+- 만약 position $i, j$ 에서의 attention이 크다면, 자그만한 $x_{i, j}$ 변화도 final output에 큰 영향을 미칠 것이다. 
+
+attention을 바탕으로 한 transfer objective는 다음과 같은 수식으로 정의된다.
+
+![matching intermediate attention map](images/matching_intermediate_attention_map.png)
+
+```math
+{{\beta} \over {2}} || J_S - J_T||_{2}^{2}
+```
+
+- $J_S$ : student attention map
+
+- $J_T$ : teacher attention map
+
+---
+
+#### 10.2.3.1 Spatial Attention Mapping Function
+
+논문에서는 spatial attention mapping function으로 아래 3가지 방법을 소개하고 있다.
+
+- 채널별 절댓값의 합
 
 ```math
 F_{sum}(A) = {\sum}_{i=1}^{C}{|A_{i}|}
 ```
 
-- 절댓값의 p 거듭제곱 합( 이때 $p > 1$ )
+- 채널별 절댓값의 p 거듭제곱 합( 이때 $p > 1$ )
 
 ```math
 F_{sum}^{p}(A) = {\sum}_{i=1}^{C}{|A_{i}|}^{p}
 ```
 
-- 절댓값의 p 거듭제곱 값 중 최댓값:( 이때 $p > 1$ )
+- 채널별 절댓값의 p 거듭제곱 값 중 최댓값:( 이때 $p > 1$ )
 
 ```math
 F_{max}^{p}(A) = \max_{i=1,c}{|A_{i}|}^{p}
 ```
 
-> $i$ 는 channel index, $p$ 는 승수로 연산 후에 더해준다는 의미이다. 수학적으로 거듭제곱을 **power**라는 단어로 표현한다.
-
-이를 바탕으로 attention map을 이용해 loss를 정의하고, 이 loss를 최소화하는 방법으로 knowledge transfer를 진행한다.
-
-![matching intermediate attention map](images/matching_intermediate_attention_map.png)
-
-흥미롭게도 동일한 input에서 accuracy가 높은 model(perfomant model)들의 activation map이 비슷한 점을 확인할 수 있다.
+참고로 동일한 입력 이미지를 사용했을 때, high accuracy model(perfomant model)들의 activation map은 비슷한 경향을 보인다.
 
 ![attention map comparison](images/attention_maps_compare.png)
 
-- accuracy가 비교적 작은 NIN model과 다르게, accuracy가 높은 ResNet34와 ResNet101이 비슷한 activation map을 갖는다.
+- accuracy가 높은 ResNet34와 ResNet101은 비슷한 activation map을 갖는다.
 
 ---
 
-## 10.6 matching sparsity pattern
+### 10.2.4 Matching sparsity pattern
 
-match할 수 있는 또 다른 요소로 **sparsity** pattern이 있다. teacher model과 student model은 ReLU activation을 거치면 비슷한 sparsity pattern을 가져야 할 것이다.
+> [Knowledge Transfer via Distillation of Activation Boundaries Formed by Hidden Neurons 논문(2019)](https://arxiv.org/abs/1811.03233)
 
-> ReLU activation을 거치면 음수 값은 모두 0이 되었다.
+한편, **sparsity** pattern을 match시킬 수도 있다. teacher model과 student model 모두 ReLU activation을 거치면서 비슷한 sparsity pattern을 가져야 한다는 직관에서 출발한다.
 
-따라서 **indicator funcion** $\rho(x) = 1[x > 0]$ 을 사용해서, sparsity pattern을 match시킬 수 있다.
+- sparsity pattern은 **indicator function**을 사용해서 나타낼 수 있다.
 
-아래는 'Knowledge Transfer via Distillation of Activation Boundaries Formed by Hidden Neurons' 논문(2018)에서 sparsity map을 나타낸 그림이다.
+$$ \rho(x) = 1[x > 0] $$
 
-> [Knowledge Transfer via Distillation of Activation Boundaries Formed by Hidden Neurons](https://arxiv.org/abs/1811.03233)
+- 따라서 loss function은 다음과 같이 정의할 수 있다.
 
-![matching sparsity pattern](images/matching_sparsity_pattern.png)
+$$ \mathcal{L}(I) = {|| \rho({{T}(I)}) - \rho({{S}(I)}) ||}_{1} $$
 
-- 흰색 ~ 파란색: activated region이다. 파란색일수록 response strength가 높다.
+다음은 teacher model의 **activation boundary**를 시각화한 그림이다.
 
-기본적으로 classification에서 model이 학습하는 것은 feature space 내 **decision boundary**이다.(위 그림처럼 decision boundary는 activation boundary와 큰 연관성을 갖는다.)
+![matching sparsity pattern](images/sparsity_pattern.png)
 
-> decision boundary는 feature space를 여러 class로 나누는 hyperplane처럼 생각하면 쉽다.
+- 파란색일수록 response strength가 높다.
 
-수식으로 정리하면 loss function은 다음과 같다. 우선 knowledge transfer의 목적은 다음과 같이 나타낼 수 있다.
+- classification 성능을 좌우하는 **decision boundary**는, activation boundary와 큰 연관성을 갖는다.
 
-$$ \mathcal{L}(I) = {|| \sigma({\mathcal{T}(I)}) - \sigma({\mathcal{S}(I)}) ||}^{2}_{2} $$
+---
 
-- $I$ : input image
+### 10.2.5 Matching relational information
 
-- $\mathcal{T}$ : input image를 받는 teacher network의 layer
+---
 
-- $\mathcal{S}$ : input image를 받는 student network의 layer
+#### 10.2.5.1 Relations between different layers
 
-- $\sigma(x)$ : ReLU ( = $max(0, x)$ )
+> [A Gift from Knowledge Distillation: Fast Optimization, Network Minimization and Transfer Learning 논문(2017)](https://openaccess.thecvf.com/content_cvpr_2017/papers/Yim_A_Gift_From_CVPR_2017_paper.pdf)
 
-이를 indicator function을 이용하면 다음과 같은 수식이 된다.
+![relational information](images/relational_information.png)
 
-$$ \mathcal{L}(I) = {|| \rho({\mathcal{T}(I)}) - \rho({\mathcal{S}(I)}) ||}_{1} $$
+- teacher, student 사이 \#layers는 다르지만 \#channels는 같다.
+
+- relational information으로는 $C_{in}$ , $C_{out}$ 의 내적을 사용한다.
+
+  > 즉, spatial dimensions 정보는 사용하지 않는다.
+
+$$ C_{in} \times C_{out} $$
+
+---
+
+#### 10.2.5.2 Relations between different samples
+
+> [Relational Knowledge Distillation 논문(2019)](https://arxiv.org/abs/1904.05068)
+
+기존 KD는 오직 1개의 input에서 features, logits 등을 matching했으나, **Relational Knowledge Distillation**(RKD)는 multiple inputs에서의 intermediate features 사이 관계를 분석한다.
+
+![conventional vs relational KD](images/Conventional_vs_Relational_KD.png)
+
+가령 $n$ 개의 sample이 있다고 할 때, relation은 다음과 같은 수식으로 나타낼 수 있다.
+
+![relational knowledge distillation](images/Relational_KD.png)
+
+$$ \Psi (s_1, s_2, ..., s_n) = (||s_1 - s_2||_{2}^{2}, ||s_1 - s_3||_{2}^{2}, ..., ||s_1 - s_n||_{2}^{2}, ..., ||s_{n-1} - s_n||_{2}^{2} )  $$
 
 ---
