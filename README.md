@@ -53,7 +53,9 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   > integer, fixed-point, floating-point(IEEE 754 single/half precision, BF16, TF32)
 
-  > K-Means-based weight quantization, huffman coding, linear quantization(zero point, scale)
+  > symmetric vs asymmetric quantization, uniform vs non-uniform quantization
+
+  > huffman coding, K-Means-based weight quantization, linear quantization(zero point, scaling factor)
 
 - [Post Training Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec06/summary01)
 
@@ -87,9 +89,15 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 - [Knowledge Distillation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary01)
 
-  > NetAug, knowledge transfer(KT)
+  > Knowledge Distillation(distillation loss, temperature)
   
-  > knowledge distillation: distillation loss, softmax temperature, matching intermediate weights/features/attention maps/sparsity pattern 
+  > KD: matching intermediate weights/features/attention maps/sparsity pattern /relational information(layers, samples)
+
+- [Self Distillation, Online Distlliation, Applications](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary02)
+
+  > Self Distillation, Online Distillation, Combining Online and Self-Distillation, Network Augmentation
+  
+  > Applications: Object Detection, Semantic Segmentation, GAN, NLP
 
 - [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec11)
 
