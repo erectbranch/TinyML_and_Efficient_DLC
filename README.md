@@ -71,27 +71,33 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   
   > AlexNet, VGGNet, SqueezeNet(global average pooling, fire module, pointwise convolution), ResNet50(bottleneck block, residual learning), ResNeXt(grouped convolution)
   
-  > MobileNet(depthwise-separable convolution, width/resolution multiplier), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle), SENet(squeeze-and-excitation block), MobileNetV3(redesigning expensive layers, h-swish), MobileNet quantization
+  > MobileNet(depthwise-separable convolution, width/resolution multiplier), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle), SENet(squeeze-and-excitation block), MobileNetV3(redesigning expensive layers, h-swish)
 
 - [Neural Architecture Search: RNN controller & search strategy](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary02)
 
-  > RNN controller, cell-level search space, network-level search space
+  > cell-level search space, network-level search space
+
+  > design the search space: Cumulative Error Distribution, FLOPs distribution
 
   > Search Strategy: grid search, random search, reinforcement learning, bayesian optimization, gradient-based search, evolutionary search
 
-  > EfficientNet(compound scaling), ProxylessNAS(architecture parameter, mixed operation function, binary gate), DARTS(latency penalty term)
+  > EfficientNet(compound scaling), ProxylessNAS(architecture parameter, binary gate), DARTS
 
-- [Neural Architecture Search: latency profiling & Once-for-All Network](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec08)
+- [Neural Architecture Search: Performance Estimation & Hardware-Aware NAS](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec08)
 
-  > MACs/FLOPs and latency, latency predictor(layer-wise latency profiling, network-wise latency profiling), specialized models for different hardware(mobile, CPU, GPU)
+  > Weight Inheritance, HyperNetwork, Weight Sharing(super-network, sub-network)
 
-  > Once-for-All Network: progressive shrinking(elastic resolution/kernel size/depth/width)
+  > Performance Estimation Heuristics: Zen-NAS, GradSign
+
+  > Hardware-Aware NAS: ProxylessNAS, Once-for-All
+
+  > latency prediction: layer-wise/network-wise
 
 - [Knowledge Distillation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary01)
 
   > Knowledge Distillation(distillation loss, temperature)
   
-  > KD: matching intermediate weights/features/attention maps/sparsity pattern /relational information(layers, samples)
+  > KD: matching intermediate weights/features/attention maps/sparsity pattern/relational information(layers, samples)
 
 - [Self Distillation, Online Distlliation, Applications](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary02)
 
