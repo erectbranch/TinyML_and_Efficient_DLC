@@ -382,6 +382,8 @@ ImageNet dataset으로 훈련한 AlexNet에서 pruning+quantization, pruning, qu
 
 > [Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding 논문(2015)](https://arxiv.org/abs/1510.00149)
 
+> [Deep Compression 논문 리뷰](https://velog.io/@woojinn8/LightWeight-Deep-Learning-3.-Deep-Compression-%EB%A6%AC%EB%B7%B0)
+
 **K-Means-based weight quantization**이란 여러 <U>bucket을 갖는 codebook</U>(**centroids**, 무게중심)을 만들어서 quantization하는 방식이다.
 
 > clustering 기법 자체를 non-uniform quantization의 일종으로 볼 수 있다.(quantization level 수 = cluster 수)
@@ -441,6 +443,8 @@ K-Means-based Quantization 이전/이후 필요한 memory를 계산하라.
 이처럼 quantization 시 필연적으로 error가 발생하게 된다. 하지만 추가로 centroids(codebook)을 fine-tuning하는 방식으로 error를 줄일 수 있다.
 
 ![Fine-tuning quantized weights(K-means)](images/K-means_fine_tune.png)
+
+- 이때 weight가 어떤 cluster에 속하는지에 따라 분류한 뒤, 평균치를 구하여 centroids를 업데이트한다.
 
 ---
 
@@ -540,7 +544,7 @@ $$ Z = \mathrm{round}{\left( -2 - {{-1.08} \over {1.07}} \right)} = 1 $$
 
 ---
 
-### 5.4.2 Sources of quantization error
+#### 5.4.2.2 Sources of quantization error
 
 이러한 양자화 과정에서 quantization error를 증가시키는 주범을 찾아보자.
 
