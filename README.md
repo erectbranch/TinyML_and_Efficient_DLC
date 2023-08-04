@@ -65,6 +65,12 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   > Bias Quantization
 
+- [Quantization-Aware Training, Low bit-width quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec06/summary02)
+
+  > fake quantization, Straight-Through Estimator
+
+  > Binary Quantization(Deterministic, Stochastic), XNOR-Net
+
 - [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary01)
 
   > input stem, stage, head
