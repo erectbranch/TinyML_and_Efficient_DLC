@@ -8,7 +8,7 @@
 
 ## 8.1 Performancd Estimation in NAS
 
-model architecture가 갖는 성능을 평가하는 방법을 생각해 보자. RNN controller를 쓰는 NAS를 생각해 보자.
+model architecture가 갖는 성능을 평가하는 방법을 생각해 보자. 우선 RNN controller를 쓰는 NAS는 다음과 같은 구조였다.
 
 ![from scratch](images/from_scratch.png)
 
@@ -152,7 +152,9 @@ $$ \triangle \overset{\triangle}{=} \mathbb{E_{x, \epsilon}} || f(x) - f(x+\alph
 
     output channels $m$ 개를 갖는 $i$ 번째 BN layer에서, 각 채널이 갖는 분산의 평균을 제곱근한 값을 계산한다.
 
-$$ \bar{{\sigma}_{i}} = \sqrt{{\sum}_{j}{\sigma}^2_{i,j}/m} $$
+```math
+\bar{{\sigma}_{i}} = \sqrt{{\sum}_{j}{\sigma}^2_{i,j}/m}
+```
 
 - ${\sigma}_{i,j}$ : $i$ 번째 BN layer의 $j$ 번째 output channel의 standard deviation.
 
@@ -168,7 +170,7 @@ $$ \mathrm{Zen}(F) \overset{\triangle}{=} \log(\triangle) + \sum_{i}\log(\bar{{\
 
 GradSign 논문에서는 다음과 같은 heuristic을 사용한다.
 
-- heuristic: 다른 input sample을 줬을 때 각각의 local minima point ${\theta}_{1}^{*}$ , ${\theta}_{2}^{*}$ 의 distance가 작아야(**denser**) 성능이 좋은 모델이다.
+- heuristic: 다른 input sample을 줬을 때 각각의 local minima point의 distance가 작아야(**denser**) 성능이 좋은 모델이다.
 
   ![GradSign](images/GradSign.png)
 
