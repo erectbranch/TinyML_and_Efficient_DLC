@@ -225,6 +225,6 @@ L' = L(x; W) + \lambda ||W||^2
 
 - 대신 그보다 적은 $k$ 번 횟수만큼 먼저 training iteration을 거친 뒤의 가중치( $W_{t=k}$ )를 사용하면, pruned sub-networks의 정확도를 회복할 수 있다.
 
-  ![scaling limitation](images/lottery_imagenet.png)
+  ![scaling limitation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/lottery_imagenet.png)
 
 ---
