@@ -201,15 +201,15 @@ L' = L(x; W) + \lambda ||W||^2
 
     > 이를 **sparsity mask**라고 한다.
 
-    ![iterative magnitude pruning 1](images/iterative_magnitude_pruning_1.png)
+    ![iterative magnitude pruning 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/iterative_magnitude_pruning_1.png)
 
 2. 해당 모델을 다시 재학습 $\rightarrow$ pruning
 
-    ![iterative magnitude pruning 2](images/iterative_magnitude_pruning_2.png)
+    ![iterative magnitude pruning 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/iterative_magnitude_pruning_2.png)
 
 3. 2번을 통해 얻은 모델을 동일한 sparsity pattern을 갖는 무작위 가중치 모델로 초기화
 
-    ![iterative magnitude pruning 3](images/iterative_magnitude_pruning_3.png)
+    ![iterative magnitude pruning 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/iterative_magnitude_pruning_3.png)
 
 4. 2번과 3번 과정을 반복하며 winning ticket를 찾는다.
 
@@ -221,10 +221,10 @@ L' = L(x; W) + \lambda ||W||^2
 
 > [Stabilizing the Lottery Ticket Hypothesis 논문](https://arxiv.org/abs/1903.01611)
 
-단, MNIST, CIFAR-10과 같이 작은 데이터셋과 달리, ImageNet과 같이 거대한 데이터셋에서는 from scratch( $W_{t=0}$ )부터 학습하면 정확도가 복구되지 않는다. 
+단, MNIST, CIFAR-10과 같이 작은 데이터셋과 달리, ImageNet과 같이 거대한 데이터셋에서는 from scratch( $W_{t=0}$ )부터 학습해서 정확도가 복구되지 않는다. 
 
-대신 적은 $k$ 번 횟수만큼 training iteration을 거친 뒤의 가중치( $W_{t=k}$ )를 사용하는 것으로, pruned sub-networks의 정확도를 회복할 수 있다.
+- 대신 그보다 적은 $k$ 번 횟수만큼 먼저 training iteration을 거친 뒤의 가중치( $W_{t=k}$ )를 사용하면, pruned sub-networks의 정확도를 회복할 수 있다.
 
-![scaling limitation](images/lottery_imagenet.png)
+  ![scaling limitation](images/lottery_imagenet.png)
 
 ---
