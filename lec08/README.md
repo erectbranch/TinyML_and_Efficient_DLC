@@ -6,7 +6,7 @@
 
 ---
 
-## 8.1 Performancd Estimation in NAS
+## 8.1 Performance Estimation in NAS
 
 model architecture가 갖는 성능을 평가하는 방법을 생각해 보자. 우선 RNN controller를 쓰는 NAS는 다음과 같은 구조였다.
 
