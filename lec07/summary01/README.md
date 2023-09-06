@@ -88,7 +88,7 @@ Neural Network architecture는 input stem, head, 그리고 여러 stage로 나�
 
 - **AlexNet**(2012)
 
-  ![AlexNet](images/AlexNet_arch.png)
+  ![AlexNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/AlexNet_arch.png)
 
   특징으로 ealry stage에서 큰 kernel을 사용한다.
   
@@ -98,7 +98,7 @@ Neural Network architecture는 input stem, head, 그리고 여러 stage로 나�
 
   반면 VGGNet은 early stage에서 작은 kernel을 여러 개 쌓아서 더 나은 성능을 얻었다.
 
-  ![VGGNet](images/VGGNet_arch.png)
+  ![VGGNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/VGGNet_arch.png)
 
   - 오직 $3 \times 3$ convolution을 사용한다. 
   
@@ -108,7 +108,7 @@ Neural Network architecture는 input stem, head, 그리고 여러 stage로 나�
 
     특히 VGGNet의 $(3 \times 3)$ convolution은 bottleneck을 유발하는 지점이 되었다.
 
-    ![VGGNet bottleneck](images/VGGNet_FLOP_bottleneck.png)
+    ![VGGNet bottleneck](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/VGGNet_FLOP_bottleneck.png)
 
 ---
 
@@ -372,7 +372,7 @@ $$ z = F_{sq}(u_{c}) = {{1} \over {H \times W}} {\sum_{i=1}^{H}}{\sum_{j=1}^{W}}
 
   - sigmoid function을 이용해 0과 1 사이의 값으로 normalize한다.
 
-  ![Excitation](images/Excitation.png)
+  ![Excitation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/Excitation.png)
 
 $$ s = F_{ex}(z, W) = {\sigma}(W_{2} {\delta}(W_{1} z)) $$
 
