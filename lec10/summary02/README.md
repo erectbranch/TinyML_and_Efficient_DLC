@@ -188,7 +188,7 @@ bounding box regression 문제를 classification 문제로 바꿔서 접근할 �
 
 ### 10.6.4 KD for GAN
 
-> [GAN Compression: Efficient Architectures for Interactive Conditional GANs(2020)](https://arxiv.org/abs/2003.08936)
+> [GAN Compression: Efficient Architectures for Interactive Conditional GANs 논문(2020)](https://arxiv.org/abs/2003.08936)
 
 (생략)
 
@@ -204,7 +204,7 @@ bounding box regression 문제를 classification 문제로 바꿔서 접근할 �
 
 ## 10.7 Network Augmentation
 
-> [NETWORK AUGMENTATION FOR TINY DEEP LEARNING(2022)](https://arxiv.org/pdf/2110.08890.pdf)
+> [NETWORK AUGMENTATION FOR TINY DEEP LEARNING 논문(2022)](https://arxiv.org/pdf/2110.08890.pdf)
 
 large model에서는 overfitting을 피하기 위한 방법으로, **data augmentation**, **dropout**과 같은 방법을 종종 사용한다.
 
@@ -238,7 +238,7 @@ large model에서는 overfitting을 피하기 위한 방법으로, **data augmen
 
   훈련 중 forward, backward 과정이 original, augmented model 모두 진행된다.
 
-  ![NetAug step 1](images/NetAug_step1.png)
+  ![NetAug step 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec10/summary02/images/NetAug_step1.png)
 
   > 좌: original tiny model, 우: augmented model
 
