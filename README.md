@@ -121,6 +121,14 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   > RNNPool, MicroNets(MOPs & latency/energy consumption relationship)
 
+### ⚙️ Efficient Training and System Support
+
+- [TinyEngine](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec17)
+
+  > memory hierarchy of MCU, data layout(NCHW, NHWC, CHWN)
+
+  > TinyEngine: Loop Unrolling, Loop Reordering, Loop Tiling, SIMD programming, Im2col, In-place depthwise convolution, appropriate data layout(pointwise, depthwise convolution), Winograd convolution
+
 </br>
 
 ## :mag: Schedule
