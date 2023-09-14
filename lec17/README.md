@@ -128,7 +128,7 @@ convolution 연산은 일반적으로 4차원 텐서를 입출력으로 한다.
 
     예: 000 $\rightarrow$ 001
 
-    ![NCHW pointer ex](images/nchw_ex_1.png)
+    ![NCHW pointer ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec17/images/nchw_ex_1.png)
 
 | 000 | 001 | 002 | 003 | ... | 009 | 010 | ... | 089 | 090 | 091 | ... | 177 | 178 | 179 |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -147,7 +147,7 @@ convolution 연산은 일반적으로 4차원 텐서를 입출력으로 한다.
 
     예: 000 $\rightarrow$ 009
 
-    ![NHWC pointer ex](images/nhwc_ex_1.png)
+    ![NHWC pointer ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec17/images/nhwc_ex_1.png)
 
 | 000 | 009 | 018 | ... | 081 | 001 | 010 | ... | 089 | 090 | 099 | ... | 163 | 170 | 179 |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -162,7 +162,7 @@ convolution 연산은 일반적으로 4차원 텐서를 입출력으로 한다.
 
     예: 000 $\rightarrow$ 090
 
-    ![CHWN pointer ex](images/chwn_ex_1.png)
+    ![CHWN pointer ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec17/images/chwn_ex_1.png)
 
 | 000 | 090 | 001 | 091 | ... | 008 | 098 | 009 | 099 | ... | 177 | 088 | 178 | 089 | 179 |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -387,13 +387,13 @@ depthwise convolution(입출력 채널 수가 같다.)을 단순히 계산한다
 
 - peak memory: $2 \times C \times H \times W$
 
-  ![general depthwise](images/general_depthwise.png)
+  ![general depthwise](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec17/images/general_depthwise.png)
 
 하지만 input activation의 channel 1에 해당되는 값의 계산이 끝났다면, 더 이상 이 값을 유지할 필요가 없다. 다시 말해 temp buffer를 사용하여 연산이 끝나면 결과값을 덮어쓰는 방식으로 peak memory를 줄일 수 있다.
 
 - peak memory: $(1+C) \times H \times W$
 
-  ![inplace depthwise](images/inplace_depthwise.png)
+  ![inplace depthwise](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec17/images/inplace_depthwise.png)
 
 ---
 
