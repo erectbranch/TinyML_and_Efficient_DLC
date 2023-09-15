@@ -307,27 +307,27 @@ EIE 논문에서는 초록색 processing element를 메모리에 저장할 때, 
 
   skip
 
-  ![dataflow 1](images/dataflow_1.png)
+  ![dataflow 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/dataflow_1.png)
 
 - activation $a_1$
 
   broadcast 후 parallel하게 연산한다.
 
-  ![dataflow 2-1](images/dataflow_2_1.png)
+  ![dataflow 2-1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/dataflow_2_1.png)
 
-  ![dataflow 2-2](images/dataflow_2_2.png)
+  ![dataflow 2-2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/dataflow_2_2.png)
 
 - activation 0
 
-  ![dataflow 3](images/dataflow_3.png)
+  ![dataflow 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/dataflow_3.png)
 
 - activation $a_3$
 
   broadcast 후 parallel하게 연산한다.
 
-  ![dataflow 4-1](images/dataflow_4_1.png)
+  ![dataflow 4-1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/dataflow_4_1.png)
 
-  ![dataflow 4-2](images/dataflow_4_2.png)
+  ![dataflow 4-2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/images/dataflow_4_2.png)
 
 끝나면 다음 cycle로 가중치 행렬의 아래 부분 연산도 수행한다. 결과를 모두 얻은 뒤 update를 수행한다.
 
