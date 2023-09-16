@@ -43,11 +43,13 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   
   > magnitude-based pruning(L1-norm), second-order-based pruning, percentage-of-zero-based pruning, regression-based pruning
 
-- [Finding Pruning Ratio, Fine-tuning](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec04)
+- [Finding Pruning Ratio, Iterative Pruning, System Support for Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec04)
 
   > pruning ratio, pruning sensitivity, AMC, NetAdapt
 
   > Finetuning, iterative pruning, regularization, Lottery Ticket Hypothesis
+
+  > EIE(CSC format: relative index, column pointer)
 
 - [Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05)
 
