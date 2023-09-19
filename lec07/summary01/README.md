@@ -10,23 +10,18 @@ AutoML(자동기계학습)에서는 크게 세 가지 process를 자동화하는
 
 - **feature engineering**
 
-    domain knowledge를 바탕으로 feature를 만드는 과정이다.
+    domain knowledge를 바탕으로 feature를 다듬는 과정이다.
 
 - **Hyper-Parameter Optimization**(HPO)
 
-    HPO는 **meta-optimization**으로, hyperparameter 자체를 자동으로 optimization한다.
+    **meta-optimization**으로, hyperparameter 자체를 자동으로 optimization한다.
 
     > hyperparameter: learning rate, lr scheduling, loss function, epoch, weight initialization, normalization, \#layers 등
 
 - **Neural Architecture Search**(NAS)
 
-  최적의 model architecture를 자동으로 탐색한다.
+  최적 model architecture를 자동으로 탐색한다.
 
-  - Evolutionary Algorithms(진화 알고리즘) 기반 탐색(AmeobaNet 등)
-  
-  - Reinforcement Learning(강화 학습) 기반 탐색(NASNet 등)
-
-  - Gradient Descent 기반 탐색
 
 이중에서도 Neural Architecture Search(NAS)를 중점적으로 살펴볼 것이다.
 
@@ -38,19 +33,19 @@ AutoML(자동기계학습)에서는 크게 세 가지 process를 자동화하는
 
 ### 7.1.1 Stages
 
-Neural Network architecture는 input stem, head, 그리고 여러 stage로 나눌 수 있다.
+Network Architecture는 input stem, head, 그리고 여러 stage로 나눌 수 있다.
+
+> stage를 전원 묶어서 body로 표현하는 경우도 있다. stage는 주로 NAS에서 많이 사용하는 용어이다.
 
 ![input stem, head, stages](images/stage.png)
 
 - **Input Stem** 
 
-  가장 큰 resolution input을 갖는 부분으로, aggressive하게 downsampling을 수행한다.
-  
-  예시에서는 resolution을 ( $56 \times 56$ )으로 downsampling한다.
+  가장 큰 resolution input을 갖는 부분으로, aggressive하게 **downsampling**을 수행한다.
 
   - 큰 receptive field를 얻기 위해, 대체로 large kernel( $7 \times 7$ )을 사용한다.
 
-  - channel 수가 3개로 매우 적기 때문에, 계산이 많이 필요하지는 않다.
+  - <U>channel 수가 3개로 매우 적기 때문에, 계산량 자체가 많이 필요하지는 않다.</U>
 
 - **Stage**
 
@@ -60,11 +55,11 @@ Neural Network architecture는 input stem, head, 그리고 여러 stage로 나�
 
   - late stage: small feature map size를 갖는다.
 
-    따라서 그만큼 width(\#channels)를 늘릴 수 있다.
+    대신 많은 width(\#channels)를 가질 수 있다.(weights를 위한 memory가 많이 필요하다.)
 
 - **head**
 
-  **application-specific**한 부분으로 detection head, segmentation head 등이 위치하게 된다.
+  **application-specific**하며, detection head, segmentation head 등이 위치하게 된다.
 
 ---
 
@@ -72,7 +67,7 @@ Neural Network architecture는 input stem, head, 그리고 여러 stage로 나�
 
 ![downsample](images/downsample.png)
 
-- 대체로 각 stage의 first block에서 **feature map downsampling**을 수행한다. 
+- 주로 각 stage별 first block에서 **feature map downsampling**을 수행한다. 
 
   stride convolution 혹은 pooling을 통해 downsampling을 수행한다.
 
@@ -86,25 +81,29 @@ Neural Network architecture는 input stem, head, 그리고 여러 stage로 나�
 
 ### 7.2.1 AlexNet, VGGNet
 
-- **AlexNet**(2012)
+> [AlexNet 논문(2012)](https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf)
+
+> [VGGNet 논문(2014)](https://arxiv.org/abs/1409.1556)
+
+- **AlexNet**
 
   ![AlexNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/AlexNet_arch.png)
 
-  특징으로 ealry stage에서 큰 kernel을 사용한다.
+  ealry stage에서 큰 kernel을 사용하는 특징을 가졌다.
   
   - $11 \times 11$ (channel 96) , 그 다음은 $5 \times 5$ (channel 256)
 
-- **VGGNet**(2014)
+- **VGGNet**
 
-  반면 VGGNet은 early stage에서 작은 kernel을 여러 개 쌓아서 더 나은 성능을 얻었다.
+  반면 <U>early stage에서 작은 kernel을 여러 개 쌓아서</U> 더 나은 성능을 얻었다.
 
   ![VGGNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/VGGNet_arch.png)
 
-  - 오직 $3 \times 3$ convolution을 사용한다. 
+  - 오로지 $3 \times 3$ convolution을 사용한다. 
   
   - 한 stage에서 $3 \times 3$ 레이어를 두 개 쌓는 것이( $3 \times 3 + 3 \times 3 = 18$ parameters ),  $5 \times 5$ (=25 parameters) 레이어 하나보다 computational cost가 적게 들면서도 더 나은 성능을 보였다.
 
-  - 단, layer, kernel call, activation load/store 수가 늘어나므로, memory efficiency 측면에서는 더 비효율적이다. 
+  - 단, layer, kernel call, activation load/store 수 증가로, memory efficiency 측면에서는 더 비효율적이다. 
 
     특히 VGGNet의 $(3 \times 3)$ convolution은 bottleneck을 유발하는 지점이 되었다.
 
@@ -112,43 +111,43 @@ Neural Network architecture는 input stem, head, 그리고 여러 stage로 나�
 
 ---
 
-### 7.2.2 SqueezeNet
+### 7.2.2 SqueezeNet: file module
 
 > [SqueezeNet: AlexNet-level accuracy with 50x fewer parameters and <0.5MB model size 논문(2016)](https://arxiv.org/pdf/1602.07360)
 
-**SqueezeNet**은 $3 \times 3$ convolution을 **fire module**이라는 연산으로 교체하여, 더 적은 parameter로 효율적으로 연산을 구현했다. 
+> [1x1 convolution이란?](https://euneestella.github.io/research/2021-10-14-why-we-use-1x1-convolution-at-deep-learning/)
+
+**SqueezeNet**은 $3 \times 3$ convolution을 **fire module**로 대체하여, 더 적은 \#parameters로 효율적으로 연산을 수행한다. 다음은 SqueezeNet의 architecture를 묘사한 그림이다.
 
 ![SqueezeNet](images/SqueezeNet.png)
 
 - head
 
-  **global average pooling**을 사용하여 cost를 줄인다.
+  **global average pooling**을 사용.
 
 - fire module
 
-  $1 \times 1$ convolution(**squeeze**)과 $3 \times 3$ convolution(**expand**)을 함께 사용하여 효과적으로 연산을 수행한다.
+  $1 \times 1$ convolution(**squeeze**), $3 \times 3$ convolution(**expand**)을 사용.
 
-  > [1x1 convolution이란?](https://euneestella.github.io/research/2021-10-14-why-we-use-1x1-convolution-at-deep-learning/)
-  
-  > $1 \times 1$ convolution을 이용하면 resolution 변화 없이 input feature map의 \#channels를 조절할 수 있다. **pointwise convolution**이라고도 지칭한다.
-
-fire module의 단계별 과정을 더 자세히 살펴보자.
+fire module을 세부적으로 자세히 살펴보자.
 
 ![fire module](images/fire_module_2.png)
 
 - Squeeze
 
-    1x1 convolution으로 channel을 압축한다.
-
-    ![SqueezeNet 1x1](images/SqueezeNet_1x1_filter.png)
+  1x1 convolution으로 channel을 압축한다.
 
 - expand
 
-  1x1 convolution, 일부는 3x3 convolution 연산을 수행한다.
+  각자 연산을 수행하며, 다시 channel을 확장한다.
+
+  - 1x1 convolution
+  
+  - 3x3 convolution
 
 - concatenate
   
-  1x1 convolution output, 3x3 convolution output을 합친다.
+  1x1, 3x3 convolution output을 합친다.
 
 ---
 
@@ -156,21 +155,17 @@ fire module의 단계별 과정을 더 자세히 살펴보자.
 
 > [Deep Residual Learning for Image Recognition 논문(2015)](https://arxiv.org/abs/1512.03385)
 
-ResNet50에서는 **bottleneck block**을 도입한다.
+ResNet50에서는 **bottleneck block**을 도입한다. 1x1 convolution을 사용해 연산량은 줄이면서, residual connection을 도입해서 gradient vanishing 문제를 해결했다. ResNet 이래로 CNN을 더 깊게 쌓을 수 있게 되었다.
 
 ![ResNet bottleneck block](images/ResNet_bottleneck.png)
 
 1. $1 \times 1$ convolution
 
-    \#channels: $2048 \rightarrow 512$
-
 2. $3 \times 3$ convolution
 
-    > batch normalization, ReLU 적용
+    이때 batch normalization, ReLU를 적용한다.
 
 3. $1 \times 1$ convolution
-
-    \#channels: $512 \rightarrow 2048$
 
 4. shortcut
 
@@ -178,11 +173,11 @@ ResNet50에서는 **bottleneck block**을 도입한다.
 
 ### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 1: bottleneck block MACs &nbsp;&nbsp;&nbsp;</span>
 
-위 bottleneck block 예시에서 얼마나 \#MACs 연산이 줄었는지를 구하라.
+위 bottleneck block 그림에서 \#MACs 연산이 얼마나 줄었는지 계산하라.
 
 ### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
 
-- 기존(\#channels 2048, \#kernels 9)
+- full convolution(\#channels 2048, \#kernels 9)
 
 $$ 2048 \times 2048 \times H \times W \times 9 = 512 \times 512 \times H \times W \times 144 $$
 
@@ -196,7 +191,7 @@ $$ + 2048 \times 512 \times H \times W \times 1 $$
 
 $$ = 512 \times 512 \times H \times W \times 17 $$
 
-총 8.5배 \#MACs 연산이 줄어든다.
+총 **8.5배** \#MACs 연산이 줄어들었다.
 
 ---
 
@@ -204,7 +199,9 @@ $$ = 512 \times 512 \times H \times W \times 17 $$
 
 > [Aggregated Residual Transformations for Deep Neural Networks 논문(2017)](https://arxiv.org/abs/1611.05431)
 
-**ResNeXt**(2017)에서는 **grouped convolution**을 도입한다. 다음은 결과는 동일하지만 과정은 다른 세 가지 방식의 grouped convolution 예시다.
+**ResNeXt**(2017)에서는 **grouped convolution**을 도입한다. \#parameters 수를 굉장히 줄이면서도, 정확도는 거의 유지할 수 있다.
+
+grouped convolution에 있어서, 어떻게 group을 구성하는가에 따라서도 효율이 달라진다. 다음은 결과는 동일하지만 과정은 다른 세 가지 방식의 grouped convolution 예시다.
 
 ![ResNeXt](images/ResNeXt.png)
 
@@ -224,9 +221,9 @@ $$ = 512 \times 512 \times H \times W \times 17 $$
 
   - concatenation 대신 $1 \times 1$ convolution으로 256 dimension으로 확장한 뒤 합산한다.
 
-맨 왼쪽 방식이 parallel cost가 더 적기 때문에 hardware-friendly하고 GPU 가속에 유리하다.
+이중에서도 맨 왼쪽 방식이 parallel cost가 더 적기 때문에, hardware-friendly하고 GPU 가속에 유리하다.
 
-> 사실 중간이 제일 먼저 제안된 ResNeXt block이다.
+> 중간 그림이 제일 먼저 제안된 ResNeXt block이다.
 
 ---
 
@@ -234,37 +231,41 @@ $$ = 512 \times 512 \times H \times W \times 17 $$
 
 > [MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications 논문(2017)](https://arxiv.org/abs/1704.04861)
 
-> [depthwise-separable convolution 정리](https://velog.io/@woojinn8/LightWeight-Deep-Learning-5.-MobileNet)
+**MobileNetV1**(2017)은 depthwise-separable convolution, pointwise convolution 두 가지 layer로 구성된 **depthwise-separable block**을 제안했다.
 
-**MobileNet**(2017)은 depthwise-separable convolution, pointwise convolution 두 가지 layer로 구성된 **depthwise-separable block**을 제안했다. 
+- 입력부 하나의 full convolution을 제외하고, 나머지는 모두 depthwise-separable convolution으로 구성된다.
 
-> \#channels = \#groups인 group convolution의 극단적인 형태로도 볼 수 있다.
+> depthwise-separable block: \#channels = \#groups인 극단적인 형태의 group convolution로도 볼 수 있다.
+
+> depthwise-separable convolution은 Xception이란 논문에서 먼저 제안된 방식이다. 하지만 Xception 논문은 accuracy 향상을 위한 목적이었지만 MobileNet은 경량화를 위해서 사용한다.
 
 ![depthwise-separable convolution](images/depthwise-separable_3.png)
 
-- **depthwise-seperable convolution**
+- **depthwise convolution**
 
-  input의 모든 channel을 분리하고, spatial information capture를 위한 convolution을 수행한다.
+  input의 모든 channel을 분리하고, channel마다 spatial information capture를 위한 convolution을 수행한다.
 
 - **pointwise convolution**
 
   channel별로 수행된 결과물을 다시 합친 뒤, pointwise convolution을 통해 channel 사이의 information을 fuse한다.
 
-추가로 activation function으로 ReLU6를 사용하여 연산량을 더욱 줄인다.
+depthwise convolution 이후와, pointwise convolution 이후에, activation function으로 ReLU6를 사용한다.(ReLU의 특성상 연산 효율적이다.)
 
 ![ReLU6](images/ReLU6.png)
 
-> depthwise-separable convolution은 Xception이란 논문에서 먼저 제안된 방식이다. 하지만 Xception 논문은 accuracy 향상을 위한 목적이었지만 MobileNet은 경량화를 위해서 사용한다.
+실제 결과를 보면 모두 convolution 연산으로 채운 모델보다도, 훨씬 적은 \#parameters에 거의 유사한 정확도를 보인다.
+
+![depthwise-separable vs full convolution](images/depthwise-separable_vs_conv.png)
 
 ---
 
 #### 7.2.5.1  Width Multiplier, Resolution Multiplier
 
-또한 MobileNet에서는 model shrinking을 위한 두 가지 parameter를 추가로 도입했다.
+MobileNet에서는 추가로 model shrinking을 위한 두 가지 hyperparameter를 도입했다.
 
 - **Width Multiplier** $\alpha$
 
-  각 layer가 갖는 \#channels를 uniform하게 scaling하는 parameter이다.
+  \#output channels에 uniform하게 적용되는 scaling parameter
   
   - \#input channels: $M \rightarrow {\alpha}M$
   
@@ -272,43 +273,53 @@ $$ = 512 \times 512 \times H \times W \times 17 $$
 
   - $\alpha \in (0, 1]$ 
 
-  > 주로 1, 0.75, 0.5, 0.25 값을 사용한다.
+  > 주로 1, 0.75, 0.5, 0.25 값 중에서 사용한다.(1: default MobileNet)
 
 - **Resolution Multiplier** $\rho$
 
-  input resolution을 줄이는 parameter. 결과적으로 모든 layer의 internal representation이 동일한 비율로 감소하게 된다.
+  input resolution을 줄이는 parameter. (결과적으로 모든 layer의 internal representation이 동일한 비율로 감소하게 된다.)
 
   - $\rho \in (0, 1]$
 
 ---
 
-### 7.2.6 MobileNetV2: inverted bottleneck block
+### 7.2.6 ShuffleNet: 1x1 group convolution & channel shuffle
+
+> [ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices 논문(2018)](https://arxiv.org/abs/1707.01083)
+ 
+ShuffleNet에서는 channel information의 손실을 보완하기 위한 **channel shuffle** 기법을 제안했다.
+
+![ShuffleNet](images/ShuffleNet.png)
+
+![channel shuffle](images/channel_shuffle.png)
+
+---
+
+### 7.2.7 MobileNetV2: inverted bottleneck block
 
 > [MobileNetV2: Inverted Residuals and Linear Bottlenecks 논문(2018)](https://arxiv.org/pdf/1801.04381.pdf)
 
-**MobileNetV2**(2018)는 depthwise-separable block의 정보 손실을 compensate할 수 있는 **inverted bottleneck block** 방법을 제시한다. 
+**MobileNetV2**(2018)는 depthwise-separable block에서의 정보 손실을 compensate할 수 있는 **inverted bottleneck block** 방법을 제시한다. 
 
-- 특히 ReLU를 activation function으로 사용할 때, input/output channel이 많을수록 정보 손실이 적다는 점을 이용한다.
+![inverted residual block](images/inverted_residual_block.png)
+
+- 특히 ReLU는 input/output channel이 많을수록 정보 손실이 적다는 점에서, 1x1 convolution을 활용해 채널 수를 늘려 연산을 수행한다.
 
   ![channel compensate](images/linear_bottlenecks.png)
 
-  > 더 낮은 차원의 subspace로 mapping되는 information을 **maniford**라고 지칭한다.
+- MobileNetV1과 비교하면 다음과 같은 차이가 있다.
 
-inverted bottleneck block에서는 ReLU로 인한 정보 손실을 막기 위해, 먼저 $1 \times 1$ convolution을 이용해 input channel 수를 늘린다.
+  ![Mb vs MbV2](images/Mb_and_MbV2_block.png)
 
-![Mb vs MbV2](images/Mb_and_MbV2_block.png)
+  - MobileNetV2 stride=1 block
 
-- MobileNetV2 stride=1 block
+    inverted bottleneck block + residual connection
 
-  inverted bottleneck block과 skip connection을 적용한다.
+  - MobileNetV2 stride=2 block
 
-  ![inverted residual block](images/inverted_residual_block.png)
+    inverted bottleneck block + downsampling
 
-- MobileNetV2 stride=2 block
-
-  inverted bottleneck block 연산과 downsampling을 수행한다.
-
-논문에서 제시한 MobileNetV2의 architecture는 다음과 같다.
+참고로 MobileNetV2 architecture는 다음과 같다. MobileNetV2 기반의 아키텍처는 이와 하이퍼패러미터를 갖는다.
 
 ![MbV2 arch](images/MbV2_arch.png)
 
@@ -320,19 +331,11 @@ inverted bottleneck block에서는 ReLU로 인한 정보 손실을 막기 위해
 
 - $s$ : stride
 
-- spatial convolution은 모두 3x3 kernel만을 사용한다.
+- spatial convolution으로 모두 3x3 kernel만을 사용한다.
 
----
+실제 MobileNetV1과 비교했을 때, 더 적은 \#Parameters로 보다 우수한 성능을 갖는 것을 알 수 있다.
 
-### 7.2.7 ShuffleNet: 1x1 group convolution & channel shuffle
-
-> [ShuffleNet: An Extremely Efficient Convolutional Neural Network for Mobile Devices 논문(2018)](https://arxiv.org/abs/1707.01083)
- 
-ShuffleNet에서는 다른 group의 channel information를 교환하기 위한 **channel shuffle** 기법을 제안했다.
-
-![ShuffleNet](images/ShuffleNet.png)
-
-![channel shuffle](images/channel_shuffle.png)
+![MbV2 vs MbV1](images/mobilenetv1_vs_shufflenet_vs_mobilenetv2.png)
 
 ---
 
