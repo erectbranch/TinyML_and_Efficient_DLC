@@ -2,15 +2,19 @@
 
 > [Lecture 03 - Pruning and Sparsity (Part I) | MIT 6.S965](https://youtu.be/sZzc6tAtTrM)
 
+> [EfficientML.ai Lecture 3 - Pruning and Sparsity (Part I) (MIT 6.5940, Fall 2023, Zoom recording)](https://youtu.be/95JFZPoHbgQ?si=rHYkeGoQoZZTnyVa)
+
 > [Network Pruning의 개념](https://do-my-best.tistory.com/entry/Network-pruning#----%--pruning%--%EB%B-%A-%EC%-B%-D%---%--Structured%--Pruning)
 
-![AI model size](images/model_size.png)
+![AI model size](images/model_size_2.png)
 
-지금의 AI model size는 너무나 크다. 무엇보다도 메모리 비용은 연산 비용과 비교했을 때 더 expensive하다.
+지금의 AI model size는 너무나 크다. 게다가 메모리 비용은 (연산 비용과 비교해서, 보다) **expensive**하다.
+
+- register file access cost를 1로 뒀을 때, SRAM cache가 5배 cost, DRAM access가 약 640배 cost를 소비한다.
 
 ![energy cost](images/energy_cost.png)
 
-또한 data movement가 많으면 많을수록 memory reference도 필요하고, 결국 더 많은 energy를 필요로 한다. 그렇다면 이런 cost를 어떻게 줄일 수 있을까?
+또한 data movement가 많으면 많을수록 memory reference도 필요하고, 결국 더 많은 power를 필요로 한다. 그렇다면 이런 cost를 어떻게 줄일 수 있을까?
 
 - model/activation size 줄이기
 
@@ -70,7 +74,7 @@
 
     ![pruning parameters 1](images/pruning_parameters.png)
 
-- Pruning+Fine-tuning(초록색 선)
+- Pruning + Fine-tuning(초록색 선)
 
     - 남은 20% weights를 가지고 fine-tuning한다.
     
@@ -78,7 +82,7 @@
 
     ![fine tuning parameters](images/fine_tuning_parameters.png)
 
-- Iterative Pruning and Fine-tuning(빨간색 선): 
+- **Iterative Pruning + Fine-tuning**(빨간색 선): 
 
     위 과정를 반복하여 적용 시, 매우 적은 accuracy lost를 유지하며 weight를 약 90%까지 pruning할 수 있다.
 
@@ -108,7 +112,41 @@ AlexNet, VGG-16과 다르게, compressed model에서는 큰 효과를 보지 못
 
 ---
 
-### 3.1.3 Pruning in the Industry
+### 3.1.3 MLPerf Inference
+
+> [Leading MLPerf Inference v3.1 Results with NVIDIA GH200 Grace Hopper Superchip Debut](https://developer.nvidia.com/blog/leading-mlperf-inference-v3-1-results-gh200-grace-hopper-superchip-debut/)
+
+**MLPerf**는 여러 기업에서 참가하는 Al computing 경쟁 대회다. **closed division**과 **open division** 두 가지 트랙에서 경쟁한다.
+
+- closed division
+
+  model을 변경할 수 없다.(precision, weight 등) 오로지 hardware innovation으로 경쟁해야 한다.
+
+- open division
+
+  신경망을 변경할 수 있다. model을 변경하거나 compression 등 다양한 기법을 적용해서 경쟁한다.
+
+두 트랙 모두 정확도를 잃지 않으면서, 빠르게 추론할 수 있어야 한다. 아래는 BERT를 대상으로 한 closed, open division 결과물이다.
+
+- 모델을 변경할 수 있는 open division에서, 4.5x 더 빠르게 sample을 처리할 수 있었다.
+
+| | closed division | open division | speedup |
+| :---: | :---: | :---: | :---: |
+| offline samples/sec | 1029 | 4609 | 4.5x |
+
+NVIDIA에서 밝히는 다음과 같은 기법으로 4.5x의 speedup을 얻었다.
+
+- Pruning
+
+- Quantization-Aware Training(QAT)
+
+- Knowledge Distillation
+
+![NVIDIA MLPerf](images/NVIDIA_mlperf.png)
+
+---
+
+### 3.1.4 Pruning in the Industry
 
 - NVIDIA: hardware 수준에서 sparsity matrix을 이용한 가속을 지원하고 있다.
 
