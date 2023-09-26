@@ -4,168 +4,149 @@
 
 > [Neural Network Quantization Technique - Post Training Quantization](https://medium.com/mbeddedwithai/neural-network-quantization-technique-post-training-quantization-ff747ed9aa95)
 
-잠시 두 가지 양자화 방법을 복습하자.
-
-![K-means, Linear](images/K-means_and_Linear_quantization.png)
-
-| | 양자화 전 | K-means-based | Linear |
-| :---: | :---: | :---: | :---: |
-| Storage | FP 가중치 | INT 가중치</br>FP 코드북 | INT 가중치 |
-| Computation | FP 연산 | FP 연산 | INT 연산 |
-
-이번 정리는 크게 네 가지 양자화 방법을 다룬다.
-
-- **Post-Training Quantization**(PTQ)
-
-    학습된 floating-point 모델을 양자화
-
-    - <U>weight</U> quantization, <U>activation</U> quantization, <U>bias</U> quantization 포함
-
-- **Quantization-Aware Training**(QAT)
-
-    floating-point 모델 내 fake quantization 모듈을 배치한 뒤, 추론을 진행하며 양자화에 의한 변화를 시뮬레이션하는 방법.
-
-    training/fine-tuning 과정에서 QAT를 적용할 수 있으며, QAT가 끝나면 fake quantization 모듈에 기록한 정보를 가지고 모델을 효과적으로 양자화할 수 있다.
-
-- **binary and ternary** quantization
-
-- **mixed-precision** quantization
+> [A Comprehensive Survey on Model Quantization for Deep Neural Networks 논문](https://paperswithcode.com/paper/a-comprehensive-survey-on-model-quantization)
 
 ---
 
 ## 6.1 Post-Training Quantization: Weight Quantization
 
-우선 weight quantization에서 성능을 높이기 위해 사용되는 몇 가지 방법을 살펴보자. 
+> [Data-Free Quantization through Weight Equalization and Bias Correction 논문(2019)](https://arxiv.org/abs/1906.04721)
 
----
-
-### 6.1.1 Per-Channel Quantization
-
-CNN에서 output channel별 weight가 갖는 값의 범위를 나타낸 아래 그림을 살펴보자.(MobileNetV2 첫 번째 depthwise-seperable layer)
+이미 학습된 모델을 양자화하는, **Post-Training Quantization**(PTQ)를 살펴볼 것이다. 다음 그림은 MobileNetV2의 첫 번째 depthwise-separable 레이어가 갖는, 출력 채널별 weight range이다.
 
 ![weight range per output channel](images/weight_range_per_output_channel.png)
 
-- 필터는 32개, 따라서 출력 텐서의 채널도 32개
+위와 같은 상황에서, 다음과 같은 두 PTQ 기법을 고려할 수 있다.
 
-    > 한 채널 = 입력과 필터 하나를 연산한 결과값에 해당
+- **Per-Tensor Quantization**
 
-이처럼 채널별 weight 값의 범위가 다르므로, 모든 채널에 동일한 scaling factor를 적용하면 문제가 생길 수 있다.(**Per-Tensor Quantization**) 이를 해결하기 위한 방법으로 **Per-Channel Quantization**가 등장했다.
+  tensor 32개 전체에, 동일한 scale $S$ 를 사용한다.
 
-보통 Per-Tensor Quantization보다 성능이 좋지만 다음과 같은 단점을 갖는다. 
+  - (-) outlier weight에 영향을 받기 쉽다.
 
-- Per-Channel Quantization를 지원하지 않는 hardware가 있다.
+  - (-) 큰 모델은 잘 적용되나, 작은 모델에서는 정확도 하락이 크다.
 
-- 각 채널별 scaling factor를 구해야 하므로 computation overhead가 크다.
+     주로 output channels의 weight range 차이가 크면(100x 이상) 정확도 하락이 크다.
 
-### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 1: Per-Channel Quantization &nbsp;&nbsp;&nbsp;</span>
+- **Per-Channel Quantization**
 
-아래 tensor를 2-bit linear quantization한 결과와 오차를, Per-Tensor Quantization, Per-Channel Quantization 방식별로 구하라.
+  각 채널별로 scale $S$ 를 사용한다.
 
-![quantization example](images/quantization_ex.png)
+  - (-) 지원되지 않은 하드웨어가 있다.
 
-### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
+  - (-) 매 채널마다 개별적인 scaling 연산을 적용하기 때문에 overhead가 크다.
 
-**Per-Tensor Quantization**
+---
 
-- scaling factor
+### 6.1.1 Per-Tensor vs Per-Channel Quantization
 
-$$ {|r|}_{max} = 2.12 $$
+한 행렬을 per-tensor quantization, per-channel quantization을 적용하여 어떤 차이가 있는지 알아보자.
 
-```math
-S = {{|r|}_{max} \over {q_{max}}} = {{2.12} \over {2^{2-1} - 1}} = 2.12
-```
+| | Per-Tensor | Per-Channel |
+| :---: | :---: | :---: |
+| | ![Per-Tensor ex](images/tensor_ex_1.png) | ![Per-Channel ex](images/tensor_ex_1.png) |
+| $\|r\|_{max}$ | 2.12 | 2.09 <br/> 2.12 <br/> 1.92 <br/> 1.87 |
 
-- quantized, reconstructed
 
-    ![per-tensor quantization example](images/per-tensor_quant_ex.png)
+- Per-Tensor Quantization
 
-    오차를 구하면 다음과 같다.
+    ```math
+    S = {{|r|}_{max} \over {q_{max}}} = {{2.12} \over {2^{2-1} - 1}} = 2.12
+    ```
 
-$$ {||W-Sq_{W}||}_{F} = 2.28 $$
+    | Quantized | Reconstructed |
+    | :---: | :---: |
+    | ![per-tensor quantized](images/per-tensor_ex_1.png) | ![per-tensor reconstructed](images/per-tensor_ex_2.png) |
 
-**Per-Channel Quantization**: 채널별 scaling factor는 다음과 같이 구할 수 있다.
+    error는 다음과 같다.
 
-- 1행 
+    ```math
+    ||W - Sq_{W}||_F = 2.28
+    ```
 
-$${|r|}_{max} = 2.09$$
+- Per-Channel Quantization
 
-```math
-S = {{|r|}_{max} \over {q_{max}}} = {{2.09} \over {2^{2-1} - 1}} = 2.09
-```
+    ```math
+    S_0 = {{|r|}_{max} \over {q_{max}}} = {{2.09} \over {2^{2-1} - 1}} = 2.09
+    ```
 
-- 2행
+    ```math
+    S_1 = {{|r|}_{max} \over {q_{max}}} = {{2.12} \over {2^{2-1} - 1}} = 2.12
+    ```
 
-$${|r|}_{max} = 2.12$$
+    ```math
+    S_2 = {{|r|}_{max} \over {q_{max}}} = {{1.92} \over {2^{2-1} - 1}} = 1.92
+    ```
 
-```math
-S = {{|r|}_{max} \over {q_{max}}} = {{2.12} \over {2^{2-1} - 1}} = 2.12
-```
+    ```math
+    S_3 = {{|r|}_{max} \over {q_{max}}} = {{1.87} \over {2^{2-1} - 1}} = 1.87
+    ```
 
-- 3행
+    | Quantized | Reconstructed |
+    | :---: | :---: |
+    | ![per-channel quantized](images/per-channel_ex_1.png) | ![per-channel reconstructed](images/per-channel_ex_2.png) |
 
-$${|r|}_{max} = 1.92$$
+    error는 다음과 같다.
 
-```math
-S = {{|r|}_{max} \over {q_{max}}} = {{1.92} \over {2^{2-1} - 1}} = 1.92
-```
-
-- 4행
-
-$${|r|}_{max} = 1.87$$
-
-```math
-S = {{|r|}_{max} \over {q_{max}}} = {{1.87} \over {2^{2-1} - 1}} = 1.87
-```
-
-- quantized, reconstructed
-
-    ![per-channel quantization example](images/per-channel_quant_ex_2.png)
-
-    오차를 구하면 다음과 같다.
-
-$$ {||W-S \odot q_{W}||}_{F} = 2.08 $$
+    ```math
+    ||W - S \odot q_{W}||_F = 2.08
+    ```
 
 ---
 
 ### 6.1.2 Weight Equalization
 
-> [Data-Free Quantization through Weight Equalization and Bias Correction 논문](https://arxiv.org/abs/1906.04721): re-scaling, re-parameterization
+> [Data-Free Quantization through Weight Equalization and Bias Correction 논문(2019)](https://arxiv.org/abs/1906.04721)
 
-그렇다면 weight range를 채널별로 비슷하게 만들어서 per-tensor weight quantization을 사용하면 안 될까? 이러한 접근법을 **Weight Equalization**이라고 한다.
+반면 weight range를 채널별로 비슷하게 조절하여, Per-Tensor weight quantization을 적용하는 접근도 가능하다. (**Weight Equalization**) 
 
-두 개의 연속된 레이어 $i, i+1$ 가 있다고 하자. 행렬 연산은 다음과 같이 표현할 수 있다.
+논문에서는 양자화에서 사용하는 scaling factor를 변형해서, weight range를 함께 조절할 수 있다고 주장한다.(scaling equivariance)
 
-![weight equalization](images/weight_equalization.png)
+1. 두 개 레이어 층을 통과하는 연산을 수식으로 나타내면 다음과 같다.
 
-$$ y^{(i+1)} = f(W^{(i+1)}x^{(i+1)} + b^{(i+1)}) $$
+    - $f$ : activation function
 
-$$ \quad \quad = f(W^{(i+1)} \cdot f(W^{(i)}x^{(i)} + b^{(i)}) + b^{(i+1)}) $$
+    $$ y = f(W^{(2)} f(W^{(1)}x + b^{(1)})+b^{(2)}) $$
 
-- $f$ : activation function
+2. (양자화) scaling factor로 구성된 diagonal matrix $S$ 를 식에 포함하면 다음과 같이 변형된다.
 
-이때 rescaling을 수행하는 scaling factor 행렬 $S$ 를 식에 표기해 보자.
+    $$ = f(W^{(2)} S \hat{f}(S^{-1}W^{(1)}x + S^{-1}b^{(1)})+b^{(2)}) $$
 
-$$ \quad \quad = f(W^{(i+1)}S \cdot f(S^{-1}W^{(i)}x^{(i)} + S^{-1}b^{(i)}) + b^{(i+1)}) $$
+   이때 $S$ 와 $S^{-1}$ 를 다른 다른 행렬과 묶어서 치환할 수 있다.
 
-- $S$ : 대각 행렬 $diag(s)$ 
+   $a. \quad {\widehat{W}}^{(2)} = W^{(2)}S$
 
--  element $s_j$ : output channel $j$ 의 scaling factor
+   $b. \quad {\widehat{W}}^{(1)} = S^{(-1)}W^{(1)}$
 
-여기서 이전 레이어( $i$ )의 scaling factor가 1보다 작다면 activation 값이 더 커진다.(예: ${{1} \over {0.8}} = 1.25$ ) 그렇다면 bias 값도 자연히 증가하고 range는 점점 커질 것이다. 
+   $c. \quad {\widehat{b}}^{(1)} = S^{(-1)}b^{(1)}S$
 
-따라서 이전 레이어는 스케일을 줄이고, 뒤쪽 레이어는 스케일을 늘려야 한다.
+$$ = f({\widehat{W}}^{(2)} \hat{f}({\widehat{W}}^{(1)} x + {\widehat{b}}^{(1)})+b^{(2)}) $$
 
-- 레이어 $i$ : output channel $oc = a$ 를 scaling down
+---
 
-- 레이어 $i+1$ : input channel $ic = a$ 를 scaling up
+#### 6.1.2.1 Equalization ranges over multiple layers
 
-그렇다면 이러한 $s_j$ 값은 어떻게 정해야 할까? 논문에서는 다음과 같은 방식으로 산출한다.
+이제 각 channel별 weight range를 바꿔줄 scaling matrix $S$ 를 찾아보자. 논문에서는 각 channel $i$ 별 최적의 범위를 알기 위해, precision $\hat{p_i}$ 를 둔다.
 
-$$ s_j = {{1} \over {r_{ic=j}^{(i+1)}}} \sqrt{r_{oc=j}^{(i)} \cdot r_{ic=j}^{(i+1)}} $$
+- ${\hat{p_i}}^{(1)}$ : $\quad {\widehat{W}}^{(1)}$ 의 channel $i$ 가 갖는 quantization range
 
-- $r_{oc=j}^{(i)}$ : 레이어 $i$ output channel $j$ 가 갖는 weight range
+- ${\hat{R}}^{(1)}$ : $\quad {\widehat{W}}^{(1)}$ 의 total range
 
-- $r_{ic=j}^{(i+1)}$ : 레이어 $i+1$ input channel $j$ 가 갖는 weight range
+$$ {\hat{p_i}}^{(1)} = {{{\hat{r_i}}^{(1)}} \over {{\hat{R}}^{(1)}}} $$
+
+이제 최적의 $S$ 를 찾는 문제는 다음과 같이 나타낼 수 있다.
+
+$$ \max_{S} \sum_{i} {\hat{p_i}}^{(1)} {\hat{p_i}}^{(2)} $$
+
+여기서 symmetric quantization으로 생각하면, 다음과 같이 precision을 계산할 수 있다.
+
+- ${\hat{r_i}}^{(1)} = 2 \cdot \max_{j} |{\widehat{W}_{ij}^{(1)}}|$
+
+- ${\hat{R}}^{(1)} = 2 \cdot \max_{ij} |{\widehat{W}_{ij}^{(1)}}|$
+
+논문에서는 최적의 $S$ setting을 다음과 같이 도출해 낸다.
+
+$$ s_i = {{1} \over {r_{i}^{(2)}}}\sqrt{r_{i}^{(1)}r_{i}^{(2)}} $$
 
 ---
 
@@ -173,19 +154,23 @@ $$ s_j = {{1} \over {r_{ic=j}^{(i+1)}}} \sqrt{r_{oc=j}^{(i)} \cdot r_{ic=j}^{(i+
 
 > [Up or Down? Adaptive Rounding for Post-Training Quantization 논문](https://arxiv.org/abs/2004.10568)
 
-양자화에서 정확도를 잃는 가장 큰 원인은 **rounding**(반올림)이다. 따라서 rounding으로 잃는 성능을 최소화하기 위해 **Adaptive Rounding**이라는 방법이 제안되었다.
-
-- 일반적인 반올림( $\lfloor W \rceil$ )이 항상 optimal하지는 않다는 점에서 착안했다.
+양자화에서 정확도를 잃는 가장 큰 원인 중 하나가 바로 **rounding**(반올림)이다. 따라서 rounding으로 잃는 성능을 최소화하기 위해 **Adaptive Rounding**이라는 방법이 제안되었다.
 
 ![AdaRound](images/AdaRound.png)
 
-그렇다면 어떠한 방식으로 weight에 내림( $\lfloor W \rfloor$ )과 올림( $\lceil W \rceil$ )을 적용할까? AdaRound는 학습 가능한 parameter를 두어 결정한다. 
+AdaRound 논문은 학습 가능한 parameter를 두어, weight에 내림( $\lfloor W \rfloor$ )과 올림( $\lceil W \rceil$ )을 적용할지 결정한다.
 
 - quantized value $\tilde{W}$ 
 
+- weight에 $\triangle w = \delta$ (perturbation)을 추가하여, 어느 방향의 rounding이 더 좋은지 판단한다.
+
 $$ \tilde{W} = \lfloor | W | + \delta \rceil , \, \delta \in [0,1] $$
 
-위 양자화 값을 최적화하는 과정을 수행한다.
+훈련은 다음과 같은 함수를 최적화하는 과정을 거친다.
+
+$$ \mathbb{E} [\mathcal{L}(x,y,w + \triangle w) - \mathcal{L}(x,y,w)] $$
+
+Taylor series로 근사 시 다음과 같이 나타낼 수 있다.
 
 ```math
 \mathrm{argmin}_{V} {|| Wx - \tilde{W}x ||}^{2}_{F} + \lambda f_{reg}(V)
@@ -195,19 +180,23 @@ $$ \tilde{W} = \lfloor | W | + \delta \rceil , \, \delta \in [0,1] $$
 \mathrm{argmin}_{V} {|| Wx - \lfloor \lfloor {W} \rfloor + h(V)\rceil x ||}^{2}_{F} + \lambda f_{reg}(V)
 ```
 
-- $x$ : input
+- $x$ : 입력, 
 
-- $V$ : 동일한 shape의 random variable
+- $V$ : 입력과 동일한 형태의 random variable
 
-- $h$ : (0, 1) 사이의 값으로 mapping하는 함수(예를 들면 rectified sigmoid)
+- $h()$ : (0, 1) 사이 값으로 mapping하는 함수 
 
-- $f_{reg}(V)$ : $h(V)$ 가 binary 값이 될 수 있도록 하는 regularization 함수
+  > 예를 들면 rectified sigmoid가 될 수 있다.
+
+- $f_{reg}(V)$ :  regularization
+
+  $h(V)$ 가 binary 값이 될 수 있도록 encourage한다.
 
 ---
 
 ## 6.2 Post-Training Quantization: Activation Quantization
 
-이번에는 activation quantization에 대해 알아보자.
+이번에는 **Activation Quantization**에 대해 알아보자.
 
 - "weight" vs "activation"
 
@@ -215,110 +204,219 @@ $$ \tilde{W} = \lfloor | W | + \delta \rceil , \, \delta \in [0,1] $$
     
     - activation: 입력(image)가 달라지면 activation 값도 천차만별로 달라진다.(**dynamic range**)
 
----
-
-### 6.2.1 Dynamic Range for Activation Quantization
-
-따라서 activation quantization을 위해서는 적절한 범위를 탐색할 필요가 있다.
+activation quantization을 위해서는, dynamic activation range에서 최적의 **clipping range**를 탐색할 필요가 있다.
 
 ![dynamic range](images/dynamic_range_activation.png)
 
-- clipping threshold인 $q_{min}$ , $q_{max}$ 값을 파악해야 한다.
+---
 
-- threshold를 설정하면 scaling factor와 zero point를 계산 가능하다. 이를 statistics한 방식으로 찾는다.
+### 6.2.1 During training
+
+먼저 모델의 훈련 중 statistics을 모아두는 방식으로, clipping range를 결정할 수 있다.
+
+- 훈련 중 activation을 관찰하고 $[a;b]$ range를 기록한다.
+
+- smoothing parameter가 1에 가까운 **Exponential Moving Averages**(EMA)를 통해 clipping range를 집계한다.
 
 ```math
 {\hat{r}}^{(t)}_{max, min} = \alpha \cdot {r}^{(t)}_{max, min} + (1-\alpha) \cdot {\hat{r}}^{(t-1)}_{max, min}
 ```
 
-이제 각 activation quantization을 위한 패러미터를 구하는 방법을 알아보자.
+단, activation range가 급격하게 변하는 훈련 초기(5만 ~ 200만 step)에는, computation overhead를 고려하여 EMA를 적용하지 않는다.
 
 ---
 
-### 6.2.2 During training
+### 6.2.2 Calibation
 
-학습 도중 패러미터를 구하는 방식으로, training step마다 **Exponential Moving Averages**(EMA, 이동평균)을 갱신한다.(model state 기록)
+> [Integer Quantization for Deep Learning Inference: Principles and Empirical Evaluation 논문(2020)](https://arxiv.org/abs/2004.09602)
+
+훈련 데이터셋을 샘플링하여 calibation batch를 만든 뒤, 이를 추론하며 dynamic range를 기록한다. 대표적으로 다음과 같은 방법이 있다.
+
+- **min-max** 
+
+  가장 단순한 방법에 해당된다.
+  
+  - activation range의 min/max를 기록한 뒤, 최종적으로 평균값을 사용한다. 
+  
+  - (-) outlier에 취약하다.
+
+- **percentile-based**
+
+  min/max 대신, i번째 largest/smallest 값을 range로 사용한다.
+
+  - 예를 들어 99% calibration의 경우, 가장 큰 1% 값은 모두 clip한다.
+
+  - (+) min-max보다 outlier에 덜 민감하다.
+
+- **Kullback-Leibler divergence** (KL-divergence)
+
+  entropy를 기반으로, 양자화 이전과 이후의 분포 차이를 최소화한다.
+
+- **Mean Squared Error** (MSE)
+
+  위 세 가지 방법(activation histogram)과 다르게, 양자화 전/후의 입력을 비교 후 차이를 최소화한다.
+
+다음은 ResNet-50의 세 번째 레이어의 input activation의 histogram으로, 3가지 방법의 calibration range를 비교한 그림이다.
+
+![ResNet-50 histogram](images/histogram.png)
 
 ---
 
-### 6.2.3 calibation batches
+### 6.2.3 Calibration: Minimize Loss of Information
 
-모델을 훈련시키며 사용한 train dataset에서 calibation batch를 만들어 추론시키며 패러미터를 구한다. 
+> [NVIDIA: 8-bit Inference with TensorRT](https://on-demand.gputechconf.com/gtc/2017/presentation/s7310-8-bit-inference-with-tensorrt.pdf): 현대 GPU에서 가장 많이 사용되는 방법이다.
 
-- **min-max**
+min-max의 단점을 보완하기 위해서는, 최적의 **threshold**를 찾아서 clipping할 필요가 있다.
 
-    각 batch마다 계산한 activation의 min/max를 구한 뒤 평균값을 사용한다.
+| No saturate | Saturate |
+| :---: | :---: |
+| ![no saturate](images/no_saturation.png) | ![saturate](images/saturate.png) |
+| FP32 \|max\| $\rightarrow$ INT8 127 | FP32 \|threshold\| $\rightarrow$ INT8 127 |
 
-    - activation 특성상 outlier가 나타나는 경우가 많고 영향을 받기 쉬우므로 주의해야 한다.
+최적의 clipping range를 찾기 위해서, FP32 입력 및 INT 입력에 따른 activation 분포(entropy) 차이를 **KL divergence**를 기반으로 최소화한다.
 
-- **Mean Squared Error**(MSE)
+1. 여러 calibration batch를 FP32 model에서 추론하여, activation histograms를 얻는다.
 
-    fp32 입력 $X$ 와 양자화된 입력 $Q(X)$ 을 사용했을 때의 출력값 차이를 비교하며 mean-square-error를 최소화하는 방향으로 진행된다.
-    
-    - min-max 방식보다 outlier에 덜 민감하다.
+2. 다양한 saturation thresholds를 사용하여, **quantized distributions**를 생성한다.
 
-$$ \underset{{|r|}_{max}}{\min} \mathbb{E}[{(X - Q(X))}^{2}] $$
-
-- **KL divergence**
-
-    fp32 입력과 양자화 입력에 따른 출력의 분포 차이를 최소화한다. 분포는 **KL divergence**(Kullback-Leibler divergence)를 사용해 측정한다.
-
-    - 이때 특정 threshold 값 이상, 이하의 값은 saturation된다.
-
-    ![KL divergence](images/KL_divergence.png)
+3. KL divergence를 최소화하는, 최적의 threshold를 탐색한다.
 
 ```math
 D_{KL}(P||Q) = {\sum}_{i}^{N}P(x_{i})\log{{P(x_{i})} \over {Q(x_{i})}}
 ```
 
+다음은 ResNet의 특정 레이어에서, saturation 전/후의 histogram을 비교한 그림이다.
+
+| No saturate | Saturate |
+| :---: | :---: |
+| ![no saturate ResNet activation](images/activation_clipping_ex_1.png) | ![saturate ResNet activation](images/activation_clipping_ex_2.png) |
+
+---
+
+### 6.2.4 Calibration: Minimize MSE
+
+양자화 이전 입력과, 양자화 이후의 입력에 주목하여, 두 입력의 차이(**mean-square-error**)를 최소화하는 접근도 가능하다.
+
+- $X$ : input
+
+- $Q(X)$ : quantized imput
+
+$$ \underset{{|r|}_{max}}{\min} \mathbb{E}[{(X - Q(X))}^{2}] $$
+
+입력을 Laplace(혹은 Gaussian) distribution으로 가정하면, Laplace $(0, b)$ distribution에서 최적의 clipping values는 다음과 같다.
+
+- $b$ : calibration input distribution에서 estimate할 수 있다.
+
+- 2, 3, 4 bits에서 각각의 최적 clipping value
+
+$$ |r|_{max} = 2.83, 3.89b, 5.03b $$
+
 ---
 
 ## 6.3 Post-Training Quantization: Bias Quantization
 
-> [Data-Free Quantization through Weight Equalization and Bias Correction 논문](https://arxiv.org/abs/1906.04721). 6.1.2절과 이어짐
+> [Data-Free Quantization through Weight Equalization and Bias Correction 논문](https://arxiv.org/abs/1906.04721)
 
-> [Batch Normalization 정리](https://github.com/erectbranch/Neural_Networks_and_Deep_Learning/tree/master/ch03/summary02)
+> calibration data가 없고 모델이 **Batch Normalization**을 쓰는 경우, 유용하게 사용할 수 있다.
 
-> calibration data가 없고 모델이 **Batch Normalization**을 쓰는 경우 이 방법을 사용할 수 있다.
+weight quantization error는, 잇따라 output activation의 분포를 shifting시키는 문제를 낳을 수 있다.(**biased error**)
 
-weight에 의한 quantization error는 잇달아 출력 분포를 shifting시켜서, activation이 잘못된 분포를 갖도록 만들 수 있다. 이를 **biased error**라고 한다.
+- weight quantization error
 
-우선 bias를 더하기 전 단계인 **pre-activation**을 살펴보자. FP32 모델의 pre-activation $y$ , quantization error가 추가된 $\tilde{y}$ 은 다음과 같이 표현할 수 있다.
+$$ \epsilon = Q(W) - W $$
 
-$$ \tilde{y} = \tilde{W}\mathrm{x} = y + \epsilon \mathrm{x} $$
-
-- $W$ : weight tensor
-
-- $\tilde{W}$ : quantized weight
-
-- $\mathrm{x}$ : input activation
-
-- $\epsilon = \tilde{W} - W$ : quantization error
-
-따라서 **biased error**는 다음과 같이 나타낼 수 있다.
+- biased error
 
 $$ \mathbb{E}[\tilde{y_j} - y_j] \approx {{1} \over {N}} \sum_{n}{(Q(W)\mathrm{x_n})_j - (W\mathrm{x_n})_j} $$
 
-아래 그림은 MobileNetV2 모델의 depthwise-separable convolution layer의 채널별 bias quantization error를 나타낸다.
+biased error는 FP32 model과 quantized model의 결과를 비교하는 것으로 알 수 있다.
 
-![quantization bias correction](images/quantization_biased_output_error.png)
+$$ \mathbb{E}[y] = \mathbb{E}[W\mathrm{x}] + \mathbb{E}[\epsilon\mathrm{x}] - \mathbb{E}[\epsilon\mathrm{x}] $$
 
-error는 다음과 같이 correction할 수 있다.
+$$ \quad = \mathbb{E}[(\tilde{y})\mathrm{x}] - \mathbb{E}[\epsilon\mathrm{x}] $$
 
-$$ \mathbb{E}[y] = \mathbb{E}[W\mathrm{x_n}] + \mathbb{E}[\epsilon\mathrm{x}] - \mathbb{E}[\epsilon\mathrm{x}] $$
+---
 
-$$ \quad = \mathbb{E}[Q(W)\mathrm{x}] - \epsilon \mathbb{E}[\mathrm{x}] $$
+### 6.3.1 Bias Correction
 
-- input distributions $\mathbb{E}[x]$ 는 Batch Normalization을 통해 얻어진다.
+**bias correction** 절차는 다음과 같이 진행된다.
 
-즉, BatchNorm statistics에 quantization error를 곱하는 것으로 bias를 보정할 수 있다.
+1. $\mathbb{E}[y]$ 를 계산한다.
+
+    FP32 model을 N개 example에 대해 추론하고, 레이어별 per-channel pre-activation mean( $\mathbb{E}[y]$ )을 획득한다.
+
+2. $\mathbb{E}[\tilde{y}]$ 를 계산한다.
+
+    quantized model의 레이어마다 $\mathbb{E}[\tilde{y}]$ 를 획득한다.
+
+3. per-channel biased quantization error를 계산한다.
+
+$$\mathbb{E}[\epsilon] = \mathbb{E}[\tilde{y}] - \mathbb{E}[y]$$
+
+4. 레이어별 bias correction을 수행한다.
+
+   레이어마다 $\mathbb{E}[\epsilon]$ 를 빼주는 것으로 bias correction을 수행한다.
+
+아래 그림은 MobileNetV2 모델의 두 번째 depthwise-separable convolution layer에서, bias correction 전/후 biased output error의 분포를 나타낸 그림이다.
+
+| Before Correction | After Correction |
+| :---: | :---: |
+| ![before bias correction](images/biased_output.png) | ![after bias correction](images/after_bias_correction.png) |
+
+
 
 ---
 
 ## 6.4 Post-Training INT8 Linear Quantization
 
+하지만 large model과 비교해서, 모델이 작을수록 PTQ가 그다지 좋은 성능을 보이지 않는다.
+
 ![PTQ int8 models](images/PTQ_models.png)
 
-large model과 MobileNetV1, MobileNetV2를 비교하면, 작은 모델일수록 PTQ가 그다지 좋은 성능을 보이지 않는 것을 알 수 있다.
+---
+
+## 6.5 Post-Training Quantization: Data Free Quantization
+
+> [ZeroQ: A Novel Zero Shot Quantization Framework 논문(2020)](https://arxiv.org/abs/2001.00281)
+
+ZeroQ 논문은 훈련 데이터셋을 사용하지 않고, distilled data를 만들어 양자화하는 **Zero-Shot Quantization**을 제안했다. 
+
+이전까지는 훈련 데이터셋이 없을 경우, 주로 naive approach로 평균 0과 단위 분산을 갖는 Gaussian distribution $N(0, 1)$ 을 사용했다. 하지만 이러한 방식으로는 activation statistics를 정확히 파악하기 어렵다.
+
+하지만 더 많은 local structure를 가지는 distilled data를 이용하면 문제를 해결할 수 있다. 다음은 논문에서 두 data를 시각화하여 비교한 예시 그림이다.
+
+| Gaussian data | Distilled data |
+| :---: | :---: |
+| ![Gaussian data](images/gaussian_data.png) | ![Distilled data](images/distilled_data.png)  |
+
+> 8-V100 시스템에서 ImageNet 대상으로 훈련한 ResNet-50 기준으로 32개 데이터를 만드는 시간은 3초로, computational overhead가 적다.
+
+---
+
+### 6.5.1 Generation of Distilled Data
+
+ZeroQ에서는 batch normalization 레이어의 statistic을 바탕으로 distilled data를 생성한다. 이때 distilled data를 생성하기 위해, 모델을 추론하며 최적화하는 수식은 다음과 같다.
+
+$$ \min_{x^r} \sum_{i=0}^{L} ||\tilde{\mu}_i^r - {\mu}_{i}||_{2}^{2} + || \tilde{\sigma}_{i}^{r} - \tilde{\sigma}_{i} ||_{2}^{2} $$
+
+- $x^{r}$ : reconstructed (ditilled) input data
+
+- $i$ : layer(0~L)
+
+- ${\mu}_i, {\sigma}_i$ : BN 레이어에 저장된 평균, 표준편차
+
+---
+
+### 6.5.2 Sensitivity Analysis for Mixed-Precision Quantization
+
+ZeroQ가 해결하려는 mixed-precision 문제는 레이어별 최적의 bit-width를 고르는 문제의 경우의 수(search space)가 매우 많아서 어렵다. 하지만 KL divergence를 사용하여, 레이어 단위의 quantization sensitivity를 구하여 문제를 단순화 한다.
+
+다음은 ResNet-50에서 2,4,8 bit로 weight quantization을 적용했을 때, 레이어(block)별 sensitivity를 나타낸 그래프다.
+
+- 민감한 레이어는 큰 bit precision를 사용한다.
+
+- 덜 민감한 레이어는 작은 bit precision을 사용한다.
+
+![quantization sensitivity](images/layer_bit_width_sensitivity.png)
 
 ---
