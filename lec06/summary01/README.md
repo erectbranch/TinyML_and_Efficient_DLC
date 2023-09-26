@@ -4,7 +4,7 @@
 
 > [Neural Network Quantization Technique - Post Training Quantization](https://medium.com/mbeddedwithai/neural-network-quantization-technique-post-training-quantization-ff747ed9aa95)
 
-> [A Comprehensive Survey on Model Quantization for Deep Neural Networks 논문](https://paperswithcode.com/paper/a-comprehensive-survey-on-model-quantization)
+> [A Comprehensive Survey on Model Quantization for Deep Neural Networks 논문(2022)](https://arxiv.org/abs/2205.07877)
 
 ---
 
@@ -44,7 +44,7 @@
 
 | | Per-Tensor | Per-Channel |
 | :---: | :---: | :---: |
-| | ![Per-Tensor ex](images/tensor_ex_1.png) | ![Per-Channel ex](images/tensor_ex_1.png) |
+| | ![Per-Tensor ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary01/images/tensor_ex_1.png) | ![Per-Channel ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary01/images/tensor_ex_2.png) |
 | $\|r\|_{max}$ | 2.12 | 2.09 <br/> 2.12 <br/> 1.92 <br/> 1.87 |
 
 
@@ -106,11 +106,15 @@
 
     - $f$ : activation function
 
-    $$ y = f(W^{(2)} f(W^{(1)}x + b^{(1)})+b^{(2)}) $$
+    ```math
+    y = f(W^{(2)} f(W^{(1)}x + b^{(1)})+b^{(2)})
+    ```
 
 2. (양자화) scaling factor로 구성된 diagonal matrix $S$ 를 식에 포함하면 다음과 같이 변형된다.
 
-    $$ = f(W^{(2)} S \hat{f}(S^{-1}W^{(1)}x + S^{-1}b^{(1)})+b^{(2)}) $$
+    ```math
+    = f(W^{(2)} S \hat{f}(S^{-1}W^{(1)}x + S^{-1}b^{(1)})+b^{(2)})
+    ```
 
    이때 $S$ 와 $S^{-1}$ 를 다른 다른 행렬과 묶어서 치환할 수 있다.
 
@@ -270,7 +274,7 @@ min-max의 단점을 보완하기 위해서는, 최적의 **threshold**를 찾�
 
 | No saturate | Saturate |
 | :---: | :---: |
-| ![no saturate](images/no_saturation.png) | ![saturate](images/saturate.png) |
+| ![no saturate](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary01/images/no_saturation.png) | ![saturate](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary01/images/saturate.png) |
 | FP32 \|max\| $\rightarrow$ INT8 127 | FP32 \|threshold\| $\rightarrow$ INT8 127 |
 
 최적의 clipping range를 찾기 위해서, FP32 입력 및 INT 입력에 따른 activation 분포(entropy) 차이를 **KL divergence**를 기반으로 최소화한다.
@@ -315,7 +319,7 @@ $$ |r|_{max} = 2.83, 3.89b, 5.03b $$
 
 ## 6.3 Post-Training Quantization: Bias Quantization
 
-> [Data-Free Quantization through Weight Equalization and Bias Correction 논문](https://arxiv.org/abs/1906.04721)
+> [Data-Free Quantization through Weight Equalization and Bias Correction 논문(2019)](https://arxiv.org/abs/1906.04721)
 
 > calibration data가 없고 모델이 **Batch Normalization**을 쓰는 경우, 유용하게 사용할 수 있다.
 
@@ -363,8 +367,6 @@ $$\mathbb{E}[\epsilon] = \mathbb{E}[\tilde{y}] - \mathbb{E}[y]$$
 | :---: | :---: |
 | ![before bias correction](images/biased_output.png) | ![after bias correction](images/after_bias_correction.png) |
 
-
-
 ---
 
 ## 6.4 Post-Training INT8 Linear Quantization
@@ -383,7 +385,7 @@ ZeroQ 논문은 훈련 데이터셋을 사용하지 않고, distilled data를 �
 
 이전까지는 훈련 데이터셋이 없을 경우, 주로 naive approach로 평균 0과 단위 분산을 갖는 Gaussian distribution $N(0, 1)$ 을 사용했다. 하지만 이러한 방식으로는 activation statistics를 정확히 파악하기 어렵다.
 
-하지만 더 많은 local structure를 가지는 distilled data를 이용하면 문제를 해결할 수 있다. 다음은 논문에서 두 data를 시각화하여 비교한 예시 그림이다.
+하지만 더 많은 local structure를 가지는 distilled data를 이용하면 문제를 해결할 수 있다. 다음은 해당 논문에서 Gaussian data와 Distilled data를 시각화하여 비교한 예시다.
 
 | Gaussian data | Distilled data |
 | :---: | :---: |
@@ -397,7 +399,9 @@ ZeroQ 논문은 훈련 데이터셋을 사용하지 않고, distilled data를 �
 
 ZeroQ에서는 batch normalization 레이어의 statistic을 바탕으로 distilled data를 생성한다. 이때 distilled data를 생성하기 위해, 모델을 추론하며 최적화하는 수식은 다음과 같다.
 
-$$ \min_{x^r} \sum_{i=0}^{L} ||\tilde{\mu}_i^r - {\mu}_{i}||_{2}^{2} + || \tilde{\sigma}_{i}^{r} - \tilde{\sigma}_{i} ||_{2}^{2} $$
+```math
+\min_{x^r} \sum_{i=0}^{L} ||\tilde{\mu}_i^r - {\mu}_{i}||_{2}^{2} + || \tilde{\sigma}_{i}^{r} - \tilde{\sigma}_{i} ||_{2}^{2}
+```
 
 - $x^{r}$ : reconstructed (ditilled) input data
 
