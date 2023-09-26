@@ -105,26 +105,22 @@
 1. 두 개 레이어 층을 통과하는 연산을 수식으로 나타내면 다음과 같다.
 
     - $f$ : activation function
-
-    ```math
-    y = f(W^{(2)} f(W^{(1)}x + b^{(1)})+b^{(2)})
-    ```
+  
+    $$y = f(W^{(2)} f(W^{(1)}x + b^{(1)})+b^{(2)})$$
 
 2. (양자화) scaling factor로 구성된 diagonal matrix $S$ 를 식에 포함하면 다음과 같이 변형된다.
 
-    ```math
-    = f(W^{(2)} S \hat{f}(S^{-1}W^{(1)}x + S^{-1}b^{(1)})+b^{(2)})
-    ```
+    $$= f(W^{(2)} S \hat{f}(S^{-1}W^{(1)}x + S^{-1}b^{(1)})+b^{(2)})$$
 
-   이때 $S$ 와 $S^{-1}$ 를 다른 다른 행렬과 묶어서 치환할 수 있다.
+    이때 $S$ 와 $S^{-1}$ 를 다른 다른 행렬과 묶어서 치환할 수 있다.
 
-   $a. \quad {\widehat{W}}^{(2)} = W^{(2)}S$
+    $a. \quad {\widehat{W}}^{(2)} = W^{(2)}S$
 
-   $b. \quad {\widehat{W}}^{(1)} = S^{(-1)}W^{(1)}$
+    $b. \quad {\widehat{W}}^{(1)} = S^{(-1)}W^{(1)}$
 
-   $c. \quad {\widehat{b}}^{(1)} = S^{(-1)}b^{(1)}S$
+    $c. \quad {\widehat{b}}^{(1)} = S^{(-1)}b^{(1)}S$
 
-$$ = f({\widehat{W}}^{(2)} \hat{f}({\widehat{W}}^{(1)} x + {\widehat{b}}^{(1)})+b^{(2)}) $$
+$$ \quad = f({\widehat{W}}^{(2)} \hat{f}({\widehat{W}}^{(1)} x + {\widehat{b}}^{(1)})+b^{(2)}) $$
 
 ---
 
