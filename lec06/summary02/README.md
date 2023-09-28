@@ -91,8 +91,8 @@ real number weight 연산과, binary quantizated weight 연산을 비교해 보�
 
 | baseline | Real Number Weights | Binary Quantized Weights |
 | :---: | :---: | :---: |
-| ![binary quantization ex 1](images/binary_ex_1.png) | ![binary quantization ex 2](images/binary_ex_2.png) | ![binary quantization ex 3](images/binary_ex_3.png) |
-| $$ y_i = \sum_{j}{W_{ij} \cdot x_{j}} $$ | $$ 8 \times 5 + (-3) \times 2 + 5 \times 0 + (-1) \times 1 $$ | $$ 5 - 2 + 0 - 1 $$ |
+| ![binary quantization ex 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary02/images/binary_ex_1.png) | ![binary quantization ex 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary02/images/binary_ex_2.png) | ![binary quantization ex 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary02/images/binary_ex_3.png) |
+| $y_i = \sum_{j}{W_{ij} \cdot x_{j}}$ | $8 \times 5 + (-3) \times 2 + 5 \times 0 + (-1) \times 1$ | $5 - 2 + 0 - 1$ |
 | operation | + x | + - |
 | memory | 1x | ~32x less |
 | computation | 1x | ~2x less |
@@ -121,13 +121,13 @@ q = sign(r) = \begin{cases} +1, & r \ge 0 \\ -1, & r < 0 \end{cases}
  
 - discrete한 정도를 averaging할 수 있도록, **hard sigmoid**를 이용해서 probability를 결정한다.( $\sigma (r)$ ) 
 
-    ![hard sigmoid](images/hard_sigmoid.png)
+  ![hard sigmoid](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary02/images/hard_sigmoid.png)
 
-    ```math
-    q = \begin{cases} +1, & with \, probability \, p = \sigma(r) \\ -1, & with \, probability \, 1 - p \end{cases}
-    ```
+```math
+q = \begin{cases} +1, & with \, probability \, p = \sigma(r) \\ -1, & with \, probability \, 1 - p \end{cases}
+```
 
-    $$ \sigma (r) = \min (\max ({{r+1} \over {2}}), 1) $$
+$$ \sigma (r) = \min (\max ({{r+1} \over {2}}), 1) $$
 
 - (-) 하지만 정확도 손실이 크다. (ImageNet 대상 AlexNet Top-1 accuracy: -21.2%p)
 
@@ -255,7 +255,7 @@ $$ {{1} \over {11}}||W_{W^T \neq 0} ||_1 = 1.5 $$
 
 | weights $W$ <br/>(32bit float) | ternary weights $W^T$ <br/>(2bit) |
 | :---: | :---: |
-| ![fp32 weight ex](images/binarize_ex_1.png) | ![ternary weight ex](images/ternary_ex_2.png) |
+| ![fp32 weight ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary02/images/binarize_ex_1.png) | ![ternary weight ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary02/images/ternary_ex_2.png) |
 
 ---
 
