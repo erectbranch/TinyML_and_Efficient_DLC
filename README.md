@@ -57,25 +57,25 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 - [Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05)
 
-  > integer, fixed-point, floating-point(IEEE 754 single/half precision, BF16, TF32)
+  > Numeric Data Types: integer, fixed-point, floating-point(IEEE 754 single/half precision, BF16, TF32)
 
-  > symmetric vs asymmetric quantization, uniform vs non-uniform quantization
+  > Symmetric vs Asymmetric quantization, Uniform vs Non-uniform quantization
 
-  > huffman coding, K-Means-based weight quantization, linear quantization(zero point, scaling factor)
+  > Deep Compression(K-Means-based weight quantization, Huffman coding), Linear Quantization(zero point, scaling factor)
 
 - [Post Training Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec06/summary01)
 
   > Weight Quantiztion: Per-Tensor Activation Per-Channel Activation, Weight Equalization, Adative Rounding
 
-  > Activation Quantization: During training(EMA), calibration batches(min-max, Mean Squared Error, KL-divergence)
+  > Activation Quantization: During training(EMA), Calibration(Min-Max, KL-divergence, Mean Squared Error)
 
-  > Bias Quantization
+  > Bias Correction, Zero-Shot Quantization(ZeroQ)
 
 - [Quantization-Aware Training, Low bit-width quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec06/summary02)
 
-  > fake quantization, Straight-Through Estimator
+  > Fake quantization, Straight-Through Estimator
 
-  > Binary Quantization(Deterministic, Stochastic), XNOR-Net
+  > Binary Quantization(Deterministic, Stochastic, XNOR-Net), Ternary Quantization
 
 - [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary01)
 
@@ -93,7 +93,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   > Search Strategy: grid search, random search, reinforcement learning, bayesian optimization, gradient-based search, evolutionary search
 
-  > EfficientNet(compound scaling), ProxylessNAS(architecture parameter, binary gate), DARTS
+  > EfficientNet(compound scaling), DARTS
 
 - [Neural Architecture Search: Performance Estimation & Hardware-Aware NAS](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec08)
 
@@ -101,9 +101,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   > Performance Estimation Heuristics: Zen-NAS, GradSign
 
-  > Hardware-Aware NAS: ProxylessNAS, Once-for-All
-
-  > latency prediction: layer-wise/network-wise
+  > Hardware-Aware NAS(ProxylessNAS, HAT), One-Shot NAS(Once-for-All)
 
 - [Knowledge Distillation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary01)
 
