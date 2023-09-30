@@ -226,9 +226,11 @@ $$ r = (q - z) \cdot s_{l_0} \cdot s_{l_1} \cdot \cdots $$
 
   한 channel이 하나의 scaling factor를 공유한다.
 
-  ![per-channel quantization](images/multi_level_scaling_2.png)
+  ![per-channel quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary01/images/multi_level_scaling_2.png)
 
-  $$ r = (q - z) \cdot s_{l_0} $$
+  ```math
+  r = (q - z) \cdot s_{l_0}
+  ```
 
   - $s_{l_0}$ : FP16
 
@@ -240,9 +242,11 @@ $$ r = (q - z) \cdot s_{l_0} \cdot s_{l_1} \cdot \cdots $$
 
   vector와 channel 단위로, 각각의 scaling factor를 갖는다.
 
-  ![two-level quantization](images/multi_level_scaling_3.png)
+  ![two-level quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary01/images/multi_level_scaling_3.png)
 
-  $$ r = (q - z) \cdot s_{l_0} \cdot s_{l_1} $$
+  ```math
+  r = (q - z) \cdot s_{l_0} \cdot s_{l_1}
+  ```
 
   - $s_{l_0}$ : UINT4
 
@@ -258,7 +262,7 @@ $$ r = (q - z) \cdot s_{l_0} \cdot s_{l_1} \cdot \cdots $$
 
   shared microexponents 단위로 scaling factor를 공유하도록 하는 방식이다.
 
-  ![shared microexponents](images/multi_level_scaling_4.png)
+  ![shared microexponents](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary01/images/multi_level_scaling_4.png)
 
   > S1M2: 1 Sign bit, 2 Mantissas, E1M0: Exponent 1, Mantissa 0, E8M0: Exponent 8, Mantissa 0
 
