@@ -228,9 +228,7 @@ $$ r = (q - z) \cdot s_{l_0} \cdot s_{l_1} \cdot \cdots $$
 
   ![per-channel quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary01/images/multi_level_scaling_2.png)
 
-  ```math
-  r = (q - z) \cdot s_{l_0}
-  ```
+  $r = (q - z) \cdot s_{l_0}$
 
   - $s_{l_0}$ : FP16
 
@@ -244,9 +242,7 @@ $$ r = (q - z) \cdot s_{l_0} \cdot s_{l_1} \cdot \cdots $$
 
   ![two-level quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec06/summary01/images/multi_level_scaling_3.png)
 
-  ```math
-  r = (q - z) \cdot s_{l_0} \cdot s_{l_1}
-  ```
+  $r = (q - z) \cdot s_{l_0} \cdot s_{l_1}$
 
   - $s_{l_0}$ : UINT4
 
