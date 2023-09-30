@@ -2,13 +2,31 @@
 
 > [Lecture 06 - Quantization (Part II) | MIT 6.S965](https://youtu.be/3nqUFSSJYKQ)
 
+> [EfficientML.ai Lecture 6 - Quantization (Part II) (MIT 6.6940, Fall 2023, Zoom recording)](https://youtu.be/n72ndSimkB8?si=xU98arzumiap6buV)
+
 > [Neural Network Quantization Technique - Post Training Quantization](https://medium.com/mbeddedwithai/neural-network-quantization-technique-post-training-quantization-ff747ed9aa95)
 
 > [A Comprehensive Survey on Model Quantization for Deep Neural Networks 논문(2022)](https://arxiv.org/abs/2205.07877)
 
 ---
 
-## 6.1 Post-Training Quantization: Weight Quantization
+## 6.1 Quantization Granularity
+
+quantization granularity으로는 대표적으로 다음과 같은 세 가지 방법이 있다.
+
+| Per-Tensor | Per-Channel | Group |
+| :---: | :---: | :---: |
+| ![Per-Tensor](images/granularity_per-tensor.png) | ![Per-Channel](images/granularity_per-channel.png) | ![Group](images/granularity_group.png) |  
+
+오른쪽에 위치할수록 다음과 같은 특징을 갖는다.
+
+- (+) coarse-grained quantization으로, 더 높은 정확도를 달성할 수 있다.
+
+- (-) 하드웨어에서 지원하지 않거나 최적화가 어렵다.
+
+---
+
+## 6.2 Post-Training Quantization: Weight Quantization
 
 > [Data-Free Quantization through Weight Equalization and Bias Correction 논문(2019)](https://arxiv.org/abs/1906.04721)
 
@@ -16,7 +34,7 @@
 
 ![weight range per output channel](images/weight_range_per_output_channel.png)
 
-위와 같은 상황에서, 다음과 같은 두 PTQ 기법을 고려할 수 있다.
+위와 같은 상황에서, 다음과 같은 두 PTQ 기법을 고려해 보자.
 
 - **Per-Tensor Quantization**
 
@@ -38,7 +56,7 @@
 
 ---
 
-### 6.1.1 Per-Tensor vs Per-Channel Quantization
+### 6.2.1 Per-Tensor vs Per-Channel Quantization
 
 한 행렬을 per-tensor quantization, per-channel quantization을 적용하여 어떤 차이가 있는지 알아보자.
 
@@ -94,7 +112,7 @@
 
 ---
 
-### 6.1.2 Weight Equalization
+### 6.2.2 Weight Equalization
 
 > [Data-Free Quantization through Weight Equalization and Bias Correction 논문(2019)](https://arxiv.org/abs/1906.04721)
 
@@ -124,7 +142,7 @@ $$ \quad = f({\widehat{W}}^{(2)} \hat{f}({\widehat{W}}^{(1)} x + {\widehat{b}}^{
 
 ---
 
-#### 6.1.2.1 Equalization ranges over multiple layers
+#### 6.2.2.1 Equalization ranges over multiple layers
 
 이제 각 channel별 weight range를 바꿔줄 scaling matrix $S$ 를 찾아보자. 논문에서는 각 channel $i$ 별 최적의 범위를 알기 위해, precision $\hat{p_i}$ 를 둔다.
 
@@ -150,7 +168,109 @@ $$ s_i = {{1} \over {r_{i}^{(2)}}}\sqrt{r_{i}^{(1)}r_{i}^{(2)}} $$
 
 ---
 
-### 6.1.3 Adaptive Rounding
+### 6.2.3 Group Quantization: Per-Vector Quantization
+
+> [VS-Quant: Per-Vector Scaled Quantization for Accurate Low-Precision Neural Network Inference 논문(2021)](https://arxiv.org/abs/2102.04503)
+
+VS-Quant 논문은 vector 단위, tensor 단위로 각각 scaling하는, **two-level scaling**을 통한 **group quantization**를 소개한다.
+
+![per-vector quantization](images/per-vector.png)
+
+$$ r = S(q - Z) \rightarrow r = \gamma \cdot S_q(q-Z) $$
+
+- tensor 단위: scaling factor $\gamma$ 
+
+- vector 단위: scaling factor $S_q$ 
+
+이때 scaling factor의 numertic type을 어떤 종류를 사용하는가에 따라서도 trade-off가 발생한다.
+
+- integer scaling factor: 정확도는 낮아지나 연산이 효율적이다. 
+   
+- floating-point scaling factor: 정확도는 높아지지만 연산 비용이 커진다.
+
+따라서 coarse granularity(tensor)에서 연산 비용이 큰 floating scaling factor를 사용하고, fine granularity(vector)에서 연산 비용이 작은 integer scaling factor를 사용하며 균형을 맞출 수 있다.
+
+### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 1: Per-Vector Quantization: Memory Overhead, Effective Bitwidth &nbsp;&nbsp;&nbsp;</span>
+
+다음과 같은 조건에서, N=4, M=4, V=16일 때의 (1) memory overhead와 (2) effective bitwidth를 구하라.
+
+- weight(or activation): N-bit integer
+
+- per-vector scaling factor: M-bit integer
+
+  이때 V개 element vector가 M-bit scaling factor를 공유한다.
+
+### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
+
+(1) memory overhead는 다음과 같이 계산할 수 있다.
+
+$$ M/(VN) = 4/(16 \times 4) = 0.0625 $$
+
+따라서 16개 element vector마다 6.25%의 memory overhead가 발생한다.
+
+(2) effective bitwidth는 다음과 같이 계산할 수 있다.
+
+$$ N + M / V = 4 + 4 / 16 = 4.25 \mathrm{bits} $$
+
+---
+
+### 6.2.4 Group Quantization: Multi-level Scaling Scheme
+
+> [With Shared Microexponents, A Little Shifting Goes a Long Way 논문(2023)](https://arxiv.org/abs/2302.08007)
+
+앞서 본 two-level quantization을, 다음과 같이 multi-level quantization 수식으로 일반화할 수 있다.
+
+$$ r = (q - z) \cdot s_{l_0} \cdot s_{l_1} \cdot \cdots $$
+
+- Per-Channel Quantization
+
+  한 channel이 하나의 scaling factor를 공유한다.
+
+  ![per-channel quantization](images/multi_level_scaling_2.png)
+
+  $$ r = (q - z) \cdot s_{l_0} $$
+
+  - $s_{l_0}$ : FP16
+
+  - $q$ : INT4
+
+  - Effective Bitwidth : 4
+
+- Two-Level Quantization(VS-Quant)
+
+  vector와 channel 단위로, 각각의 scaling factor를 갖는다.
+
+  ![two-level quantization](images/multi_level_scaling_3.png)
+
+  $$ r = (q - z) \cdot s_{l_0} \cdot s_{l_1} $$
+
+  - $s_{l_0}$ : UINT4
+
+    4개 vector(16개 elements)가 하나의 UINT4 scaling factor $s_{l_0}$ 를 공유한다.
+
+  - $s_{l_1}$ : FP16
+
+    하나의 channel이 FP16 scaling factor $s_{l_1}$ 를 공유한다.
+
+  - Effective Bitwidth : 4.25
+
+- formats based on shared microexponents(MX)
+
+  shared microexponents 단위로 scaling factor를 공유하도록 하는 방식이다.
+
+  ![shared microexponents](images/multi_level_scaling_4.png)
+
+  > S1M2: 1 Sign bit, 2 Mantissas, E1M0: Exponent 1, Mantissa 0, E8M0: Exponent 8, Mantissa 0
+
+  | Approach | Data Type | L0 group size | data type | L1 group size | l1 scale<br/>data type | Effective Bitwidth |
+  | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+  | MX4 | S1M2 | 2 | E1M0 | 16 | E8M0 | 3+1/2+8/16=4 |
+  | MX6 | S1M4 | 2 | E1M0 | 16 | E8M0 | 5+1/2+8/16=6 |
+  | MX9 | S1M7 | 2 | E1M0 | 16 | E8M0 | 8+1/2+8/16=9 |
+
+---
+
+### 6.2.5 Adaptive Rounding
 
 > [Up or Down? Adaptive Rounding for Post-Training Quantization 논문](https://arxiv.org/abs/2004.10568)
 
@@ -194,7 +314,7 @@ Taylor series로 근사 시 다음과 같이 나타낼 수 있다.
 
 ---
 
-## 6.2 Post-Training Quantization: Activation Quantization
+## 6.3 Post-Training Quantization: Activation Quantization
 
 이번에는 **Activation Quantization**에 대해 알아보자.
 
@@ -204,13 +324,13 @@ Taylor series로 근사 시 다음과 같이 나타낼 수 있다.
     
     - activation: 입력(image)가 달라지면 activation 값도 천차만별로 달라진다.(**dynamic range**)
 
-activation quantization을 위해서는, dynamic activation range에서 최적의 **clipping range**를 탐색할 필요가 있다.
+activation quantization을 위해서는, **dynamic range**에서 최적의 **clipping range**를 탐색할 필요가 있다.
 
 ![dynamic range](images/dynamic_range_activation.png)
 
 ---
 
-### 6.2.1 During training
+### 6.3.1 During training
 
 먼저 모델의 훈련 중 statistics을 모아두는 방식으로, clipping range를 결정할 수 있다.
 
@@ -226,7 +346,7 @@ activation quantization을 위해서는, dynamic activation range에서 최적�
 
 ---
 
-### 6.2.2 Calibation
+### 6.3.2 Calibation
 
 > [Integer Quantization for Deep Learning Inference: Principles and Empirical Evaluation 논문(2020)](https://arxiv.org/abs/2004.09602)
 
@@ -262,7 +382,7 @@ activation quantization을 위해서는, dynamic activation range에서 최적�
 
 ---
 
-### 6.2.3 Calibration: Minimize Loss of Information
+### 6.3.3 Calibration: Minimize Loss of Information
 
 > [NVIDIA: 8-bit Inference with TensorRT](https://on-demand.gputechconf.com/gtc/2017/presentation/s7310-8-bit-inference-with-tensorrt.pdf): 현대 GPU에서 가장 많이 사용되는 방법이다.
 
@@ -293,7 +413,11 @@ D_{KL}(P||Q) = {\sum}_{i}^{N}P(x_{i})\log{{P(x_{i})} \over {Q(x_{i})}}
 
 ---
 
-### 6.2.4 Calibration: Minimize MSE
+### 6.3.4 Calibration: Minimize MSE
+
+> [Lecture 05 - Quantization (Part I) 정리](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05#552-sources-of-quantization-error): rounding error, clipping error 참고
+
+> [Optimal Clipping and Magnitude-aware Differentiation for Improved Quantization-aware Training 논문(2022)](https://arxiv.org/abs/2206.06501): NVIDIA에서 발표한, MSE를 최소화하는 QAT 방법
 
 양자화 이전 입력과, 양자화 이후의 입력에 주목하여, 두 입력의 차이(**mean-square-error**)를 최소화하는 접근도 가능하다.
 
@@ -305,15 +429,15 @@ $$ \underset{{|r|}_{max}}{\min} \mathbb{E}[{(X - Q(X))}^{2}] $$
 
 입력을 Laplace(혹은 Gaussian) distribution으로 가정하면, Laplace $(0, b)$ distribution에서 최적의 clipping values는 다음과 같다.
 
-- $b$ : calibration input distribution에서 estimate할 수 있다.
+- $b$ : calibration input distribution을 바탕으로 추정할 수 있다.
 
-- 2, 3, 4 bits에서 각각의 최적 clipping value
+- 2, 3, 4 bits quantization: 각각의 최적 clipping values
 
-$$ |r|_{max} = 2.83, 3.89b, 5.03b $$
+$$ |r|_{max} = 2.83b, 3.89b, 5.03b $$
 
 ---
 
-## 6.3 Post-Training Quantization: Bias Quantization
+## 6.4 Post-Training Quantization: Bias Quantization
 
 > [Data-Free Quantization through Weight Equalization and Bias Correction 논문(2019)](https://arxiv.org/abs/1906.04721)
 
@@ -337,7 +461,7 @@ $$ \quad = \mathbb{E}[(\tilde{y})\mathrm{x}] - \mathbb{E}[\epsilon\mathrm{x}] $$
 
 ---
 
-### 6.3.1 Bias Correction
+### 6.4.1 Bias Correction
 
 **bias correction** 절차는 다음과 같이 진행된다.
 
@@ -365,7 +489,7 @@ $$\mathbb{E}[\epsilon] = \mathbb{E}[\tilde{y}] - \mathbb{E}[y]$$
 
 ---
 
-## 6.4 Post-Training INT8 Linear Quantization
+## 6.5 Post-Training INT8 Linear Quantization
 
 하지만 large model과 비교해서, 모델이 작을수록 PTQ가 그다지 좋은 성능을 보이지 않는다.
 
@@ -373,7 +497,7 @@ $$\mathbb{E}[\epsilon] = \mathbb{E}[\tilde{y}] - \mathbb{E}[y]$$
 
 ---
 
-## 6.5 Post-Training Quantization: Data Free Quantization
+## 6.6 Post-Training Quantization: Data Free Quantization
 
 > [ZeroQ: A Novel Zero Shot Quantization Framework 논문(2020)](https://arxiv.org/abs/2001.00281)
 
@@ -391,7 +515,7 @@ ZeroQ 논문은 훈련 데이터셋을 사용하지 않고, distilled data를 �
 
 ---
 
-### 6.5.1 Generation of Distilled Data
+### 6.6.1 Generation of Distilled Data
 
 ZeroQ에서는 batch normalization 레이어의 statistic을 바탕으로 distilled data를 생성한다. 이때 distilled data를 생성하기 위해, 모델을 추론하며 최적화하는 수식은 다음과 같다.
 
@@ -407,7 +531,7 @@ ZeroQ에서는 batch normalization 레이어의 statistic을 바탕으로 distil
 
 ---
 
-### 6.5.2 Sensitivity Analysis for Mixed-Precision Quantization
+### 6.6.2 Sensitivity Analysis for Mixed-Precision Quantization
 
 ZeroQ가 해결하려는 mixed-precision 문제는 레이어별 최적의 bit-width를 고르는 문제의 경우의 수(search space)가 매우 많아서 어렵다. 하지만 KL divergence를 사용하여, 레이어 단위의 quantization sensitivity를 구하여 문제를 단순화 한다.
 
