@@ -45,9 +45,11 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 - [Automatic Pruning, Lottery Ticket Hypothesis](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec04/summary01)
 
-  > pruning ratio, pruning sensitivity, AMC, NetAdapt
+  > Pruning Ratio, Sensitivity Analysis, Automatic Pruning(AMC, NetAdapt)
 
-  > Finetuning, iterative pruning, regularization, Lottery Ticket Hypothesis
+  > Lottery Ticket Hypothesis(Winning Ticket, Iterative Magnitude Pruning, Scaling Limitation), Pruning with Regularization
+
+  > Pruning at Initialization(Connection Sensitivity)
 
 - [System & Hardware Support for Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec04/summary02)
 
@@ -65,7 +67,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 - [Post Training Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec06/summary01)
 
-  > Weight Quantiztion: Per-Tensor Activation Per-Channel Activation, Weight Equalization, Adative Rounding
+  > Weight Quantiztion: Per-Tensor Activation Per-Channel Activation, Group Quantization(Per-Vector, MX) Weight Equalization, Adative Rounding
 
   > Activation Quantization: During training(EMA), Calibration(Min-Max, KL-divergence, Mean Squared Error)
 
