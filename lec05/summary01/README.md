@@ -145,7 +145,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   > Subnormal Numbers, Fraction $=$ 0
 
-  ![fp32 NaN](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/subnormal_NaN.png)
+  ![fp32 NaN](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/subnormal_not_a_number.png)
 
 ---
 
