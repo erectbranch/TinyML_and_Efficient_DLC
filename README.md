@@ -57,17 +57,23 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   > M:N Sparsity
 
-- [Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05)
+  ---
 
-  > Numeric Data Types: integer, fixed-point, floating-point(IEEE 754 single/half precision, BF16, TF32)
+- [Basic Concepts Of Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05/summary01)
 
-  > Symmetric vs Asymmetric quantization, Uniform vs Non-uniform quantization
+  > Numeric Data Types: Integer, Fixed-Point, Floating-Point(IEEE FP32/FP16, BF16, NVIDIA FP8), INT4 and FP4
 
-  > Deep Compression(K-Means-based weight quantization, Huffman coding), Linear Quantization(zero point, scaling factor)
+  > Uniform vs Non-uniform quantization, Symmetric vs Asymmetric quantization
+
+- [Vector Quantization, Linear Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05/summary02)
+
+  > Vector Quantization(VQ): Deep Compression(Iterative Pruning, Retrain Codebook, Huffman Encoding)
+  
+  > Linear Quantization: Zero point, Scaling Factor, Quantization Error(clip error, round error), Linear Quantized Matrix Multiplization(FC layer, Conv layer)
 
 - [Post Training Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec06/summary01)
 
-  > Weight Quantiztion: Per-Tensor Activation Per-Channel Activation, Group Quantization(Per-Vector, MX) Weight Equalization, Adative Rounding
+  > Weight Quantiztion: Per-Tensor Activation Per-Channel Activation, Group Quantization(Per-Vector, MX), Weight Equalization, Adative Rounding
 
   > Activation Quantization: During training(EMA), Calibration(Min-Max, KL-divergence, Mean Squared Error)
 
@@ -78,6 +84,8 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   > Fake quantization, Straight-Through Estimator
 
   > Binary Quantization(Deterministic, Stochastic, XNOR-Net), Ternary Quantization
+
+  ---
 
 - [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary01)
 
@@ -105,6 +113,8 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   > Hardware-Aware NAS(ProxylessNAS, HAT), One-Shot NAS(Once-for-All)
 
+  ---
+
 - [Knowledge Distillation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary01)
 
   > Knowledge Distillation(distillation loss, temperature)
@@ -116,6 +126,8 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
   > Self Distillation, Online Distillation, Combining Online and Self-Distillation, Network Augmentation
   
   > Applications: Object Detection, Semantic Segmentation, GAN, NLP
+
+  ---
 
 - [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec11)
 
