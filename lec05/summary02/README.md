@@ -34,7 +34,7 @@ Deep Compression 논문은 (1) iterative pruning, (2) **vector quantization**(VQ
 
 | Iterative Pruning | | Vector Quantization(VQ) | | Huffman Encoding |
 | :---: | :---: | :---: | :---: | :---: |
-| ![Deep Compression 1](images/deep_compression_1.png) | $\rightarrow$ | ![Deep Compression 2](images/deep_compression_2.png) | $\rightarrow$ | ![Deep Compression 3](images/deep_compression_3.png) |
+| ![Deep Compression 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary02/images/deep_compression_1.png) | $\rightarrow$ | ![Deep Compression 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary02/images/deep_compression_2.png) | $\rightarrow$ | ![Deep Compression 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary02/images/deep_compression_3.png) |
 | original network 대비<br/>크기 9x-13x 감소 | | original network 대비<br/>크기 27x-31x 감소 | | original network 대비<br/>크기 35x-49x 감소 |
 
 ---
