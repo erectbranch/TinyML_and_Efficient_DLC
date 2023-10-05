@@ -41,7 +41,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   n-bit range: $[0, 2^{n} - 1]$
 
-  ![uint8 ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec0/summary01/images/int8_ex_1.png)
+  ![uint8 ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec0/summary01/images/int8_ex_1.png)
 
 - **Signed Integer** (**Sign-Magnitude**)
 
@@ -49,7 +49,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   > $00000000_{(2)} = 10000000_{(2)} = 0$
 
-  ![int8 sign-magnitude ex](images/int8_ex_2.png)
+  ![int8 sign-magnitude ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/int8_ex_2.png)
 
 - **Signed Integer** (**Two's Complement Representation**)
 
@@ -57,7 +57,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   > $00000000_{(2)} = 0$ , $10000000_{(2)} = -2^{n-1}$ 
 
-  ![int8 two's complement ex](images/int8_ex_3.png)
+  ![int8 two's complement ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/int8_ex_3.png)
 
 ---
 
@@ -83,7 +83,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
 - IEEE FP32
 
-  ![32bit floating-point](images/fp32_ieee754.png)
+  ![32bit floating-point](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/fp32_ieee754.png)
 
   - Sign(1bit)
 
@@ -99,7 +99,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   $0.265625 = (1 + 0.0625) \times 2^{125-127} = 1.0625 \times 2^{-2}$
 
-  ![32bit floating-point ex](images/fp32_ieee754_ex.png)
+  ![32bit floating-point ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/fp32_ieee754_ex.png)
 
 ---
 
@@ -109,7 +109,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
 - IEEE FP32 Subnormal Numbers
 
-  ![subnormal numbers ex](images/subnormal_numbers.png)
+  ![subnormal numbers ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/subnormal_numbers.png)
 
   - $(-1)^{\mathsf{sign}} \times \mathsf{Fraction} \times 2^{1 - 127}$
 
@@ -117,7 +117,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
 - Smallest Subnormal Numbers
 
-  ![subnormal number smallest](images/subnormal_smallest.png)
+  ![subnormal number smallest](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/subnormal_smallest.png)
 
   - $2^{-149} = 2^{-23} \times 2^{1 - 127}$
 
@@ -125,7 +125,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
 - Largest Subnormal Numbers
 
-  ![subnormal number largest](images/subnormal_largest.png)
+  ![subnormal number largest](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/subnormal_largest.png)
 
   - $2^{-126} - 2^{-149} = (1 - 2^{-23}) \times 2^{1 - 127}$
 
@@ -139,13 +139,13 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   > Normal Numbers, Exponent $\neq$ 0
 
-  ![fp32 infinity](images/subnormal_infty.png)
+  ![fp32 infinity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/subnormal_infty.png)
 
 - NaN (Not a Number)
 
   > Subnormal Numbers, Fraction $=$ 0
 
-  ![fp32 NaN](images/subnormal_NaN.png)
+  ![fp32 NaN](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/subnormal_NaN.png)
 
 ---
 
