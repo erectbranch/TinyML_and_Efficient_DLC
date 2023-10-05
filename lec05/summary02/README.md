@@ -30,29 +30,18 @@
 
 > [Deep Compression 논문 리뷰](https://velog.io/@woojinn8/LightWeight-Deep-Learning-3.-Deep-Compression-%EB%A6%AC%EB%B7%B0)
 
-Deep Compression 논문에서는, pruning과 weight quantization(+ Huffman coding)을 통해 모델의 크기를 획기적으로 줄이는 방법을 제안했다. 
+Deep Compression 논문은 (1) iterative pruning, (2) **vector quantization**(VQ), (3) Huffman encoding 방법을 기반으로, 가중치가 차지하는 메모리를 획기적으로 줄이는 방법을 제안했다. 
 
-![Deep Compression](images/deep_compression.png)
-
-- Pruning
-
-- Quantization(K-Means-based Quantization)
-
-- Huffman Encoding
-
-아래는 해당 논문에서, 방법별 AlexNet model size의 변화를 비교한 도표이다.
-
-![accuracy vs compression rate](images/acc_loss_and_model_compression.png)
-
-- 가로: Compression Ratio, 세로: Accuracy loss
-
-- Pruning + Quantization을 함께 적용하는 방법이 더 우수하다.
+| Iterative Pruning | | Vector Quantization(VQ) | | Huffman Encoding |
+| :---: | :---: | :---: | :---: | :---: |
+| ![Deep Compression 1](images/deep_compression_1.png) | $\rightarrow$ | ![Deep Compression 2](images/deep_compression_2.png) | $\rightarrow$ | ![Deep Compression 3](images/deep_compression_3.png) |
+| original network 대비<br/>크기 9x-13x 감소 | | original network 대비<br/>크기 27x-31x 감소 | | original network 대비<br/>크기 35x-49x 감소 |
 
 ---
 
-### 5.6.1 K-Means-based Weight Quantization
+### 5.6.1 Vector Quantization: K-Means-based Weight Quantization
 
-Deep Compression 논문은 **K-Means-based weight quantization** 방식으로 weight quantization을 수행한다. 
+Deep Compression에서는 **K-Means-based weight quantization** 방식으로 weight quantization을 수행한다.(Vector Quantization)
 
 > non-uniform quantization의 일종으로 볼 수 있다.(quantization level 수 = cluster 수)
 
@@ -120,9 +109,9 @@ Deep Compression 논문은 **K-Means-based weight quantization** 방식으로 we
 
 ### 5.6.3 K-Means-based Quantization Limitations
 
-그러나 K-Means-based weight quantization은 다음과 같은 한계를 갖는다.
+그러나 K-Means-based weight quantization은 다음과 같은 한계점을 갖는다.
 
-- (-) 연산에서 다시 floating point로 reconstruct된다.
+- (-) 연산 시 다시 floating point로 reconstruct된다.
 
 - (-) reconstruction 과정에서 time complexity, computation overhead가 크다.
 
@@ -176,7 +165,7 @@ a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
 ## 5.7 Linear Quantization
 
-K-means-based quantization과 다르게, 일정한 step size를 갖는 **Linear Quantization** 방법을 살펴보자. 앞서 K-means-based quantization 예제에 linear quantization을 적용 시 다음과 같다.
+다음은 일정한 step size를 가지는 대표적인 양자화 방법인 **Linear Quantization**을 살펴보자. 앞서 K-means-based quantization 예제에 linear quantization을 적용 시 다음과 같다.
 
 - integer $q \rightarrow$ real $r$ 의 affine mapping으로 볼 수 있다.
 
@@ -244,7 +233,7 @@ $$ Z = \mathrm{round}{\left( q_{min} - {{r_{min}} \over S} \right)} = \mathrm{ro
 
 ---
 
-### 5.7.2 Sources of quantization error
+### 5.7.2 Sources of Quantization Error
 
 linear quantization error와, 이를 발생시키는 원인을 알아보자. 다음은 linear quantization을 나타내는 그림이다.
 

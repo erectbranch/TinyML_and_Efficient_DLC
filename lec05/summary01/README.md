@@ -323,7 +323,9 @@ $$ Q(r) = \mathrm{Int}(r/S) - Z $$
 
   주로 값의 분포에 따라 step size를 결정한다. 
 
-$$ Q(r) = X_i, \quad r \in [{\triangle}_i , {\triangle}_{i+1}) $$
+```math
+Q(r) = X_i, \quad r \in [{\triangle}_i , {\triangle}_{i+1})
+```
 
 - Non-Uniform Quantization: **Logarithmic Quantization** 
     
