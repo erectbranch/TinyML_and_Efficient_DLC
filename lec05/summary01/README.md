@@ -41,7 +41,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   n-bit range: $[0, 2^{n} - 1]$
 
-  ![uint8 ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec0/summary01/images/int8_ex_1.png)
+  ![uint8 ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/int8_ex_1.png)
 
 - **Signed Integer** (**Sign-Magnitude**)
 
