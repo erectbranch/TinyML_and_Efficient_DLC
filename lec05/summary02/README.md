@@ -4,315 +4,13 @@
 
 > [EfficientML.ai Lecture 5 - Quantization (Part I) (MIT 6.5940, Fall 2023, Zoom recording)](https://youtu.be/MK4k64vY3xo?si=ouUP5R86zYN7XPsS)
 
-> [A White Paper on Neural Network Quantization](https://arxiv.org/abs/2106.08295)
-
-> [tinyML Talks: A Practical Guide to Neural Network Quantization](https://youtu.be/KASuxB3XoYQ)
-
 ---
 
-## 5.1 Numeric Data Types
+## 5.5 How Many Bits to Quantize Weights?
 
----
+> [Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding 논문(2015)](https://arxiv.org/abs/1510.00149)
 
-### 5.1.1 Integer
-
-우선 **integer**(정수)를 8bit로 표현한 세 가지 예시를 살펴보자. 
-
-![integer](images/integers.png)
-
-- 첫 번째: unsigned integer
-
-  range: $[0, 2^{n} - 1]$
-
-- 두 번째: (signed integer) Sign-Magnitude
-
-  range: $[-2^{n-1} - 1, 2^{n-1} - 1]$
-
-   > 00000000과 10000000은 모두 0을 표현한다.
-
-- 세 번째: (signed integer) 2-bit complement Representation
-
-  range: $[-2^{n-1}, 2^{n-1} - 1]$
-
-   > 00000000은 0, 10000000은 $-2^{n-1}$ 을 표현한다.
-
----
-
-### 5.1.2 fixed-point number
-
-소수(**decimal**)를 표현하는 방식은 두 가지가 있다.
-
-- **fixed-point number**(고정 소수점 연산)
-
-- **floating-point number**(부동 소수점 연산)
-
-아래는 8bit fixed-point number를 나타낸 그림이다.
-
-![fixed-point](images/fixed_point.png)
-
-- 맨 앞 1bit는 sign bit로 사용한다.
-
-- 3bits로 integer(정수)를 표현한다.
-
-- 4bits로 fraction(소수)을 표현한다.
-
-> 두 번째와 세 번째 연산의 차이: 소수점( $2^{-4}$ ) 의 위치를 나중에 곱하였다.
-
-위와 같은 예시를 `fixed<w,b>`로 표현할 수 있다. `w`가 총 bit width, `b`가 fraction bit width이다.
-
-> 32bit 예시: 1bit sign bit, 15bit integer, 16bit fraction
-
----
-
-### 5.1.3 floating-point number
-
-다음은 32bit **floating-point** number의 예시다.(가장 보편적인 **IEEE 754** 방법)
-
-![32bit floating-point](images/32bit_floating_point.png)
-
-$$ (-1)^{sign} \times (1 + \mathrm{Fraction}) \times 2^{\mathrm{Exponent} - 1} $$
-
-- sign: 부호를 나타내는 1bit
-
-- **exponent**: 지수를 나타내는 8bit
-
-- fraction(mantissa): 가수를 나타내는 23bit
-
-> 32bit(4byte)는 single precision(단정도), 64bit(8byte)는 double precision(배정도)이다.
-
-### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 1: IEEE 754 표준에 따라 숫자 표현하기 &nbsp;&nbsp;&nbsp;</span>
-
-숫자 -314.625를 IEEE 754 표준에 따라 표현하라.
-
-### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
-
-1. 음수이므로 **sign bit**는 1이다.
-
-2. **fraction**
-
-    -314.625의 절댓값 $314.625$ 를 2진수로 변환하면 ${100111010.101}_{(2)}$ 가 된다.
-
-    - 소수점을 옮겨서 일의 자리 수, 소수점 형태로 만든다. 
-    
-    - 소수점 부분만을 fraction 23bit 부분에 맨 앞부터 채운다.
-
-      > 남는 자리는  0으로 채운다.
-
-$$ 1.00111010101 \times 2^{8} $$
-
-3. **exponent**
-
-    bias를 계산해야 한다. (bias = $2^{k-1}$ )
-    
-    - $k$ : exponent 부분의 bit 수를 나타낸다. 
-    
-    $$2^{8-1} = 127$$
-
-    8 + 127 = 135를 2진수로 변환하면 ${10000111}_{(2)}$ 이 된다.
-
-    - 변환한 2진수를 8bit exponent 부분에 채워준다.
-
-결과는 다음과 같다.
-
-| sign bit | exponent | fraction |
-| :---: | :---: | :---: | 
-| 1 | 10000111 | 00111010101000000000000 | 
-
----
-
-### 5.1.4 floating-point number comparison
-
-다양한 floating-point number 표현법을 비교해보자. 특히 neural network에서는 <U>fraction보다도 exponent에 더 민감</U>하기 떄문에, exponent 정보를 최대한 보존하는 표현법이 등장했다.
-
-- underflow, overflow, NaN을 더 잘 처리하기 위해서는, exponent을 최대한 보존하여 정확도를 유지해야 한다.
-
-- 더 작은 bit를 사용하면서 memory, latency는 줄이고, accuracy는 최대한 보존하는 것이 목표.
-
-![floating point ex](images/floating_point_ex.png)
-
-- **Half Precision**(FP16)
-
-    exponent 5 bit, fraction은 10 bit
-
-- Brain Float(BF16)
-
-    IEEE FP32와 비교했을 때, exponent 7bit로 줄였지만 fraction은 8bit로 유지했다. 
-
-- TensorFloat(TF32)
-    
-    exponent 10bit, fraction 8bit이다. 
-    
-    > FP16과 동일한 exponent(10bit), FP32와 동일한 fraction(8bit)를 지원한다.
-
-    > BERT 모델에서 TF32 V100을 이용한 학습이, FP32 A100을 이용한 학습에 비해 6배 speedup을 달성했다.
-
----
-
-## 5.2 Quantization
-
-![quantized signal](images/quantized_signal.png)
-
-continuous 혹은 large set of values 특성을 가진 연속적인 입력을 discrete set으로 변환하는 것을 **quantization**(양자화)라고 지칭한다.
-
-![quantized image](images/quantized_image.png)
-
-다음은 quantization을 통해 얻을 수 있는 몇 가지 이점이다.
-
-- memory usage
-
-- power consumption
-
-- latency
-
-- silicon area
-
----
-
-### 5.2.1 Quantization in Neural Networks
-
-신경망은 다음과 같은 특징을 갖기 때문에, quantization을 적용하기 적합하다.
-
-- training, inference: computationally intensive하다. 
-
-- modern neural networks: over-parameterized하다.
-
-  따라서 정확도 손실 없이도 bit precision을 줄일 여지가 있다.
-
-네트워크에 quantization을 적용하기 전/후의 weight 분포 차이를 살펴보자. continuous space가 discrete space로 매핑된다.
-
-![continuous weight](images/continuous-weight.png)
-
-![discrete weight](images/discrete-weight.png)
-
-> 이후 fine-tuning 시 분포가 변하게 된다.
-
----
-
-### 5.2.2 Matrix operations with quantized weights
-
-우선 $WX + b$ 꼴의 행렬 연산이 하드웨어에서 어떻게 진행되는지 살펴보자.
-
-```math
-W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.00 & 0.18 & 0.90 & 0.28 \\ 0.57 & 0.96 & 0.80 & 0.81 \end{bmatrix} \quad X = \begin{bmatrix} 0.41 & 0.25 & 0.73 & 0.66 \\ 0.00 & 0.41 & 0.41 & 0.57 \\ 0.42 & 0.24 & 0.71 & 1.00 \\ 0.39 & 0.82 & 0.17 & 0.35 \end{bmatrix} \quad b = \begin{bmatrix} 0.1 \\ 0.2 \\ 0.3 \\ 0.4 \end{bmatrix}
-```
-
-아래 그림은 MAC 연산을 수행하는 array를 표현한 예시다.
-
-![MAC array](images/MAC_array.png)
-
-$$ A_{i} = \sum_{j}{C_{i,j}} + b_i $$
-
-$$ A_{i} = W_i \cdot \mathrm{x_1} + W_i \cdot \mathrm{x_2} + W_i \cdot \mathrm{x_3} + W_i \cdot \mathrm{x_4} $$
-
-1. $C_{i,j}$ 자리에 먼저 행렬 $W$ 값을 load한다.
-
-2. 한 사이클마다 행렬 $X$ 에서 다음 input value를 가져온다.
-
-```math
-\begin{bmatrix} 0.41 \\ 0.00 \\ 0.42 \\ 0.39 \end{bmatrix}
-```
-
-3. 연산 후 행렬 $X$ 의 다음 열을 가져와서 순차적으로 계산한다.
-
-그런데 이 과정에 **weight, bias quantization**을 추가하면 어떻게 될까?
-
-1. floating-point tensor 대신 **scaling factor** $s_{X}$ 가 곱해진 형태의 integer tensor 를 사용한다.
-
-```math
-X_{fp32} \approx s_{X}X_{int} = \hat{X}
-```
-
-```math
-\hat{X} = {{1} \over {255}} \begin{bmatrix} 105 & 64 & 186 & 168 \\ 0 & 105 & 105 & 145 \\ 107 & 61 & 181 & 255 \\ 99 & 209 & 43 & 89 \end{bmatrix}
-```
-
-- $\hat{X}$ : scaled quantized tensor
-
-- **최소값 0→0**, **최대값 1.00→255**, `uint8` 타입으로 매핑되었다.
-
-2. weight tensor도 scaling factor $s_{W}$ 를 곱한 integer tensor를 사용한다.
-
-```math
-W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.00 & 0.18 & 0.90 & 0.28 \\ 0.57 & 0.96 & 0.80 & 0.81 \end{bmatrix} \approx {{1} \over {255}}\begin{bmatrix} 247 & 163 & 189 & 255 \\ 148 & 214 & 214 & 207 \\ 0 & 46 & 229 & 71 \\ 145 & 245 & 204 & 207 \end{bmatrix} = s_{W}W_{uint8}
-```
-
-3. bias tensor는 `int32` 타입으로 매핑된다.
-
-```math
-\hat{b} = {{1} \over {255^2}}\begin{bmatrix} 650 \\ 1300 \\ 1951 \\ 650 \end{bmatrix} 
-```
-
--  **overflow**를 피하기 위해서는 이처럼 <U>더 큰 bit width를 사용</U>해야 한다.
-
-- $\hat{W}, \hat{X}$ 가 가지고 있는 ${{1} \over {255}}$ 가 서로 곱해지면 ${{1} \over {255^2}}$ 가 되므로, quantized bias $\hat{b}$ 는 scaling factor로 ${{1} \over {255^2}}$ 를 사용한다.
-
-이제 실제 연산 과정을 보자. 우선 $\hat{W}, \hat{X}$ 에서 scaling factor를 제외한 값을 행렬 연산 한 뒤에, 결과값에 ${{1} \over {255^2}}$ 를 곱해서 scale을 다시 맞춰준다.
-
-![quantized MAC array](images/quantized_MAC_array_ex.png)
-
-하지만 이렇게 얻은 `int32` activation 값을 이보다 더 낮은 정밀도인 `int8`로 바꾸고 싶다. 이것이 **activation quantization**이며, 다음과 같이 결과값 $\hat{Out}$ 을 `uint8`로 양자화할 수 있다.
-
-```math
-\hat{Out} = {{1} \over {136671 \cdot 255}} \begin{bmatrix} 134 & 185 & 206 & 255 \\ 111 & 167 & 186 & 242 \\ 60 & 65 & 96 & 134 \\ 109 & 172 & 187 & 244 \end{bmatrix}
-```
-
-- 최대값 136671이 scaling factor에 쓰인 점에 주목하자.
-
----
-
-### 5.2.3 Symmetric vs Asymmetric Quantization
-
-![symmetric, asymmetric, unsigned quantization](images/symmetric_asymmetric_signed.png)
-
-> 위 예시의 데이터 분포에서는 symmetric signed quantization이 더 정밀하게 데이터를 표현할 수 있다.
-
-- **symmetric quantization** (scale transform)
-
-  - `signed int`: zero point가 0에 정확히 매핑된다.
-
-  - `unsigned int`: zero point가 0이 아닌 위치에 매핑된다.
-  
-    > (+) 대표적으로 ReLU를 사용하여 output activation이 unsigned인 경우 유리하다.
-
-- **asymmetric quantization** (affine transform)
-
-  clipping range를 정하는 $\alpha, \beta$ 의 절댓값이 다른 양자화 방식이다.
-
-  - (+) 데이터 분포가 대칭적이지 않을 때, 정밀하게 표현할 수 있다.
-
-  - (-) computation overhead가 발생한다.
-
-    > 계산속도가 더 빠른 `unsigned int`를 사용하는 편이 유리하다.
-
----
-
-### 5.2.4 Uniform vs Non-uniform Quantization
-
-quantization의 step size를 uniform(균일)하게 정하거나, non-uniform하게 정하는가에 따라서도 표현력이 달라진다.
-
-![uniform vs non uniform](images/uniform_vs_non_uniform.png)
-
-- (a): **uniform quantization**
-
-  - (+) 구현이 쉽다.
-    
-  - (-) 표현력은 non-uniform보다 떨어진다.
-
-- (b): **non-uniform quantization**
-
-  분포에 따라 step size가 결정된다. 
-    
-  - (c): **logarithmic quantization** 
-    
-    same storage에서 더 넓은 범위의 값의 표현이 가능하다.
-
-$$ Q(x) = Sign(x)2^{round(\log_{2}|x|)} $$
-
----
-
-## 5.3 How Many Bits to Quantize Weights?
-
-그렇다면 양자화 시 bit width는 어느 정도가 적당할까? 다음은 CNN의 convolution, Fully-Connected layer를 여러 bit width로 양자화했을 때, 정확도 변화를 나타낸 도표를 살펴보자.
+양자화를 위한 bit width는 어느 정도가 적당할까? 다음은 AlexNet의 Convolution, Fully-Connected 레이어에서, bit width 변화에 따른 정확도 변화를 나타낸 그래프다.
 
 ![quantization bits](images/quantization_bits.png)
 
@@ -320,13 +18,13 @@ $$ Q(x) = Sign(x)2^{round(\log_{2}|x|)} $$
 
 - FC layer: 2bits까지 정확도 유지
 
-대표적인 CNN 모델에서 Conv, FC layer이 갖는 비중은 다음과 같다.
+참고로 대표적인 CNN 모델에서 Conv, FC layer이 갖는 비중은 다음과 같다.
 
 ![CNN models Conv, FC layers](images/conv_fc_cnn.png)
 
 ---
 
-## 5.4 Deep Compression
+## 5.6 Deep Compression
 
 > [Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding 논문(2015)](https://arxiv.org/abs/1510.00149)
 
@@ -352,7 +50,7 @@ Deep Compression 논문에서는, pruning과 weight quantization(+ Huffman codin
 
 ---
 
-### 5.4.1 K-Means-based Weight Quantization
+### 5.6.1 K-Means-based Weight Quantization
 
 Deep Compression 논문은 **K-Means-based weight quantization** 방식으로 weight quantization을 수행한다. 
 
@@ -372,7 +70,7 @@ Deep Compression 논문은 **K-Means-based weight quantization** 방식으로 we
 | :---: | :---: | :---: | :---: | :---: |
 | ![deep compression ex 1](images/deep_compression_ex_1.png) | → | ![deep compression ex 2](images/deep_compression_ex_2.png) | → |  ![deep compression ex 3](images/deep_compression_ex_3.png) |
 
-### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 2: K-Means-based Quantization의 메모리 사용량 &nbsp;&nbsp;&nbsp;</span>
+### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 1: K-Means-based Quantization의 메모리 사용량 &nbsp;&nbsp;&nbsp;</span>
 
 위 예시 그림에서 K-Means-based Quantization 이전/이후 사용하는 메모리 사용량을 계산하라.
 
@@ -400,7 +98,7 @@ Deep Compression 논문은 **K-Means-based weight quantization** 방식으로 we
 
 ---
 
-### 5.4.2 K-Means-based Quantization Error
+### 5.6.2 K-Means-based Quantization Error
 
 위 예시에서 weight를 다시 reconstruct(decode)한 뒤, error를 계산해 보자.
 
@@ -420,7 +118,7 @@ Deep Compression 논문은 **K-Means-based weight quantization** 방식으로 we
 
 ---
 
-### 5.4.3 K-Means-based Quantization Limitations
+### 5.6.3 K-Means-based Quantization Limitations
 
 그러나 K-Means-based weight quantization은 다음과 같은 한계를 갖는다.
 
@@ -434,7 +132,7 @@ Deep Compression 논문은 **K-Means-based weight quantization** 방식으로 we
 
 ---
 
-### 5.4.4 Huffman Coding
+### 5.6.4 Huffman Coding
 
 추가로 **Huffman Coding** 알고리즘을 적용하여 memory usage를 더 줄일 수 있다.
 
@@ -476,7 +174,7 @@ a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
 ---
 
-## 5.5 Linear Quantization
+## 5.7 Linear Quantization
 
 K-means-based quantization과 다르게, 일정한 step size를 갖는 **Linear Quantization** 방법을 살펴보자. 앞서 K-means-based quantization 예제에 linear quantization을 적용 시 다음과 같다.
 
@@ -494,7 +192,7 @@ $$ r = S(q-Z) $$
 
 ---
 
-### 5.5.1 Zero Point, Scaling Factor
+### 5.7.1 Zero Point, Scaling Factor
 
 zero point $Z$ , scaling factor $S$ 를 계산해 보자.
 
@@ -546,7 +244,7 @@ $$ Z = \mathrm{round}{\left( q_{min} - {{r_{min}} \over S} \right)} = \mathrm{ro
 
 ---
 
-### 5.5.2 Sources of quantization error
+### 5.7.2 Sources of quantization error
 
 linear quantization error와, 이를 발생시키는 원인을 알아보자. 다음은 linear quantization을 나타내는 그림이다.
 
@@ -576,7 +274,7 @@ linear quantization error와, 이를 발생시키는 원인을 알아보자. 다
 
 ---
 
-## 5.6 Linear Quantized Matrix Multiplication
+## 5.8 Linear Quantized Matrix Multiplication
 
 linear quantization 연산은 **affine mapping**(아핀변환)으로 볼 수 있다.
 
@@ -586,7 +284,7 @@ $$ r = S(q - Z) $$
 
 ---
 
-### 5.6.1 Linear Quantized Fully-Connected Layer
+### 5.8.1 Linear Quantized Fully-Connected Layer
 
 먼저 Fully-Connected layer + linear quantization 수식을 살펴보자.
 
@@ -638,7 +336,7 @@ $(3) \quad Z_{Y}$
 
 ---
 
-### 5.6.2 Linear Quantized Convolution Layer
+### 5.8.2 Linear Quantized Convolution Layer
 
 $$ Y = \mathrm{Conv} (W, X) + b $$
 
@@ -665,21 +363,5 @@ $(3) \quad Z_{Y}$
 위 연산을 그래프로 그리면 다음과 같이 나타낼 수 있다.
 
 ![CNN quantized computation graph](images/cnn_quantized_computational_graph.png)
-
----
-
-## 5.7 Simulated Quantization
-
-하지만 fixed-point operation을 미리 general purpose hardware(예: CPU, GPU)로 시뮬레이션할 수 있다면 다양한 quantization scheme을 실험해 볼 수 있다.
-
-> GPU 가속을 이용해 다양한 조건의 양자화를 검증할 수 있다.
-
-이러한 시뮬레이션이 가능하게끔 딥러닝 프레임워크에서 quantization operations(**quantizer**)를 제공하고 있다.
-
-![simulated quantization](images/simulated_quantization.png)
-
-- 좌측: fixed-point operations을 이용한 quantized on-device inference
-
-- 우측: floating-point operations을 이용한 **simulated quantization**
 
 ---
