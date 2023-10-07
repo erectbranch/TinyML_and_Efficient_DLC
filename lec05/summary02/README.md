@@ -202,7 +202,7 @@ a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
 | | Codebook | Codeword | 
 | :---: | :---: | :---: |
-| | ![codebook](images/pq_codebook_codeword_1.png) | ![codeword](images/pq_codebook_codeword_2.png) |
+| | ![codebook](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary02/images/pq_codebook_codeword_1.png) | ![codeword](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary02/images/pq_codebook_codeword_2.png) |
 | dimension | $d \times k$ | $d$ |
 
 ### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 3: Product Quantization의 메모리 사용량 &nbsp;&nbsp;&nbsp;</span>
@@ -237,13 +237,17 @@ a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
 최적의 centroid(codeword)를 찾기 위한 방법을 살펴보자. 먼저 양자화 전,후 가중치 값을 비교하며, quantization error를 최소화하는 objective function은 다음과 같이 정의할 수 있다.
 
-$$ || W - \widehat{W}|{|}_2^2 = \sum_{j} || w_j - q(w_j) |{|}_2^2 $$
+```math
+|| W - \widehat{W}|{|}_2^2 = \sum_{j} || w_j - q(w_j) |{|}_2^2
+```
 
 - $q(w_j) = (c_{i_1}, c_{i_2}, \cdots , c_{i_m})$
 
 하지만 논문에서는 양자화 전,후의 차이를 최소화해 얻은 가중치가, 반드시 양자화 전의 출력과 비슷한 결과를 보장하지 않는다는 사실에 주목한다. 대신 in-domain input을 추론시키면서, activation을 대상으로 양자화 전,후 차이를 최소화하는 objective function을 제안한다.
 
-$$ || y - \widehat{y}|{|}_2^2 = \sum_{j} || x(w_j - q(w_j)) |{|}_2^2 $$
+```math
+|| y - \widehat{y}|{|}_2^2 = \sum_{j} || x(w_j - q(w_j)) |{|}_2^2
+```
 
 다음은 개와 고양이를 분류하는 간단한 binary classifier $\varphi$ 를 대상으로, 두 가지 objective function을 사용한 결과를 비교한 그림이다.
 
