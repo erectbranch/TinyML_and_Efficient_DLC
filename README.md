@@ -9,7 +9,7 @@
   
 <b>강의 주제: TinyML and Efficient Deep Learning Computing</b></br>
 Instructor : Song Han(Associate Professor, MIT EECS)</br>
-[[schedule](https://efficientml.ai/schedule/)] | [[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)] | [[github](https://github.com/mit-han-lab/6s965-fall2022)]</b>
+[[schedule(2023 Fall)](https://efficientml.ai/schedule/)] | [[schedule(2022 Fall)](https://hanlab.mit.edu/courses/2022-fall-6s965)] | [[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)]</b>
 
 </div>
 
@@ -59,7 +59,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
   ---
 
-- [Basic Concepts Of Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05/summary01)
+- [Basic Concepts of Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05/summary01)
 
   > Numeric Data Types: Integer, Fixed-Point, Floating-Point(IEEE FP32/FP16, BF16, NVIDIA FP8), INT4 and FP4
 
@@ -67,7 +67,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 - [Vector Quantization, Linear Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05/summary02)
 
-  > Vector Quantization(VQ): Deep Compression(Iterative Pruning, Retrain Codebook, Huffman Encoding)
+  > Vector Quantization(VQ): Deep Compression(iterative pruning, retrain codebook, Huffman encoding), Product Quantization(PQ): AND THE BIT GOES DOWN
   
   > Linear Quantization: Zero point, Scaling Factor, Quantization Error(clip error, round error), Linear Quantized Matrix Multiplization(FC layer, Conv layer)
 
