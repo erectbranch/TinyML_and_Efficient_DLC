@@ -24,7 +24,7 @@
 
 ---
 
-## 5.6 Deep Compression
+## 5.6 Deep Compression: Vector Quantization
 
 > [Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding 논문(2015)](https://arxiv.org/abs/1510.00149)
 
@@ -39,19 +39,19 @@ Deep Compression 논문은 (1) iterative pruning, (2) **vector quantization**(VQ
 
 ---
 
-### 5.6.1 Vector Quantization: K-Means-based Weight Quantization
+### 5.6.1 K-Means-based Weight Quantization
 
-Deep Compression에서는 **K-Means-based weight quantization** 방식으로 weight quantization을 수행한다.(Vector Quantization)
+Deep Compression에서는 **K-Means Algorithm** 기반의, **non-uniform weight quantization**을 수행한다.(Vector Quantization)
 
-> non-uniform quantization의 일종으로 볼 수 있다.(quantization level 수 = cluster 수)
+> \#quantization levels = \#clusters
 
-> 비슷하게 Computer Graphics에서는 65536개의 스펙트럼으로 이루어진 원래 색상을, 256개 bucket을 갖는 codebook을 만들어서 양자화한다.
+> Computer Graphics에서도 65536개의 스펙트럼으로 이루어진 원래 색상을, 256개 bucket을 갖는 codebook을 만들어서 유사하게 양자화한다.
 
 - storage: **Integer** Weights, Floating-Point Codebook
 
-  - codebook(centroids): 아래 예시에서는 FP32 bucket 4개로 구성된다. 
+  - codebook: 예시 기준으로 FP32 bucket 4개를 사용한다. 
   
-  - cluster index: bucket이 4개 있으므로 2bit만 사용하면 충분하다.
+  - cluster index: bucket이 4개이므로, 2bit(index 0,1,2,3)로 충분하다.
 
 - computation: Floating-Point Arithmetic
 
@@ -67,19 +67,19 @@ Deep Compression에서는 **K-Means-based weight quantization** 방식으로 wei
 
 - 양자화 전 
 
-  weight matrix: FP32 x 16
+  FP32 $(4 \times 4)$ weight matrix
 
-  $$32 \times (4 \times 4) = 512 \, \mathrm{bits} = 64 \, \mathrm{bytes} $$
+  $$32 \ \mathrm{bits} \times (4 \times 4) = 512 \ \mathrm{bits} = 64 \ \mathrm{bytes} $$
 
 - 양자화 후
 
   - weight matrix: INT2 x 16
 
-  $$2 \times (4 \times 4) = 32 \, \mathrm{bits} = 4 \, \mathrm{bytes} $$
+  $$2 \times (4 \times 4) = 32 \ \mathrm{bits} = 4 \ \mathrm{bytes} $$
     
   - codebook: FP32 x 4
 
-  $$32 \times (1 \times 4) = 128 \, \mathrm{bits} = 16 \, \mathrm{bytes} $$
+  $$32 \times (1 \times 4) = 128 \ \mathrm{bits} = 16 \ \mathrm{bytes} $$
 
 따라서 양자화 전 필요한 메모리 사용량은 64 bytes, 양자화 후 필요한 메모리 사용량은 20 bytes이다.(3.2배 사용량 감소) 
 
@@ -87,7 +87,7 @@ Deep Compression에서는 **K-Means-based weight quantization** 방식으로 wei
 
 ---
 
-### 5.6.2 K-Means-based Quantization Error
+### 5.6.2 Finetuning Codebook
 
 위 예시에서 weight를 다시 reconstruct(decode)한 뒤, error를 계산해 보자.
 
@@ -95,15 +95,19 @@ Deep Compression에서는 **K-Means-based weight quantization** 방식으로 wei
 | :---: | :---: | :---: |
 | ![deep compression error 1](images/deep_compression_ex_1.png) | ![deep compression error 2](images/deep_compression_ex_3.png) | <br>![deep compression error 3](images/deep_compression_ex_error.png) |
 
-이처럼 quantization 시 발생하는 error는, centroids(codebook)을 fine-tuning하며 줄일 수 있다.
-
-![Fine-tuning quantized weights(K-means)](images/K-means_fine_tune.png)
+이러한 quantization error는 양자화 전, 후의 가중치 값 차이를 줄이는 방식으로, codebook을 fine-tuning하며 개선할 수 있다.
 
 1. cluster index에 따라 quantization error를 분류한다.
 
-2. 평균 error를 구한다.
+    ![fine-tuning quantized weights 1](images/K-means_fine_tune_1.png)
 
-3. centroids를 업데이트한다.
+2. mean error를 구한다.
+
+    ![fine-tuning quantized weights 2](images/K-means_fine_tune_2.png)
+
+3. codebook의 centroid를 업데이트한다.
+
+    ![fine-tuning quantized weights 3](images/K-means_fine_tune_3.png)
 
 ---
 
@@ -117,7 +121,7 @@ Deep Compression에서는 **K-Means-based weight quantization** 방식으로 wei
 
 - (-) weight가 메모리에서 연속적이지 않기 떄문에, memory access에서 긴 지연이 발생하게 된다.
 
-- (-) activation은 입력에 따라 다양하게 변하기 때문에, actiavation quantization으로 clustering-based approach는 적합하지 않다.
+- (-) activation은 입력에 따라 dynamic하게 변하므로, activation quantization으로 clustering-based approach는 적합하지 않다.
 
 ---
 
@@ -163,7 +167,95 @@ a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
 ---
 
-## 5.7 Linear Quantization
+## 5.7 AND THE BIT GOES DOWN: Product Quantization
+
+> [AND THE BIT GOES DOWN: REVISITING THE QUANTIZATION OF NEURAL NETWORKS 논문(2019)](https://arxiv.org/abs/1907.05686)
+
+어떤 레이어가 $(C_{in} \times K \times K)$ 크기의 3D 텐서 $C_{out}$ 개를 갖는다고 하자. 위 논문에서는 합성곱 필터가 갖는 spatial redundancy를 이용할 수 있도록, $K \times K$ 크기를 갖는 subvector 단위로 vector quantization을 적용한다.
+
+- 각 3차원 텐서를, subvector $C_{in}$ 개로 구성된 단일 벡터로 reshape한다.
+
+  - subvector size $d$ : $K \times K$
+
+  - \#subvectors per vector: $C_{in}$
+
+- (크기 $d$ 를 갖는) subvector $k$ 개로 구성된 codebook 기반으로 양자화한다.
+
+| Filters | Reshaped filters | Codebook |
+| :---: | :---: | :---: |
+| ![codebook](images/ATBGD_1.png) | ![codeword](images/ATBGD_2.png) | ![codebook index](images/ATBGD_3.png) |
+
+---
+
+### 5.7.1 Product Quantization
+
+> [MATRIN KERSNER BLOG: Kill the bits and gain the speed?](https://martinkersner.com/2019/11/28/kill-the-bits/#product-quantization)
+
+앞서 살펴본 Vector Quantization(VQ)는 **Product Quantization**(PQ)의 특수한 경우로 볼 수 있다. 다음은 Product Quantization의 두 가지 경우를 비교한 표다.
+
+| | Vector Quantization | Scalar K-means algorithm |
+| :---: | :---: | :---: |
+| subvector size $d$ | $C_{in}$ | $1$ |
+| \#subvectors per vector | $1$ | $C_{in}$ |
+
+또한 product quantization에서 codebook $C = \lbrace c_1, \cdots , c_k \rbrace$ 는, 크기 $d$ 를 갖는 centroid(**codeword**) $k$ 개로 구성된다.
+
+| | Codebook | Codeword | 
+| :---: | :---: | :---: |
+| | ![codebook](images/pq_codebook_codeword_1.png) | ![codeword](images/pq_codebook_codeword_2.png) |
+| dimension | $d \times k$ | $d$ |
+
+### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 3: Product Quantization의 메모리 사용량 &nbsp;&nbsp;&nbsp;</span>
+
+다음과 같은 조건에서 Product Quantization으로 사용되는 메모리 사용량을 계산하라.
+
+- 입력 레이어: $(128 \times 128 \times 3 \times 3)$
+
+- \#centroids: $k = 256$ 
+
+  데이터 타입은 `float16`을 사용하며, 각 subvector는 1 byte를 차지한다고 가정한다.
+
+- block size: $d = 9$
+
+### <span style='background-color: #C2B2B2; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;🔍 풀이&nbsp;&nbsp;&nbsp;</span>
+
+메모리 사용량은 크게 (1) indexing cost와 (2) FP16 타입의 centroid가 차지하는 메모리로 나뉜다.
+
+- indexing cost
+
+  입력 레이어의 \#blocks $m$ 은 $128 \times 128 = 16,384$ 개다. 따라서 16kB 메모리를 차지한다.
+  
+- centroids
+
+  FP16을 사용하므로, 256개 centroids가 차지하는 메모리는 다음과 같다. 
+  
+  $$9 \times 256 \times 2 \ \mathrm{bytes} = 4,608 \ \mathrm{bytes}$$
+
+---
+
+### 5.7.2 Minimize Difference between Output Activations
+
+최적의 centroid(codeword)를 찾기 위한 방법을 살펴보자. 먼저 양자화 전,후 가중치 값을 비교하며, quantization error를 최소화하는 objective function은 다음과 같이 정의할 수 있다.
+
+$$ || W - \widehat{W}|{|}_2^2 = \sum_{j} || w_j - q(w_j) |{|}_2^2 $$
+
+- $q(w_j) = (c_{i_1}, c_{i_2}, \cdots , c_{i_m})$
+
+하지만 논문에서는 양자화 전,후의 차이를 최소화해 얻은 가중치가, 반드시 양자화 전의 출력과 비슷한 결과를 보장하지 않는다는 사실에 주목한다. 대신 in-domain input을 추론시키면서, activation을 대상으로 양자화 전,후 차이를 최소화하는 objective function을 제안한다.
+
+$$ || y - \widehat{y}|{|}_2^2 = \sum_{j} || x(w_j - q(w_j)) |{|}_2^2 $$
+
+다음은 개와 고양이를 분류하는 간단한 binary classifier $\varphi$ 를 대상으로, 두 가지 objective function을 사용한 결과를 비교한 그림이다.
+
+![activation based objective function](images/ATBGD_objective_function.png)
+
+- weight-based(빨간색), activation-based(초록색)
+
+- in-domain 입력에 대해, activation-based objective function으로 최적화한 모델의 성능이 더 우수하다.
+
+---
+
+## 5.8 Linear Quantization
 
 다음은 일정한 step size를 가지는 대표적인 양자화 방법인 **Linear Quantization**을 살펴보자. 앞서 K-means-based quantization 예제에 linear quantization을 적용 시 다음과 같다.
 
@@ -181,7 +273,7 @@ $$ r = S(q-Z) $$
 
 ---
 
-### 5.7.1 Zero Point, Scaling Factor
+### 5.8.1 Zero Point, Scaling Factor
 
 zero point $Z$ , scaling factor $S$ 를 계산해 보자.
 
@@ -209,7 +301,7 @@ zero point $Z$ , scaling factor $S$ 를 계산해 보자.
 
 $$ S = {{r_{max} - r_{min}} \over {q_{max} - q_{min}}} $$
 
-### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 3: linear quantization &nbsp;&nbsp;&nbsp;</span>
+### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 4: linear quantization &nbsp;&nbsp;&nbsp;</span>
 
 다음 weight matrix에서 zero point, scaling factor 값을 구하라.
 
@@ -233,7 +325,7 @@ $$ Z = \mathrm{round}{\left( q_{min} - {{r_{min}} \over S} \right)} = \mathrm{ro
 
 ---
 
-### 5.7.2 Sources of Quantization Error
+### 5.8.2 Sources of Quantization Error
 
 linear quantization error와, 이를 발생시키는 원인을 알아보자. 다음은 linear quantization을 나타내는 그림이다.
 
@@ -263,7 +355,7 @@ linear quantization error와, 이를 발생시키는 원인을 알아보자. 다
 
 ---
 
-## 5.8 Linear Quantized Matrix Multiplication
+## 5.9 Linear Quantized Matrix Multiplication
 
 linear quantization 연산은 **affine mapping**(아핀변환)으로 볼 수 있다.
 
@@ -273,7 +365,7 @@ $$ r = S(q - Z) $$
 
 ---
 
-### 5.8.1 Linear Quantized Fully-Connected Layer
+### 5.9.1 Linear Quantized Fully-Connected Layer
 
 먼저 Fully-Connected layer + linear quantization 수식을 살펴보자.
 
@@ -325,7 +417,7 @@ $(3) \quad Z_{Y}$
 
 ---
 
-### 5.8.2 Linear Quantized Convolution Layer
+### 5.9.2 Linear Quantized Convolution Layer
 
 $$ Y = \mathrm{Conv} (W, X) + b $$
 
