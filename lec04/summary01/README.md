@@ -2,176 +2,137 @@
 
 > [Lecture 04 - Pruning and Sparsity (Part II) | MIT 6.S965](https://youtu.be/1njtOcYNAmg)
 
+> [EfficientML.ai Lecture 4 - Pruning and Sparsity (Part II) (MIT 6.5940, Fall 2023, Zoom recording)](https://youtu.be/sDJymyfAOKY?si=uXQDRHl50SIk-37Y)
+
 ---
 
 ## 4.1 Pruning Ratio
 
-per-layer **pruning ratio**는 어떻게 설정해야 할까? 이는 레이어의 특성에 따라 고려해야 한다.
+> [AMC: AutoML for Model Compression and Acceleration on Mobile Devices 논문(2018)](https://arxiv.org/abs/1802.03494)
 
-- FC layer: pruning이 쉽다.
-
-- 얕은 레이어: pruning이 어렵다.
-
-![uniform vs not uniform](images/uniform_vs_not_uniform.png)
-
-이때 각 채널마다 적절한 pruning ratio를 찾아서 pruning 시, latency와 accuracy를 모두 향상시킬 수 있다. uniform shrink와 not uniform shrink(AMC 논문)의 성능을 보면 이러한 경향을 더 잘 알 수 있다.
-
-![AMC tradeoff](images/AMC_tradeoff.png)
-
----
-
-### 4.1.1 Finding Pruning Ratios
-
-pruning ratio를 정하기 위해서, 해당 레이어가 pruning에 얼마나 **sensitive**한지 파악해 보자.(**sensitivity analysis**)
-
-> sensitive: pruning을 하면 할수록 정확도가 크게 감소한다.
-
-다음은 CIFAR-10 데이터셋을 쓰는 VGG-11 model에서, 레이어별 pruning sensitivity를 분석한 그래프이다.
+최적의 **pruning ratio**는 다양한 특성을 고려하여 도출된다. 다음은 CIFAR-10 데이터셋으로 학습한 VGG-11 모델의 6개 레이어를 대상으로, pruning에 얼마나 민감한지 비교한 실험이다.(sensitivity analysis)
 
 ![VGG-11 pruning](images/VGG11_pruning.png)
 
 - $L_i$ : $i$ 번째 레이어
 
-   pruning ratio $r \in \lbrace 0, 0.1, 0.2, ..., 0.9  \rbrace$ 를 골라서 pruning을 적용한다.
+- pruning ratio $r \in \lbrace 0, 0.1, 0.2, ..., 0.9  \rbrace$ 
 
-- 정확도 감소 ${\triangle} {Acc}_{r}^{i}$ 가 제일 큰 레이어: L0 
+- 정확도 감소 ${\triangle} {Acc}_{r}^{i}$ 가 제일 큰 레이어: $L0$ 
 
-   = L0 레이어가 pruning에 제일 민감하다.
+  해당 레이어가 제일 pruning에 민감함을 알 수 있다. 
 
-위 그래프에 degradation threshold $T$ 를 추가하면, 각 레이어마다 어느 정도의 pruning ratio를 적용할지 intuition을 얻을 수 있다.
-
-![VGG-11 pruning threshold](images/VGG11_pruning_threshold.png)
-
-하지만 이렇게 얻은 pruning ratio가 optimal하지는 않다. 각 레이어 특징과 레이어  간의 interection을 고려하지 않았기 때문이다.(어디까지나 sub-optimal한 방식)
+단, 이렇게 얻은 pruning ratio는 optimal하지는 않은데, 레이어의 세부적인 특징이나 interection을 고려하지 않았기 때문이다.
 
 > 예를 들어 레이어 크기가 작다면, pruning ratio를 크게 설정해도 정확도 감소가 작을 수밖에 없다.
 
 ---
 
-### 4.1.2 Automatic Pruning: AMC
+## 4.2 Finding Pruning Ratio: Learn to Prune
+
+따라서, 최적의 pruning ratio를 찾고자 하는 다양한 방법이 제시되었다.
+
+---
+
+### 4.2.1 Reinforcement Learning based Pruning: AMC
 
 > [AMC: AutoML for Model Compression and Acceleration on Mobile Devices 논문(2018)](https://arxiv.org/abs/1802.03494)
 
-**AMC**(AutoML for Model Compression) 논문에서는 pruning ratio를, **reinforcement learning problem**(강화 학습 문제)으로 정의하여 해결한다.
+**AMC**(AutoML for Model Compression) 논문에서는, pruning ratio를 **Reinforcement Learning**(강화 학습) 기반으로 획득한다.
 
 ![AMC](images/AMC.png)
 
-- **Critic**
+- DDPG(Deep Deterministic Policy Gradient) agent
 
-    좋은 정책인지 나쁜 정책인지를 평가하기 위한 reward function
-    
-    - Reward = -Error(error rate)
+  - action $a_i$ : sparsity ratio
 
-      제약조건을 만족하지 않는 경우, $-\infty$ 를 사용한다.
-
-    - 이때 latency나 FLOPs, model size가 크면, 패널티를 부여할 수 있다.
-
-      > Reward = -Error \* log(FLOP)
-
-      > latency: latency lookup table(LUT)을 바탕으로 예측한다.
+  - 레이어 $t$ 의 embedding state $s_t$ 를 입력으로, action $a_t$ 를 출력한다.
 
 ```math
-R = \begin{cases} -Error, & if \, satisfies \, constrains \\ -\infty , & if \, not \end{cases}
+s_t = [N, C, H, W, i, ...]
 ```
 
-- **Action**
+- Reward = -Error(error rate)
 
-    각 레이어가 갖는 **pruning ratio**
+  - 제약조건(latency, FLOPs, model size 등)에 따라 패널티를 부여할 수 있다.
+
+    > 예: Reward = -Error \* log(FLOP)
+
+  - 제약조건을 만족하지 않는 경우, $-\infty$ 를 사용한다.
 
 ```math
-a \in [0,1)
+R = \begin{cases} -Error, & if \ satisfies \ constraints \\ -\infty , & if \ not \end{cases}
 ```
 
-- **Embedding**
+---
 
-    강화 학습을 위해서 network architecture를 embedding한다.
+#### 4.2.1.1 AMC: Results
 
-    - $s$ : **state**. 11개 feature로 구성된다.
-
-      > layer index $i$ , channel number, kernel sizes, FLOPs, ...
-
-
-```math
-s_t = [N, C, H, W, i]
-```
-
-- **Agent**
-
-    DDPG agent를 기반으로 한다.(continuous action output 지원)
-
-다음 그림은 논문에서 얻은 레이어별 sparsity ratio 분포(pruning policy)다. ImageNet 데이터셋으로 학습한 ResNet-50으로, peak와 crest가 경향성을 갖는 것을 알 수 있다.
+다음 그림은 ImageNet 데이터셋으로 학습한 ResNet-50 대상에서 획득한 레이어별 sparsity ratio이다. (pruning policy) 
 
 ![AMC sparsity ratio](images/AMC_sparsity_ratio.png)
 
 > y축: density(\#non-zero weights/ \#total weights)
 
-> y 값이 작다 =  \#non-zero weight가 적다 = sparsity가 크다. 
+> density가 작다 = \#non-zero weight가 적다 = 높은 sparsity ratio
 
 - **peaks**
 
-  1x1 convolution은 redundancy가 적고 pruning에 민감하다.
+  대체로 1x1 convolution으로 pruning에 민감하다.
 
 - **crests**
   
-  3x3 convolution은 redundancy가 많고, 더 aggressive하게 pruning할 수 있다.
+  대체로 3x3 convolution으로, 더 aggressive하게 pruning할 수 있다.
 
-논문의 MobileNet 결과를 보면, (Galaxy S7 Edge에서 추론했을 때) 25%의 pruning으로 1.7x speedup을 얻은 것을 확인할 수 있다.
-
-> convolution 연산에서 쓰이는 6개 항에, 입력 채널과 출력 채널이 포함되어 있다. 두 개 항이 모두 3/4로 줄어드는 효과이므로, quadratic speedup을 얻을 수 있는 것이다.
+MobileNet 대상으로 한 실험에서는, (Galaxy S7 Edge에서 추론했을 때) 25%의 pruning ratio로 1.7x speedup을 획득했다.
 
 ![AMC result](images/AMC_result.png)
 
+> convolution 연산 항에 입력 채널과 출력 채널이 포함되어 있다. 두 항이 모두 3/4로 줄어드는 효과이므로, quadratic speedup을 획득한 것이다.
+
 ---
 
-### 4.1.3 NetAdapt
+### 4.2.2 Rule based Pruning: NetAdapt
 
 > [NetAdapt: Platform-Aware Neural Network Adaptation for Mobile Applications 논문(2018)](https://arxiv.org/abs/1804.03230)
 
-**NetAdapt**는 **rule-based** iterative/progressive한 방법으로, 레이어별 최적의 pruning ratio를 찾는 논문이다.
+**NetAdapt**에서는 feedback loop 기반으로, global 제약 조건(예: latency)을 만족할 때의 레이어별 최적 pruning ratio를 찾는다.
 
-![NetAdapt](images/NetAdapt.png)
+> 다음 설명에서 제약 조건은 latency로 가정한다. 
 
-- 매 iteration마다, (수동으로 정의한) $\triangle R$ 만큼 latency가 줄어드는 것을 목표로 pruning한다.
+| | |
+| :---: | :---: |
+| ![NetAdapt layers filters](images/netadapt_layer_filter.png) | ![NetAdapt](images/NetAdapt.png) |
 
-    > \#models = \#iterations
+- 1 iteration: 하나의 레이어를 대상으로, 제약조건 latency가 reduction $\triangle R$ 만큼 줄어들 때까지 pruning한다.
 
-1. 각 레이어 $L_k$ (A~Z)
+  > 따라서 \#models = \#iterations이다.
 
-   - latency가 $\triangle R$ 만큼 줄어들 때까지 pruning한다.(LUT 기반 예측)
+  - reduction $\triangle R$ : 수동으로 정의한다.
 
-   - short-term fine-tune (10k iterations): fine-tuning 후 정확도를 측정한다.
+  - latency: LUT 기반 예측을 통해 측정한다.
 
-2. 가장 큰 정확도를 갖는 pruned layer를 선택한다.
-
-   - 이후 accuracy를 회복하기 위해, long-term fine-tune을 진행한다.
-
----
-
-## 4.2 Finetuning Pruned Neural Network
-
-pruning 후 fine-tuning 과정에서는, 해당 모델이 이미 수렴에 근접하므로 learning rate를 더 작게 설정해야 한다.
-
-> 보통 original learning rate의 1/100, 1/10으로 설정한다.
-
-이때 pruning+fine-tuning 방법보다도, 이를 여러 차례 반복하는 **Iterative Pruning**이 효과적이다.
-
-![iterative pruning](images/iterative_pruning.png)
+전 과정이 끝나면, 가장 큰 정확도를 갖는 pruned layer를 선택한 뒤, short-term(10k iterations) fine-tuning 후 정확도를 측정한다.
 
 ---
 
-### 4.2.1 Regularization
+### 4.2.3 Regularization based Pruning: Network Slimming
 
 > [Learning Efficient Convolutional Networks through Network Slimming 논문(2017)](https://arxiv.org/abs/1708.06519): channel scaling factors에 smooth-L1 regularization 적용
 
 > [Learning both Weights and Connections for Efficient Neural Networks 논문(2015)](https://arxiv.org/abs/1506.02626): weights에 L2 regularization 적용 후 magnitude-based fine-grained pruning
 
-fine-tuning 중 **regularization**을 추가로 적용하면, weight sparsity를 늘릴 수 있다.
+loss function에 **regularization** 항을 추가하여, weight sparsity를 늘릴 수 있다. 
 
-- non-zero parameters: 패널티를 부여한다.
+- 주로 가중치와 mask를 함께 학습하며, 다음 문제를 해결한다.
 
-- small parameters: 최대한 0이 될 수 있도록 한다.
+$$ \min_{w,m} \mathcal{L}(w, m) $$
 
-가장 대표적인 regularization 방법인 **L1 Regularization**와 **L2 Regularization**을 살펴보자.
+- 주로 가중치(또는 채널, 필터)에 scaling factor $\gamma$ 를 도입하여, sparsity regularization과 공동으로 학습하는 방식으로 구현한다. (예: Network Sliming 논문)
+
+$$ \mathcal{L} = {{1} \over {N}}\sum_{i=1}^{N} l(y_{i}, f(x_i; w, \gamma)) + \lambda \sum_{{\gamma}_i \in \gamma} \mathcal{R}(r_i) $$
+
+참고로 가장 대표적인 regularization 방법인 **L1 Regularization**와 **L2 Regularization**은 다음과 같다.
 
 - L1 Regularization
 
@@ -188,6 +149,27 @@ L' = L(x; W) + \lambda |W|
 ```math
 L' = L(x; W) + \lambda ||W||^2
 ```
+
+---
+
+### 4.2.4 Meta-Learning based Pruning: MetaPruning
+
+> [MetaPruning: Meta Learning for Automatic Neural Network Channel Pruning 논문(2019)](https://arxiv.org/abs/1903.10258)
+
+MetaPruning 논문에서는 meta network인 PruningNet을 학습하여, pruned network의 가중치를 에측한다. 이를 기반으로 evolutionary search을 이용하여, 제약조건(FLOP, latency 등)을 만족하면서 정확도가 높은 pruned network를 찾는다.
+
+| Training | Searching |
+| :---: | :---: |
+| ![MetaPruning training](images/MetaPruning_1.png) | ![MetaPruning Search](images/MetaPruning_2.png)
+
+
+$$ w = \mathrm{PruningNet}(v_1, v_2, \cdots, v_L) $$
+
+> $v_i$ : i번째 레이어의 채널 수
+
+- 입력: network encoding vector $(v_1, v_2, \cdots, v_L)$
+
+- 출력: pruned network의 가중치 $w$
 
 ---
 
@@ -263,25 +245,29 @@ winning ticket은 **Iterative Magnitude Pruning** 방법으로 찾아낼 수 있
 
 ### 4.3.3 One-Shot Pruning vs Iterative Pruning
 
-다음은 논문에서 one-shot pruning과 iterative pruning 방법에서, 다양한 조건의 winning ticket을 비교한  그래프다.
+one-shot pruning 방법보다, 여러 차례 과정을 반복하는 **Iterative Pruning**이 효과적이다.
+
+![iterative pruning](images/iterative_pruning.png)
+
+다음은 LTH 논문에서 one-shot pruning과 iterative pruning를 비교한 결과다.
+
+![LTH result 1](images/LTH_result_1.png)
 
 - iterative pruning(파란색)이 정확도를 보존하면서 가중치를 더 많이 제거할 수 있다.
 
-  ![LTH result 1](images/LTH_result_1.png)
+![LTH result 2](images/LTH_result_2.png)
 
 - iterative pruning(파란색)이 더 나은 일반화 성능을 보인다.
 
-  ![LTH result 2](images/LTH_result_2.png)
-
 ---
 
-### 4.3.2 Scaling Limitation
+## 4.4 Scaling Limitation
 
 > [Stabilizing the Lottery Ticket Hypothesis 논문(2019)](https://arxiv.org/abs/1903.01611)
 
 > [One ticket to win them all: generalizing lottery ticket initializations across datasets and optimizers 논문(2019)](https://arxiv.org/abs/1906.02773)
 
-또한, MNIST, CIFAR-10과 같이 작은 데이터셋과 달리, ImageNet과 같이 거대한 데이터셋에서는 from scratch부터 학습해서는 정확도가 복구되지 않는다. 
+하지만 MNIST, CIFAR-10과 같이 작은 데이터셋과 달리, ImageNet과 같이 거대한 데이터셋에서는 from scratch부터 학습해서는 정확도가 복구되지 않는다. 
 
 대신 $k$ iteration만큼 이미 훈련한 뒤의 가중치( $W_{t=k}$ )를 사용하면, fine-tuning을 통해 sub-networks 정확도를 회복할 수 있다.
 
@@ -289,13 +275,11 @@ winning ticket은 **Iterative Magnitude Pruning** 방법으로 찾아낼 수 있
 
 ---
 
-## 4.4 Pruning at Initialization(PaI)
-
-> [SNIP: Single-shot Network Pruning based on Connection Sensitivity 논문(2018)](https://arxiv.org/abs/1810.02340)
+## 4.5 Pruning at Initialization(PaI)
 
 보다 훈련 비용을 낮추기 위해, 훈련 전에 먼저 winning ticket을 찾는 **Pruning at Initialization**(PaI) 방법이 제안되었다.
 
-- Pruning at Training(PaT)
+- Pruning after Training(PaT)
 
   ![Traditional](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary01/images/SNIP_vs_traditional_1.png)
 
@@ -309,7 +293,9 @@ winning ticket은 **Iterative Magnitude Pruning** 방법으로 찾아낼 수 있
 
 ---
 
-### 4.4.1 Connection Sensitivity
+### 4.5.1 SNIP: Connection Sensitivity
+
+> [SNIP: Single-shot Network Pruning based on Connection Sensitivity 논문(2018)](https://arxiv.org/abs/1810.02340)
 
 훈련 전에 pruning을 적용하기 위해서, SNIP 논문에서는 **connection sensitivity**를 측정한다.
 
@@ -351,7 +337,7 @@ $$ = \lim_{\delta \rightarrow 0}{{L(c \odot w; \mathcal{D}) - L((c - \delta e_j)
 
 최종적으로 connection sensitivity는 다음과 같이 정의한다.
 
-$$ s_j = {{|g_{j}(w;\mathcal{D})|} \over {\sum_{k=1}^m|g_k(w;\mathcal{D})|}} $$
+$$ s_j = {{|g_{j}(w;\mathcal{D})|} \over {{\sum_{k=1}^m} |g_k(w;\mathcal{D})|}} $$
 
 > 모든 연결의 sensitivity 계산이 끝나면, top- $\kappa$ 개의 연결만을 남기고 pruning한다.
 
