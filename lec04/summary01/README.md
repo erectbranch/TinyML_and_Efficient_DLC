@@ -156,7 +156,7 @@ L' = L(x; W) + \lambda ||W||^2
 
 > [MetaPruning: Meta Learning for Automatic Neural Network Channel Pruning 논문(2019)](https://arxiv.org/abs/1903.10258)
 
-MetaPruning 논문에서는 meta network인 PruningNet을 학습하여, pruned network의 가중치를 에측한다. 이를 기반으로 evolutionary search을 이용하여, 제약조건(FLOP, latency 등)을 만족하면서 정확도가 높은 pruned network를 찾는다.
+MetaPruning 논문에서는 meta network인 PruningNet을 학습하여, pruned network의 가중치를 에측한다. 최적 모델의 탐색은 evolutionary search를 이용한다. (제약조건(FLOP, latency 등)을 만족하면서 정확도가 높은 pruned network)
 
 | Training | Searching |
 | :---: | :---: |
@@ -287,9 +287,11 @@ one-shot pruning 방법보다, 여러 차례 과정을 반복하는 **Iterative 
 
   **학습 전에** pruning한 뒤, 학습을 수행한다.
 
-  ![SNIP](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary01/images/SNIP_vs_traditional_2.png)
+  ![PaI](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary01/images/SNIP_vs_traditional_2.png)
 
 > 대체로 PaI는 PaT에 비해 성능이 떨어지기 때문에, 효율적인 훈련(예: 훈련 속도)을 위한 목적으로 주로 사용한다.
+
+> PaI를 foresight pruning으로 지칭하기도 한다.
 
 ---
 
@@ -297,7 +299,7 @@ one-shot pruning 방법보다, 여러 차례 과정을 반복하는 **Iterative 
 
 > [SNIP: Single-shot Network Pruning based on Connection Sensitivity 논문(2018)](https://arxiv.org/abs/1810.02340)
 
-훈련 전에 pruning을 적용하기 위해서, SNIP 논문에서는 **connection sensitivity**를 측정한다.
+최초로 PaI 방법을 구현한 SNIP 논문에서는, 가중치를 active/pruned 상태로 변경하면서 손실의 변화를 관찰한다. (**connection sensitivity**)
 
 - $c_j \in \lbrace 0, 1 \rbrace$ : connection mask
 
@@ -305,40 +307,60 @@ one-shot pruning 방법보다, 여러 차례 과정을 반복하는 **Iterative 
   
   - pruned: $c_j = 0$
 
-가중치와 무관하게, 오직 connection의 변화에 따른 손실을 측정하기 위해, 다음과 같이 순차적으로 loss function을 변형한다.
+connection을 loss fuction에 반영한 식은 다음과 같다.
 
-> Variance Scaling을 통해 초기화된 가중치와, 훈련 데이터셋에서 샘플링한 하나의 minibatch를 사용한다.
+- $\mathcal{D}$ : training dataset
 
-1. connectivity를 loss fuction에 반영한다.
-
-    - $\mathcal{D}$ : training dataset
-
-    - $\odot$ : Hadamard product
+- $\odot$ : Hadamard product
 
 $$ \min_{c,w} L(c \odot w; \mathcal{D}) = \min_{c,w} {{1} \over {n}} \sum_{i=1}^n l(c \odot w ; (x_i, y_i)) $$
 
 $$ \mathrm{s.t.} \quad ||c||_0 \le \kappa$$
 
-2. connection $j$ 에서 active/pruned loss의 차이를 계산한다.
+connection $j$ 에서 active/pruned loss의 차이는 다음과 같이 계산할 수 있다.
 
-    - $j \in \lbrace 1 \cdots m \rbrace$
+- $j \in \lbrace 1 \cdots m \rbrace$
 
-    - $e_j$ : $j$ 번째를 제외하고, 모두 0의 값을 갖는 vector
+- $e_j$ : $j$ 번째를 제외하고, 모두 0의 값을 갖는 vector
 
 $$ \triangle L_j (w; \mathcal{D}) = L(1 \odot w; \mathcal{D}) - L((1 - e_j) \odot w; \mathcal{D}) $$
 
-3. binary $c_j$ 는 미분 불가능하므로, 다음과 같이 식을 근사한다.
-
-    - $\delta$ : multiplicative perturbation
-
-$$ \triangle L_j (w; \mathcal{D}) \approx g_j (w; \mathcal{D}) = {{\partial L(c \odot w; \mathcal{D})} \over {\partial c_j}}|_{c=1} $$
-
-$$ = \lim_{\delta \rightarrow 0}{{L(c \odot w; \mathcal{D}) - L((c - \delta e_j) \odot w; \mathcal{D})} \over {\delta}}|_{c=1} $$
-
 최종적으로 connection sensitivity는 다음과 같이 정의한다.
 
-$$ s_j = {{|g_{j}(w;\mathcal{D})|} \over {{\sum_{k=1}^m} |g_k(w;\mathcal{D})|}} $$
+```math
+s_j = {{|g_{j}(w;\mathcal{D})|} \over { {\sum_{k=1}^m} |g_k(w;\mathcal{D})|}}
+```
 
 > 모든 연결의 sensitivity 계산이 끝나면, top- $\kappa$ 개의 연결만을 남기고 pruning한다.
+
+> Variance Scaling을 통해 초기화된 가중치와, 훈련 데이터셋에서 샘플링한 하나의 minibatch를 사용한다.
+
+---
+
+### 4.5.2 GraSP: Gradient Signal Preservation
+
+> [PICKING WINNING TICKETS BEFORE TRAINING BY PRESERVING GRADIENT FLOW 논문(2020)](https://arxiv.org/abs/2002.07376)
+
+> [Neural Tangent Kernel: Convergence and Generalization in Neural Networks 논문(2018)](https://arxiv.org/abs/1806.07572)
+
+> [Dynamical Isometry and a Mean Field Theory of CNNs: How to Train 10,000-Layer Vanilla Convolutional Neural Networks 논문(2018)](https://arxiv.org/abs/1806.05393)
+
+하지만 SNIP은 하나의 가중치만 주목하기 때문에, 가중치 간의 복잡한 상호 작용을 포착하지 못한다. 이는 sub-optimal한 pruning을 유발할 수 있으며, 중요한 연결을 제거하면서 정보의 흐름이 차단될 수 있다.
+
+이러한 단점을 해결하기 위해, GraSP 논문에서는 gradient signal에 기반한 PaI 방법을 제안한다.
+
+- 모델의 최종 성능은 **trainability**에 큰 영향을 받는다.
+
+- pruning 후 **gradient flow**를 관찰 및 유지하는 것으로, trainability를 보존한다.
+
+- pruning 이후의 gradient norm이 크게 감소하면, 해당 연결은 중요한 연결이다.
+
+다음은 Tiny-ImageNet 대상으로 학습한 VGG19, ResNet32 모델에서, GraSP와 SNIP을 비교한 실험 결과다.
+
+![GraSP Result](images/GraSP_result.png)
+
+- pruning ratio가 높을수록, GraSP가 더 높은 정확도를 보인다.
+
+  > SNIP은 pruning ratio가 높을수록, 특정 레이어의 가중치를 모두 제거하면서 bottleneck이 발생하는 경향이 있다.
 
 ---
