@@ -328,7 +328,7 @@ $$ \triangle L_j (w; \mathcal{D}) = L(1 \odot w; \mathcal{D}) - L((1 - e_j) \odo
 최종적으로 connection sensitivity는 다음과 같이 정의한다.
 
 ```math
-s_j = {{|g_{j}(w;\mathcal{D})|} \over { {\sum_{k=1}^m} |g_k(w;\mathcal{D})|}}
+s_j = {{|g_{j}(w;\mathcal{D})|} \over { {\sum}^m_{k=1} |g_k(w;\mathcal{D})|}}
 ```
 
 > 모든 연결의 sensitivity 계산이 끝나면, top- $\kappa$ 개의 연결만을 남기고 pruning한다.
