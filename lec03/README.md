@@ -4,7 +4,7 @@
 
 > [EfficientML.ai Lecture 3 - Pruning and Sparsity (Part I) (MIT 6.5940, Fall 2023, Zoom recording)](https://youtu.be/95JFZPoHbgQ?si=rHYkeGoQoZZTnyVa)
 
-> [Network Pruning의 개념](https://do-my-best.tistory.com/entry/Network-pruning#----%--pruning%--%EB%B-%A-%EC%-B%-D%---%--Structured%--Pruning)
+> [A Survey on Deep Neural Network Pruning: Taxonomy, Comparison, Analysis, and Recommendations 논문(2023)](https://arxiv.org/abs/2308.06767)
 
 지금의 AI model size는 너무나 크다.
 
@@ -122,7 +122,7 @@ prining은 크게 세 가지 단계로 구성된다.
 
 이때 다음과 같은 기법으로 4.5x의 speedup을 얻었다.
 
-- Pruning
+- **Pruning**
 
 - Quantization-Aware Training(QAT)
 
@@ -142,19 +142,9 @@ prining은 크게 세 가지 단계로 구성된다.
 
 ---
 
-## 3.2 formulate pruning
+## 3.2 Formulate Pruning
 
-다음과 같은 일반적인 loss function을 가정하자.
-
-$$ \underset{W}{\mathrm{argmin}}{L(\mathbf{x}; W)} $$
-
-- $\mathbf{x}$ : input
-
-- $L$ : objective function
-
-- $W$ : original weights
-
-이때 pruning은 non-zero 패러미터 수에 threshold $N$ 을 두어 제한한다.
+일반적으로 Pruning은 loss function에서, \#non-zero 수의 threshold $N$ 을 두어 제한하는 것으로 구현할 수 있다.
 
 $$ \underset{W_p}{\mathrm{argmin}}{L(\mathbf{x}; W_p)} $$
 
@@ -167,7 +157,7 @@ $$ s.t. {||W_{p}||}_{0} \le N $$
 
 > s.t.: subject to
 
-> L0-norm: 엄밀히는 norm이 아니며, 벡터에서 0이 아닌 원소의 개수를 의미한다.(\#nonzeros)
+> L0-norm: = \#nonzeros
 
 ---
 
@@ -177,233 +167,196 @@ $$ s.t. {||W_{p}||}_{0} \le N $$
 
 pruning은 어떤 단위로, 어떤 기준으로, 언제, 얼마나 자주 적용해야 하는가에 따라 세부적으로 나눌 수 있다.
 
-![pruning overview](images/pruning_overview.png)
+![pruning overview](images/pruning_overview_2.png)
 
 ---
 
-## 3.4 What to prune: pruning granularity
+## 3.4 Pruning Granularity
 
-pruning을 어떤 단위로 적용하는 것이 좋을까? 대표적으로 unstructured/structured 두 가지 분류 중 하나를 고려할 수 있다.
+pruning을 적용하는 granularity는, 크게 unstructured, structured pruning으로 나눌 수 있다.
 
-1. **Unstructured**(Fine-grained pruning)
-
-    ![unstructured](images/8_8_matrix_unstructed.png)
-
-    - element 단위로, 특정한 pattern 없이 pruning한다.
-
-      따라서 flexible하고 compression ratio가 높다.
-
-    - (-) 모델 크기를 줄이기 위해서는 weight position을 mapping해야 하며, 이에 따라 overhead가 발생한다.
-
-    - (-) large model에서는 structured와 비교해 정확도가 떨어지는 경향이 있다.
-
-    - (-) 불규칙하기 때문에 GPU acceleration이 어렵다.
-
-      > 대부분의 하드웨어가 sparse matrix를 다루는 데 특화되어 있지 않다.
-
-      > 따라서 특수한 software 혹은 sparse matrix에 특화된 hardware(FPGA 등)를 함께 사용(혹은 설계)해야 효과적이다.
-
-2. **Structured**(Coarse-grained pruning)
-
-    ![structured](images/8_8_matrix_structured.png)
-
-    - pattern 단위로 pruning한다.
-
-    - GPU acceleration이 쉽다.
+|| Unstructured<br/>(weight-wise) | Structured<br/>(Channel, Kernel, Layer, ...) |
+| :---: | :---: | :---: |
+| | ![unstructured](images/8_8_matrix_unstructed.png) | ![structured](images/8_8_matrix_structured.png) |
+| compression ratio | 크다 | 작다 | 
+| acceleration | 어렵다 | 비교적 쉽다 |
 
 ---
 
-### 3.4.1 pruning at different granularities
+### 3.4.1 Pruning at Different Granularities
 
-좀 더 세부적으로 pruning granularity를 살펴보자. 
+보다 세부적으로 pruning granularity를 살펴보자. 
 
-![convolutional layer pruning ex 2](images/convolution_layer_pruning_ex_2.png)
+| Fine-grained | Pattern-based | Vector-level | Kernel-level | Channel-level |
+| :---: | :---: | :---: | :---: | :---: |
+| ![fine-grained](images/pruning_granularities_1.png) | ![pattern-based](images/pruning_granularities_2.png) | ![vector-level](images/pruning_granularities_3.png) | ![kernel-level](images/pruning_granularities_4.png) | ![channel-level](images/pruning_granularities_5.png) |
 
-- **Fine-grained**
+> 좌측에 위치할수록 fine-grained, 우측에 위치할수록 coarse-grained
 
-  극단적인 압축률을 얻을 수 있다. 
 
-- **Pattern-based**
+---
 
-  Ampere GPU 이상이면 지원하는 N:M sparsity가 대표적이다.(N:M sparsity: M개의 element당 element N개가 pruned)
+### 3.4.2 Pattern-based Pruning: N:M sparsity
 
-- **Channel-level**
+(생략)
 
-  > 가장 기본적인 structured pruning 기법에 해당된다.
+---
+
+### 3.4.3 Channel Pruning
+
+이때 채널별로 최적의 pruning ratio를 탐색하면, 더 좋은 성능을 얻을 수 있다.
+
+![channel pruning](images/channel_pruning.png)
+
+- (+) direct하게 speedup을 구현할 수 있다.
   
-  주의할 점으로, uniform pruning보다도, channel별로 적절한 pruning ratio를 적용해야 성능면에서 유리하다.
+- (-) compression ratio이 낮다.
 
-  ![channel pruning](images/channel_pruning.png)
-
-  - (+) direct하게 speedup을 구현할 수 있다.
-
-  - (+) 특히 CPU에서 제일 부하가 적어서 유리한 방식이다.
-    
-  - (-) compression ratio는 낮은 편이다.
-
-  - (-) 출력 채널 수가 바뀌는 영향을 고려해야 한다.(예를 들면 residual connection의 적용이 불가능해질 수 있음)
-
+- (-) 출력에 영향을 미치는 것을 주의해야 한다.(특히 residual connection 사용 시)
 
 ---
 
-## 3.5 pruning criterion
+## 3.5 Pruning Criterion
 
-그렇다면 importance는 어떻게 판단할 수 있을까?
+pruning은 기본적으로 **less important**한 패러미터를 제거하는 과정이다.
 
 ---
 
-### 3.5.1 magnitude-based pruning
+### 3.5.1 Magnitude-based Pruning: L1-norm
 
 > [Learning both Weights and Connections for Efficient Neural Networks 논문(2015)](https://arxiv.org/abs/1506.02626)
 
-대표적으로 heuristic에 기반해서, 절댓값 크기를 바탕으로 중요도를 정할 수 있다.(**L1-norm**)
+heuristic에 기반하여, 패러미터의 절댓값 크기를 importance로 사용할 수 있다.(**L1-norm**)
 
-$$ Importance = |W| $$
+$$ Importance = \sum_{i \in S}|w_i| $$
 
-다음과 같은 예시가 있다고 하자.
+다음은 예시 행렬을 대상으로, importance를 기준으로 50%만을 남기고 pruning한 결과다.
 
-![selection to prune](images/selection_to_prune.png)
-
-$$ f(\cdot) = ReLU(\cdot), W = [10, -8, 0.1] $$
-
-$$ \rightarrow y = ReLU(10 x_{0} - 8 x_{1} + 0.1 x_{2}) $$
-
-이때 L1 norm 기준에서는, weight가 제일 작은 $x_{2}$ 가 pruning 대상이 된다.
+| Example | Element-wise | Row-wise | |
+| :---: | :---: | :---: | :---: |
+| $\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$ | $\begin{bmatrix} \|3\| & \|-2\| \\ \|1\| & \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$ | $\begin{bmatrix} \|3\| + \|-2\| \\ \|1\| + \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$ | |
 
 ---
 
-#### 3.5.1.1 magnitude-based pruning examples
+### 3.5.2 Magnitude-based Pruning: L2-norm
 
-- Element-wise
-
-    ![heuristic pruning criterion](images/magnitude-based_pruning_ex_1.png)
-
-- Row-wise(L1-norm)
-
-    ![heuristic pruning criterion 2](images/magnitude-based_pruning_ex_2.png)
-
-
-$$ Importance = \sum_{i \in S}{|w_{i}|} $$
-
-- Row-wise(L2-norm)
-
-    ![heuristic pruning criterion 3](images/magnitude-based_pruning_ex_3.png)
+혹은 L2-norm이나, $L_p$ norm을 사용할 수도 있다.
 
 $$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
 
----
-
-### 3.5.2 Scaling-based Pruning
-
-> [Learning Efficient Convolutional Networks through Network Slimming 논문(2017)](https://arxiv.org/abs/1708.06519)
-
-Network Slimming 논문에서는 출력 채널마다 scaling factor $\gamma$ 를 두고 학습한 뒤, scaling factor가 threshold를 넘지 못하는 채널을 pruning한다.(다음으로 fine-tuning 후 iterative하게 진행된다.)
-
-![network slimming](images/network_slimming.png)
-
-이러한 scaling factor는 다음과 같이 loss function의 regularization term으로 사용된다.
-
-$$ L = \sum_{x,y}l(f(x,W, y)) + \lambda \sum_{\gamma in \Gamma} g(\gamma) $$
-
-- sparsity regularization: scaling factor $\gamma$ 의 sum이 클수록 패널티가 부여된다.
-
-참고로 scaling factor는 Batch Normalization 패러미터로 사용(reuse)할 수 있다.
-
-$$ z_o = \gamma {{z_i - {\mu}_{\Beta}} \over {\sqrt{{\sigma}^2_{\Beta}+ \epsilon}}} $$
+| Example | Element-wise | Row-wise | |
+| :---: | :---: | :---: | :---: |
+| $\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$ | $\begin{bmatrix} \sqrt{\|3\|^2} & \sqrt{\|-2\|^2} \\ \sqrt{\|1\|^2} & \sqrt{\|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$ | $\begin{bmatrix} \sqrt{\|3\|^2 + \|-2\|^2} \\ \sqrt{\|1\|^2 + \|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$ | |
 
 ---
 
-### 3.5.3 second-order-based pruning
+### 3.5.3 Sensitivity and Saliency
+
+> [SNIP: Single-shot Network Pruning based on Connection Sensitivity 논문(2018)](https://arxiv.org/abs/1810.02340)
+
+SNIP 논문에서는 **connection sensitivity**라는 salience 기반의 pruning criterion을 제시했다. 가중치의 sensitivity가 높을수록 importance가 높다고 가정한다.
+
+$$ s_j(w; \mathcal{D}) = {{|g_{j}(w;\mathcal{D})|} \over {{\sum_{k=1}^m} |g_k(w;\mathcal{D})|}} $$
+
+- $s_j$ : weight $w_j$ 의 sensitivity
+
+- $m$ : \#weights
+
+- $c_j$ : connection(active = 1, pruned = 0)
+
+- $g_j$ : $c_j$ 에 대한 loss $L(c \odot w)$ 의 미분 
+
+---
+
+### 3.5.4 Loss Change: First-Order Taylor Expansion
+
+> [Gate Decorator: Global filter pruning method for accelerating deep convolutional neural networks 논문(2019)](https://arxiv.org/abs/1909.08174)
+
+weight saliency를 weight pruning 이후의 loss change로 정의할 수 있다. 대표적으로 1차 테일러 근사를 활용하면, weight의 작은 변화(**perturbation**)를 쉽게 측정할 수 있다.
+
+$$ \triangle \mathcal{L} = \mathcal{L} (w + \triangle w) - \mathcal{L}(w) = {\nabla}_w \mathcal{L} \triangle w $$
+
+- $\triangle w$ : weight perturbation
+
+예를 들어 Gate Decorator 논문에서는, BN에 scaling factor $\lambda$ 를 추가하는 GBN(Gate Batch Normalization) 방법을 제시한다. 일부 $\lambda$ 를 0으로 만들 때 발생하는 loss change $\mathcal{L}$ 을 기준으로 필터의 importance를 측정한다.
+
+---
+
+### 3.5.5 Loss Change: Second-Order Taylor Expansion
 
 > [Optimal Brain Damage 논문(1989)](https://proceedings.neurips.cc/paper/1989/hash/6c9882bbac1c7093bd25041881277658-Abstract.html)
 
-loss function을 Taylor series로 근사한 뒤, second-order 기반의 pruning criterion을 사용하는 방법도 있다.
+> [Group fisher pruning for practical network compression 논문(2021)](https://arxiv.org/abs/2108.00708)
 
-$$ \delta L = L(x; W) - L(x; W_{p} = W - \delta W) $$
+굉장히 오래 전부터 사용된 방법으로, loss function의 2차 테일러 근사를 이용하여 importance를 측정할 수도 있다.
 
-$$ = \sum_{i}{g_{i}{\delta}w_{i}} + {1 \over 2}\sum_{i}{h_{ii}{\delta}{w_{i}^{2}}}+ {1 \over 2}{\sum_{i \neq j}{h_{ij}{\delta}w_{i}{\delta}w_{j}}}+O({||{\delta}W||}^{3}) $$
+$$ \mathcal{L} (w + \triangle w) - \mathcal{L}(w) = {\nabla}_w \mathcal{L} \triangle w + {{1} \over {2}} {\triangle}w^{T}H \triangle w $$
 
-- first order derivative $g_{i} = {{\partial}L \over {{\partial}w_{i}}}$
+- $H  = {\triangle}_w^2 \mathcal{L}(w)$
 
-- second order derivative $h_{i,j} = {{\partial}^{2}L \over {{\partial}w_{i}{\partial}w_{j}}}$
+- 이때 neural network가 수렴한다고 가정하면, first-order term을 0에 가까운 값으로 취급하여 무시할 수 있다.
 
-이때 다음과 같은 가정을 사용한다.
-
-- third order derivative항( $O({||{\delta}W||}^{3})$ )은 매우 작다고 가정하고 제거한다.
-
-    따라서 objective function $L$ 은 거의 **quadratic**(2차 방정식)에 가깝다.
-
-- neural network가 수렴한다고 가정한다. 
-
-    따라서 first-order term $g_{i}$ 이 0에 가깝게 수렴하므로 무시할 수 있다.
-
-- cross terms( $h_{ij}{\delta}w_{i}{\delta}w_{j}$ )에서는 parameter들이 서로 independent하다.
-
-    따라서 무시할 수 있다.
-
-위 가정에 따라 제거 후, 남는 항은 다음과 같다.
-
-$$ {\delta}{L_{i}} = L(x;W) - L(x; W_{p}|w_{i}=0) \approx {1 \over 2}{h_{ii}{\delta}{w_{i}}^{2}} $$
-
-위 수식을 기반으로 importance score를 정의할 수 있다.
-
-```math
-{importance}_{w_{i}} = |{\delta}L_{i}| = {1 \over 2}{h_{ii}{w_{i}}^{2}}
-```
-
-- 이때 $h_{ii}$ 는 non-negative하다.
-
-- (-) **Hessian matrix**(헤세 행렬) 계산이 복잡하기 때문에, computation, memory overhead가 발생하게 된다.
+- (-) 단, **Hessian matrix** 계산이 복잡하기 때문에, computation, memory overhead가 발생하게 된다.
 
 ---
 
-### 3.5.4 percentage-of-zero-based pruning
+## 3.6 Data-Aware Pruning Criterion
+
+가중치만으로는 최적의 검증 성능을 찾는 것이 어렵기 때문에, 훈련 데이터를 활용하여 pruning importance를 정하는 **data-aware pruning** 방법이 등장했다.
+
+---
+
+### 3.6.1 Average-Percentage-Of-Zero-based Pruning(APoZ)
 
 > [Network Trimming: A Data-Driven Neuron Pruning Approach towards Efficient Deep Architectures 논문(2016)](https://arxiv.org/abs/1607.03250)
 
-다음은 (ReLU activation 이후의) output activations 예시다.
+최적의 threshold를 정할 필요 없이, 보다 간단하게 0의 값을 갖는 percentage를 기반으로 하는 pruning 방법이 제시되었다. 예를 들어 다음과 같은 output activations이 있다고 하자.
 
-![channel pruning ex](images/channel_pruning_ex_1.png)
+| Batch 1 | Batch 2 |
+| :---: | :---: |
+| ![channel pruning ex](images/channel_pruning_ex_1.png) | ![channel pruning ex](images/channel_pruning_ex_2.png)  |
 
-- 2개 batch
-
-- 하나의 batch image는 4x4 resolution, 3 channel을 갖는다.
-
-- 두 batch를 함께 고려해서 pruning해야 한다. 
-
-activation pruning에서는, 보편적으로 **Average Percentage of Zeros**(APoZ), channel 내 0의 비율을 기준으로 판단한다.
+Network Trimming 논문은 **Average Percentage of Zeros**(APoZ) 기반의 activation pruning을 적용한다. 각 배치에서 같은 위치에 있는 채널들을 하나의 pruning 단위로 보고, 0의 비율을 기반으로 한 importance를 이용하여 pruning한다.
 
 - channel 0
+
+  - batch 1 \#zeros: 5
+
+  - batch 2 channel 0 \#zeros: 6
 
 $$ {{5+6} \over {2 \cdot 4 \cdot 4}} = {11 \over 32} $$
 
 - channel 1
 
+  - batch 1 \#zeros: 5
+
+  - batch 2 \#zeros: 7
+
 $$ {{5+7} \over {2 \cdot 4 \cdot 4}} = {12 \over 32} $$
 
 - channel 2
 
+  - batch 1 \#zeros: 6
+
+  - batch 2 \#zeros: 8
+
 $$ {{6+8} \over {2 \cdot 4 \cdot 4}} = {14 \over 32} $$
 
-제일 0의 비율이 많은(제일 sparsity가 높은) channel 2를 pruning한다.
+> 제일 0의 비율이 많은 channel 2를 pruning한다.
 
 ---
 
-### 3.5.5 regression-based pruning
+### 3.6.2 Regression-based Pruning: Reconstruction Error
 
-heristic에 기반해 원래 출력과 pruning 이후 출력을 비교하여, 오차가 제일 적은 경우의 channel을 pruning할 수 있다.
+> [Channel Pruning for Accelerating Very Deep Neural Networks 논문(2017)](https://arxiv.org/abs/1707.06168)
 
-- 원래 출력
+pruning 전/후 출력을 비교하여, 제일 오차가 적은 channel을 pruning할 수 있다.
 
-  ![original output](images/original_output.png)
+| Before Pruning | After Pruning |
+| :---: | :---: |
+| ![original output](images/original_output.png) | ![pruned output](images/pruned_output.png) |
 
-$$ Z = XW^{T} = \sum_{c=0}^{c_{i}-1}{X_{c}{W_{c}}^{T}} $$
-
-- pruning 이후 출력
-
-  ![pruned output](images/pruned_output.png)
-
-따라서 $\hat{Z}$ 와 $Z$ 의 차이를 최소화하는 방향으로 pruning을 진행하면 된다. regression을 사용하여, loss function을 다음과 같이 나타낼 수 있다.
+pruning 전/후 output activation $\hat{Z}$ 와 $Z$ 의 차이를 최소화하는 loss function은, 다음과 같이 나타낼 수 있다.
 
 ```math
 {\mathrm{arg}}\underset{W, {\beta}}{\mathrm{min}}{||Z-\hat{Z}||}^{2}_{F} = || Z - \sum_{c=0}^{c_{i}-1}{||{{\beta}_{c}X_{c}{W_{c}}^{T}}||}^{2}_{F}
@@ -413,10 +366,18 @@ $$ Z = XW^{T} = \sum_{c=0}^{c_{i}-1}{X_{c}{W_{c}}^{T}} $$
 s.t. \quad {||\beta||}_{0} \le N_{c}
 ```
 
-- $\beta$ : (length가 $c_i$ 인) coefficient vector
+- $\beta$ : coefficient vector ( length = $c_i$ )
 
-  $\beta = 0$ 일 때 pruning을 적용한다.
+  > 0이면 pruning된다.
 
-- $N_{c}$ : nonzero channel 수
+- $N_{c}$ : \#nonzero channels
+
+---
+
+### 3.6.3 Entropy-based Pruning
+
+> [An entropy-based pruning method for cnn compression 논문(2017)](https://arxiv.org/abs/1706.05791)
+
+(생략)
 
 ---
