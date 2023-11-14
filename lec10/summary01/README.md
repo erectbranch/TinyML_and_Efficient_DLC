@@ -116,7 +116,7 @@ $${{e^{5 \over 10}} \over {e^{5 \over 10} + e^{1 \over 10}}} = 0.599$$
 
 ## 10.3 What to match?
 
-이후 다양한 연구에서 logits(response)만 아니라, 교사의 다른 정보를 학생과 match하는 방법을 제안한다.
+이후 다양한 연구에서 logits(response)만 아니라, 교사의 다른 정보를 학생과 match하는 방법들이 제안되었다.
 
 ---
 
@@ -172,7 +172,7 @@ $$\mathrm{attention} = {{\partial L} \over {\partial x}}$$
 
 - 높은 정확도를 갖는 모델은, 비슷한 attention map을 갖는다.
 
-  ![attention map ex](images/attentions_ex.png)
+  ![attention map ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec10/summary01/images/attentions_ex.png)
 
 ---
 
@@ -261,5 +261,94 @@ Relational Knowledge Distillation(RKD) 논문에서는, 여러 입력 샘플을 
 ```math
 \Psi (s_1, s_2, \cdots , s_n) = (||s_1 - s_2||_{2}^{2}, ||s_1 - s_3||_{2}^{2}, \cdots , ||s_1 - s_n||_{2}^{2}, \cdots , ||s_{n-1} - s_n||_{2}^{2} )
 ```
+
+---
+
+## 10.4 Distillation Schemes
+
+> [Knowledge Distillation: A Survey 논문(2020)](https://arxiv.org/abs/2006.05525)
+
+교사와 학생이 동시에 학습되는지 여부에 따라서, KD를 세 가지 범주로 분류할 수 있다.
+
+| Offline Distillation | Online Distillation | Self-Distillation |
+| :---: | :---: | :---: |
+| ![offine](images/kd_schemes_1.png) | ![offine](images/kd_schemes_2.png) | ![offine](images/kd_schemes_3.png) |
+
+> 빨간색: Pre-trained, 노란색: To be trained
+
+---
+
+### 10.4.1 Self Distillation
+
+> [Born Again Neural Networks 논문(2018)](https://arxiv.org/abs/1805.04770)
+
+위 논문에서는 $k$ stages로 학습 과정을 나누고, 매 stage에서 동일한 구조의 모델을 학습한다.
+
+![self-distillation](images/self-distillation.png)
+
+- 이전 stage에서 획득한 모델을 교사로 하여, iterative하게 학습을 진행한다.
+
+- Network Architecture
+
+$$ T = S_1 = S_2 = ... = S_k $$
+
+- Accuracy
+  
+$$ T < S_1 < S_2 < ... < S_k $$
+
+- 각 stage model의 예측을 **ensemble**하여, 예측 정확도를 추가로 높일 수 있다.
+
+---
+
+### 10.4.2 Online Distillation
+
+> [Deep Mutual Learning 논문(2018)](https://arxiv.org/abs/1706.00384)
+
+Online Distillation에서는, 교사와 학생을 동시에 **from scratch**로 학습한다.
+
+![Deep Mutual Learning](images/deep_mutual_learning.png)
+
+- 교사와 학생의 output distribution 차이를 최소화하는 방식으로 학습이 진행된다.
+
+$$ L(S) = \mathrm{CrossEntropy}(S(I), y) + KL(S(I), T(I)) $$
+
+$$ L(T) = \mathrm{CrossEntropy}(T(I), y) + KL(T(I), S(I)) $$
+
+- (+) pretrained teacher $T$ 가 필요하지 않다.
+
+- (+) 두 모델이 같은 구조를 가져도 적용할 수 있다. ( $S = T$ )
+
+- (-) 동시에 학습하는 학생이 많을수록, 학습 자원도 많이 소모된다.
+
+---
+
+### 10.4.3 Combining Online and Self-Distillation
+
+---
+
+#### 10.4.3.1 ONE: Multiple Branches + Ensemble
+
+> [Knowledge Distillation by On-the-Fly Native Ensemble 논문(2018)](https://arxiv.org/abs/1806.04606)
+
+Online Distillation은 여러 학생을 학습하면서 학습 자원을 많이 소모하고, 동시다발적이고 복잡한 backpropagation 알고리즘을 갖는다. ONE 논문에서는 해당 문제를 개선하기 위해, 다양한 branch를 갖는 단일 모델에서 Distillation을 구현했다.
+
+![ONE](images/ONE.png)
+
+- **Gate**: 각 branch의 출력 logits을 ensemble한다.
+
+---
+
+#### 10.4.3.2 Be Your Own Teacher: Deep Supervision + Distillation
+
+> [Be Your Own Teacher: Improve the Performance of Convolutional Neural Networks via Self Distillation 논문(2019)](https://arxiv.org/abs/1905.08094)
+
+위 논문에서는, 출력부에 가까운 레이어(deeper layer)의 지식을, 입력부와 가까운 레이어(shallower layer)로 전달하는 방식으로 Distillation을 구현했다.
+
+
+![BYOT](images/BYOT.png)
+
+- 예를 들어, 깊은 레이어(예: ResBlock4)에서, 더 얕은 레이어(ResBlock 3)에게 지식이 전달된다.
+
+  > 서로 다른 채널 수: 1x1 conv를 이용해 맞춘다.
 
 ---
