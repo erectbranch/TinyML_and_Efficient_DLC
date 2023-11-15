@@ -9,7 +9,7 @@
   
 <b>강의 주제: TinyML and Efficient Deep Learning Computing</b></br>
 Instructor : Song Han(Associate Professor, MIT EECS)</br>
-[[schedule(2023 Fall)](https://efficientml.ai/schedule/)] | [[schedule(2022 Fall)](https://hanlab.mit.edu/courses/2022-fall-6s965)] | [[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)]</b>
+Fall 2022([[schedule](https://hanlab.mit.edu/courses/2022-fall-6s965)] | [[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)]) | Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtube](https://youtube.com/playlist?list=PL80kAHvQbh-pT4lCkDT53zT8DKmhE0idB&si=TmPWEvwUR79TVxrz)])</b>
 
 </div>
 
@@ -39,9 +39,11 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 - [Pruning Granularity, Pruning Critertion](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec03)
 
-  > unstructured/structured pruning
+  > Unstructured/Structured pruning(Fine-grained/Pattern-based/Vector-level/Kernel-level/Channel-level)
   
-  > magnitude-based pruning(L1-norm), second-order-based pruning, percentage-of-zero-based pruning, regression-based pruning
+  > Pruning Criterion: Magnitude(L1-norm, L2-norm), Sensitivity and Saliency(SNIP), Loss Change(First-Order, Second-Order Taylor Expansion)
+  
+  > Data-Aware Pruning Criterion: Average Percentage of Zero(APoZ), Reconstruction Error, Entropy
 
 - [Automatic Pruning, Lottery Ticket Hypothesis](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec04/summary01)
 
@@ -117,15 +119,17 @@ Instructor : Song Han(Associate Professor, MIT EECS)</br>
 
 - [Knowledge Distillation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary01)
 
-  > Knowledge Distillation(distillation loss, temperature)
+  > Knowledge Distillation(distillation loss, softmax temperature)
   
-  > KD: matching intermediate weights/features/attention maps/sparsity pattern/relational information(layers, samples)
+  > What to Match?: intermediate weights, features(attention maps), sparsity pattern, relational information
 
-- [Self Distillation, Online Distlliation, Applications](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary02)
+  > Distillation Scheme: Offline Distillation, Online Distillation, Self-Distillation
 
-  > Self Distillation, Online Distillation, Combining Online and Self-Distillation, Network Augmentation
-  
+- [Distillation for Applications](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec10/summary02)
+
   > Applications: Object Detection, Semantic Segmentation, GAN, NLP
+
+  > Tiny Neural Network: NetAug
 
   ---
 
