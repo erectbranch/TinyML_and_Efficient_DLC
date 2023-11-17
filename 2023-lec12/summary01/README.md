@@ -11,7 +11,7 @@ NLP 도메인의 task는 크게 두 가지로 나눌 수 있다.
 || Discriminative | Generative |
 | :---: | :---: | :---: |
 || ![discriminative](images/nlp_tasks_1.png) | ![generative](images/nlp_tasks_2.png) |
-| 예시 | sentiment analysis<br/>text classification<br/>textual entailment | language modeling<br/>machine translation<br/>suummarization |
+| 예시 | sentiment analysis<br/>text classification<br/>textual entailment | language modeling<br/>machine translation<br/>summarization |
 
 ---
 
@@ -223,14 +223,89 @@ Normalization의 위치에 따라서도, Transformer의 학습 성능이 달라�
 
 이때 PE는 sine, cosine 함수를 기반으로, 가변적인 길이의 입력에 있어서도, 하나의 **unique** encoding을 갖도록 한다.
 
+- $t$ : token index
+
+- $i$ : feature dimension
+
 $$ {\vec{p_t}}^{(i)} = f(t)^{(i)} := \begin{cases} \sin(w_k. t), & if \ i = 2k \\ \cos(w_k.t), & if \ i = 2k + 1 \end{cases} $$
 
 $$ w_k = {{1} \over {10000^{2k/d}}} $$
 
+> 10000: 대부분의 tokens을 구분할 수 있는 큰 값을 갖는, 임의의 상수
+
+다음은 실제 PE matrix가 어떻게 구성되는지를 보여주는 heat map이다.
+
 ![positional encoding](images/positional_encoding.png)
 
-- $k$ 가 커질수록, frequency $w_k$ 는 작아진다.
+> 색상이 light $\rightarrow$ dark $\rightarrow$ light...로 변화하는 것에 주목하자.
+
+depth가 깊어질수록 다음과 같은 변화가 생긴다.
+
+- 수직선의 변화가 감소한다.
+
+  > 다시 말해, frequency가 감소한다.
+
+- 각 token 사이의 positional encoding 영향이 감소한다.
 
 이후 raw word embedding과 합산하여, positional information을 추가(fuse)한다.
+
+---
+
+#### 12.2.6.1 Derivation of Fixed Positional Encoding
+
+> [Jonathan Kernes: Master Positional Encoding](https://towardsdatascience.com/master-positional-encoding-part-i-63c05d90a0c3)
+
+몇 가지 Positional Encoding 방법을 살펴보며, fixed positional encoding이  등장한 배경을 파악해 보자.
+
+|| Just Count | Discrete PE |
+| :---: | :---: | :---: |
+| | ![just count](images/pe_ex_1.png) | ![discrete pe](images/pe_ex_2.png) |
+| 단점 | positional embedding 영향이 과도하게 커진다. | sequence 길이에 따라 encoding이 달라지므로,<br/>가변 sequence에 적용할 수 없다. |
+
+단순히 [0,1] 범위로 normalize하는 방법으로는, 효과적으로 PE가 불가능하다.
+
+---
+
+#### 12.2.6.2 Derivation of Fixed Positional Encoding: Using Binary
+
+해결책으로 binary number의 사용을 고려할 수 있다.
+
+> 아래 예시에서, embedding 차원은 이해를 위해 $d_{model}=2^3$ 로 가정한다.
+
+- PE matrix: 각 위치를 binary number로 표현
+
+  ![binary vector](images/pe_ex_3.png)
+
+- positive, negative를 구분하기 위해, [0, 1]에서 [-1, 1]로 조정한다.
+
+  다음 함수를 사용하여 조정할 수 있다.
+
+$$ f(x) = 2x -1 $$
+
+하지만 discrete한 특성은, distance 측정에서 문제를 일으킬 수 있다. 다음 예시를 보자.
+
+![continuous vs discrete PE](images/pe_ex_4.png)
+
+- (파란색: continuous)
+
+  - encoding: [x, 0]
+
+- (검은색) discrete
+
+  - encoding: [0, 0], [0, 1], [1, 0], [1, 1]
+
+  - (-) 거리 측정에 문제가 생긴다.
+
+    > 예를 들어, [0, 0]과 [0, 1]의 거리는 1이지만, [0, 1]과 [1, 0]의 거리는 $\sqrt{2}$ 이다.
+
+---
+
+#### 12.2.6.3 Derivation of Fixed Positional Encoding: Using Continuous Binary Vector
+
+따라서 삼각함수 기반의 continuous binary vector를 사용한 interpolation을 추가한다.
+
+![continuous binary vector](images/pe_ex_5.png)
+
+> $d_{model}$ 만큼 다이얼을 두는 구현을 생각해 보자.
 
 ---

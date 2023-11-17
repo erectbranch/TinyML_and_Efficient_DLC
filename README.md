@@ -151,6 +151,14 @@ Fall 2022([[schedule](https://hanlab.mit.edu/courses/2022-fall-6s965)] | [[youtu
 
   > TinyEngine: Loop Unrolling, Loop Reordering, Loop Tiling, SIMD programming, Im2col, In-place depthwise convolution, appropriate data layout(pointwise, depthwise convolution), Winograd convolution
 
+### 🔧 Application-Specific Optimizations
+
+- [Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023-lec12/summary01)
+
+  > NLP Task(Discriminative, Generative), Pre-Transformer Era(RNN, LSTM, CNN)
+
+  > Transformer: Tokenizer, Embedding, Multi-Head Attention, Feed-Forward Network, Layer Normalization(Pre-Norm, Post-Norm), Positional Encoding
+
 </br>
 
 ## :mag: Schedule
