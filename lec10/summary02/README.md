@@ -47,7 +47,9 @@ L_{Hint}(V, Z) = ||V-Z||_{2}^{2}
 
   - Bounded Regression Loss
 
-    $L_{b}(R_{s}, R_{t}, y) = - \begin{cases} ||R_{s}-y||_{2}^{2}, & if \, ||R_{s}-y||_{2}^{2} + m > || R_t - y ||_{2}^{2} \\ 0, & \mathrm{otherwise} \end{cases}$
+```math
+L_{b}(R_{s}, R_{t}, y) = - \begin{cases} ||R_{s}-y||_{2}^{2}, & if \, ||R_{s}-y||_{2}^{2} + m > || R_t - y ||_{2}^{2} \\ 0, & \mathrm{otherwise} \end{cases}
+```
 
 > 이때 margin을 두어, 학생 성능이 교사 성능 + margin $m$ 을 넘어서는 순간, loss가 0이 되며 학습이 중단되도록 구현했다.
 
@@ -91,7 +93,9 @@ L_{Hint}(V, Z) = ||V-Z||_{2}^{2}
 
 training objective는 다음과 같다.
 
-$$ \mathcal{L} = \mathcal{L}_{cGAN}(x) + \lambda_{recon} \mathcal{L}_{recon} + \lambda_{distill} \mathcal{L}_{distill}(x) $$
+```math
+\mathcal{L} = \mathcal{L}_{cGAN}(x) + \lambda_{recon} \mathcal{L}_{recon} + \lambda_{distill} \mathcal{L}_{distill}(x)
+```
 
 - Reconstruction Loss
 
@@ -99,11 +103,15 @@ $$ \mathcal{L}_{recon} = \begin{cases} {||G(x) - y||} & \mathrm{paired} \ \mathr
 
 - Distillation Loss
 
-$$ \mathcal{L}_{distill} = \sum_{k=1}^n ||G_k(x) - f_k(G_k'(x))|| $$
+```math
+\mathcal{L}_{distill} = \sum_{k=1}^n ||G_k(x) - f_k(G_k'(x))|| $$
+```
 
 - cGAN Loss
 
-$$ \mathcal{L}_{cGAN} = \mathbb{E}_{x,y}[\log D(x,y)] + \mathbb{E}_x[\log (1- D(x, G(x)))] $$
+```math
+\mathcal{L}_{cGAN} = \mathbb{E}_{x,y}[\log D(x,y)] + \mathbb{E}_x[\log (1- D(x, G(x)))]
+```
 
 ---
 
