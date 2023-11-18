@@ -43,13 +43,11 @@ L_{Hint}(V, Z) = ||V-Z||_{2}^{2}
 
     foreground, background classification을, 서로 다른 가중치를 사용하는 것으로 class imbalance 문제를 해결한다.
 
-  $$ L_{soft}(P_{s}, P_{t}) = - \sum {w_c P_t \log P_s} $$
+    $L_{soft}(P_{s}, P_{t}) = - \sum {w_c P_t \log P_s}$
 
   - Bounded Regression Loss
 
-  ```math
-  L_{b}(R_{s}, R_{t}, y) = - \begin{cases} ||R_{s}-y||_{2}^{2}, & if \, ||R_{s}-y||_{2}^{2} + m > || R_t - y ||_{2}^{2} \\ 0, & \mathrm{otherwise} \end{cases}
-  ```
+    $L_{b}(R_{s}, R_{t}, y) = - \begin{cases} ||R_{s}-y||_{2}^{2}, & if \, ||R_{s}-y||_{2}^{2} + m > || R_t - y ||_{2}^{2} \\ 0, & \mathrm{otherwise} \end{cases}$
 
 > 이때 margin을 두어, 학생 성능이 교사 성능 + margin $m$ 을 넘어서는 순간, loss가 0이 되며 학습이 중단되도록 구현했다.
 
@@ -89,7 +87,23 @@ L_{Hint}(V, Z) = ||V-Z||_{2}^{2}
 
 > [GAN Compression: Efficient Architectures for Interactive Conditional GANs 논문(2020)](https://arxiv.org/abs/2003.08936)
 
-(생략)
+![KD for GAN](images/GAN_KD.png)
+
+training objective는 다음과 같다.
+
+$$ \mathcal{L} = \mathcal{L}_{cGAN}(x) + \lambda_{recon} \mathcal{L}_{recon} + \lambda_{distill} \mathcal{L}_{distill}(x) $$
+
+- Reconstruction Loss
+
+$$ \mathcal{L}_{recon} = \begin{cases} {||G(x) - y||} & \mathrm{paired} \ \mathrm{cGANs} \\ {||G(x) - G'(x)||} & \mathrm{unpaired} \ \mathrm{cGANs} \end{cases} $$
+
+- Distillation Loss
+
+$$ \mathcal{L}_{distill} = \sum_{k=1}^n ||G_k(x) - f_k(G_k'(x))|| $$
+
+- cGAN Loss
+
+$$ \mathcal{L}_{cGAN} = \mathbb{E}_{x,y}[\log D(x,y)] + \mathbb{E}_x[\log (1- D(x, G(x)))] $$
 
 ---
 
@@ -97,7 +111,13 @@ L_{Hint}(V, Z) = ||V-Z||_{2}^{2}
 
 > [MobileBERT: a Compact Task-Agnostic BERT for Resource-Limited Devices 논문(2020)](https://arxiv.org/abs/2004.02984)
 
-(생략)
+MobileBERT 논문에서는 NLP 도메인에서, 교사의 feature map과 attention 정보를 쩐달하는 방식으로 KD를 구현했다.
+
+![MobileBERT](images/NLP_KD.png)
+
+- Feature Map Transfer(FMT)
+
+- Attention Transfer(AT)
 
 ---
 
