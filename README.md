@@ -9,7 +9,7 @@
   
 <b>강의 주제: TinyML and Efficient Deep Learning Computing</b></br>
 Instructor : Song Han(Associate Professor, MIT EECS)</br>
-Fall 2022([[schedule](https://hanlab.mit.edu/courses/2022-fall-6s965)] | [[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)]) | Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtube](https://youtube.com/playlist?list=PL80kAHvQbh-pT4lCkDT53zT8DKmhE0idB&si=TmPWEvwUR79TVxrz)])</b>
+Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtube](https://youtube.com/playlist?list=PL80kAHvQbh-pT4lCkDT53zT8DKmhE0idB&si=TmPWEvwUR79TVxrz)]) | Fall 2022([[schedule](https://hanlab.mit.edu/courses/2022-fall-6s965)] | [[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)])</b>
 
 </div>
 
@@ -159,9 +159,13 @@ Fall 2022([[schedule](https://hanlab.mit.edu/courses/2022-fall-6s965)] | [[youtu
 
   > Transformer: Tokenizer, Embedding, Multi-Head Attention, Feed-Forward Network, Layer Normalization(Pre-Norm, Post-Norm), Positional Encoding
 
+- [Transformer Design Variants](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023-lec12/summary02)
+
+  > Encoder-Decoder(T5), Encoder-only(BERT), Decoder-only(GPT), Relative Positional Encoding, KV cache optimization, Gated Linear Unit
+
 </br>
 
-## :mag: Schedule
+## :mag: Schedule (Fall 2022)
 
 ### Lecture 1: Introduction
 
