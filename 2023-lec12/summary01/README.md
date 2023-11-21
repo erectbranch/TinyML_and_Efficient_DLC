@@ -290,7 +290,7 @@ $$ f(x) = 2x -1 $$
 
   - encoding: [x, 0]
 
-- (검은색) discrete
+- (검은색: discrete)
 
   - encoding: [0, 0], [0, 1], [1, 0], [1, 1]
 

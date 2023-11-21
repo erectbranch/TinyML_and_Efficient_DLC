@@ -179,7 +179,7 @@ Transformer decoding 과정(GPT-style)에서는, attention 계산을 효율적�
 
 | | before optimization | after optimization |
 | :---: | :---: | :---: |
-| | ![before kv cache optimization](images/kv_cache_before.png) | ![after kv cache optimization](images/kv_cache_after.png) |
+| | ![before kv cache optimization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec12/summary02/images/kv_cache_before.png) | ![after kv cache optimization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec12/summary02/images/kv_cache_after.png) |
 | $q_{new}$ 와 연산 | $K, V$ | $K_{new}, V_{new}$ |
 
 - (-) 하지만 long context 대상에서는, KV cache 사용량도 함께 커져야 한다.
@@ -188,7 +188,7 @@ Transformer decoding 과정(GPT-style)에서는, attention 계산을 효율적�
 
   - $\mathrm{KV} \ \mathrm{cache} \ \mathrm{size} = BS \times 80 \times 64 \times 128 \times N \times 2 \times 2 \mathrm{bytes}$
 
-    $ = 2.5MB \times BS \times N$
+    $= 2.5MB \times BS \times N$
 
   > minibatch \* layers \* heads \* n_emd(hidden dim) \* length(num tokens) \* K&V \* bytes(ex. FP16=2bytes) 
 
@@ -206,7 +206,7 @@ Transformer decoding 과정(GPT-style)에서는, attention 계산을 효율적�
 
 | | MHA | MQA | GQA |
 | :---: | :---: | :---: | :---: |
-| | ![MHA](images/MHA.png) | ![MQA](images/MQA.png) | ![GQA](images/GQA.png) |
+| | ![MHA](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec12/summary02/images/MHA.png) | ![MQA](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec12/summary02/images/MQA.png) | ![GQA](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec12/summary02/images/GQA.png) |
 | heads for Query | $N$ | $N$ | $N$ |
 | heads for KV | $N$ | 1 | $G$ |
 
