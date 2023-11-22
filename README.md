@@ -47,11 +47,11 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 - [Automatic Pruning, Lottery Ticket Hypothesis](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec04/summary01)
 
-  > Pruning Ratio, Sensitivity Analysis, Automatic Pruning(AMC, NetAdapt)
+  > Finding Pruning Ratio: Reinforcement Learning based, Rule based, Regularization based, Meta-Learning based 
 
-  > Lottery Ticket Hypothesis(Winning Ticket, Iterative Magnitude Pruning, Scaling Limitation), Pruning with Regularization
+  > Lottery Ticket Hypothesis(Winning Ticket, Iterative Magnitude Pruning, Scaling Limitation)
 
-  > Pruning at Initialization(Connection Sensitivity)
+  > Pruning at Initialization(Connection Sensitivity, Gradient Flow)
 
 - [System & Hardware Support for Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec04/summary02)
 
@@ -150,6 +150,8 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
   > memory hierarchy of MCU, data layout(NCHW, NHWC, CHWN)
 
   > TinyEngine: Loop Unrolling, Loop Reordering, Loop Tiling, SIMD programming, Im2col, In-place depthwise convolution, appropriate data layout(pointwise, depthwise convolution), Winograd convolution
+
+  ---
 
 ### 🔧 Application-Specific Optimizations
 
