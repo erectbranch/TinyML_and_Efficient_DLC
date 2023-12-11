@@ -50,23 +50,23 @@ $$ Latency \approx \max(T_{computation}, T_{memory}) $$
 
   분모는 hardware 특성, 분자는 NN 특성이다.
 
-$$ \approx {{Number \, of \, Operations \, of \, NN} \over {Number \, of \, Opeartions \, that \, Processor \, can \, Process \, Per \, Second}} $$
+$$ \approx {{Number \ of \ Operations \ of \ NN} \over {Number \ of \ Opeartions \ that \ Processor \ can \ Process \ Per \ Second}} $$
 
 - $T_{memory}$
 
-$$ \approx T_{data \, movement \, of \, activations} + T_{data \, movement \, of \, weights} $$
+$$ \approx T_{data \ movement \ of \ activations} + T_{data \ movement \ of \ weights} $$
 
-- $T_{data \, movement \, of \, weights}$ 
+- $T_{data \ movement \ of \ weights}$ 
 
   분모는 hardware 특성, 분자는 NN 특성이다.
 
   > weight를 SRAM에 모두 저장하면, main memory에 접근하지 않을 수 있다.
 
-$$ \approx {{Model \, size} \over {Memory \, Bandwidth \, of \, Processor}} $$
+$$ \approx {{Model \ size} \over {Memory \ Bandwidth \ of \ Processor}} $$
 
-- $T_{data \, movement \, of \, activations}$ 
+- $T_{data \ movement \ of \ activations}$ 
 
-$$ \approx {{Input \, activation \, size + Output \, activation \, size} \over {Memory \, Bandwidth \, of \, Processor}} $$
+$$ \approx {{Input \ activation \ size + Output \ activation \ size} \over {Memory \ Bandwidth \ of \ Processor}} $$
 
 ---
 
@@ -244,7 +244,7 @@ $$ = 932,264 $$
 
 - Peak \#Activations 
 
-$$\approx input \, activations + output \, activations $$
+$$\approx input \ activations + output \ activations $$
 
 $$= 150,528 + 290,400 = 440,928$$
 
