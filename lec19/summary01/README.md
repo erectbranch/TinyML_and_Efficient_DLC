@@ -116,13 +116,13 @@ Temporal Shift Module(TSM)은, 3D conv 기반의 장점은 유지하며 overhead
 
   - bypass를 추가하여 information loss를 보전한다.
 
-  ![offline TSM](images/TSM_offline.png)
+  ![offline TSM](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec19/summary01/images/TSM_offline.png)
 
 - **online** TSM models
 
   > $F_t$ 입력일 때, 미래인 $F_{t+1}$ 에 접근할 수 없다. 오로지 메모리에 캐싱한 과거의 frame 정보를 사용한다.(shift)
 
-  ![online TSM](images/TSM_online.png)
+  ![online TSM](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec19/summary01/images/TSM_online.png)
 
 ---
 
@@ -136,11 +136,11 @@ Temporal Shift Module(TSM)은, 3D conv 기반의 장점은 유지하며 overhead
 
 > [A Closer Look at Spatiotemporal Convolutions for Action Recognition 논문(2017)](https://arxiv.org/abs/1711.11248)
 
-3D CNN kernel을 2D spatial + 1D temporal로 분해할 수 있다.
+3D CNN kernel은, 2D spatial + 1D temporal kernel로 분해할 수 있다.
 
 ![kernel decomposition](images/kernel_decomposition.png)
 
-- 3D에 비해 모델 크기가 가볍고 학습이 용이하다.
+- (+)3D 접근법에 비해, 모델 크기가 가볍고 학습이 용이하다.
 
 ---
 
@@ -166,7 +166,7 @@ SlowFast Networks 논문에서는, large spatial resolution과 large temporal re
 
 > [X3D: Expanding Architectures for Efficient Video Recognition 논문(2020)](https://arxiv.org/abs/2004.04730)
 
-X3D 논문에서는 탐색 공간에 temporal duration, frame rate, spatial resoultion을 추가하여 효율적인 모델을 획득한다.
+X3D 논문에서는, NAS의 탐색 공간에 temporal duration, frame rate, spatial resoultion 차원을 추가하여 효율적인 모델을 획득한다.
 
 ![X3D](images/X3D.png)
 
@@ -176,7 +176,11 @@ X3D 논문에서는 탐색 공간에 temporal duration, frame rate, spatial reso
 
 - spatial resoultion ${\gamma}_{s}$
 
-- width ${\gamma}_{w}$ / bottleneck width ${\gamma}_{b}$ / depth ${\gamma}_{d}$
+- width ${\gamma}_w$ 
+
+- bottleneck width ${\gamma}_b$ 
+
+- depth ${\gamma}_{d}$
 
 ---
 
