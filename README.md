@@ -155,6 +155,14 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 ### 🔧 Application-Specific Optimizations
 
+- [Efficient Video Understanding](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec19/summary01)
+
+  > 2D CNNs for Video Understanding, 3D CNNs for Video Understanding(I3D), Temporal Shift Module(TSM)
+
+  > Other Efficient Methods: Kernel Decomposition, Multi-Scale Modeling, Neural Architecture Search(X3D), Skipping Redundant Frames/Clips, Utilizing Spatial Redundancy
+
+  ---
+
 - [Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023-lec12/summary01)
 
   > NLP Task(Discriminative, Generative), Pre-Transformer Era(RNN, LSTM, CNN)
