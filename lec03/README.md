@@ -232,9 +232,15 @@ $$ Importance = \sum_{i \in S}|w_i| $$
 
 다음은 예시 행렬을 대상으로, importance를 기준으로 50%만을 남기고 pruning한 결과다.
 
-| Example | Element-wise | Row-wise | 
-| :---: | :---: | :---: | 
-| $\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$ | $\begin{bmatrix} \|3\| & \|-2\| \\ \|1\| & \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$ | $\begin{bmatrix} \|3\| + \|-2\| \\ \|1\| + \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$ | 
+$$\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$$
+
+- Element-wise 
+
+$$\begin{bmatrix} \|3\| & \|-2\| \\ \|1\| & \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$$
+
+- Row-wise
+
+$$\begin{bmatrix} \|3\| + \|-2\| \\ \|1\| + \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$$
 
 ---
 
@@ -244,9 +250,17 @@ $$ Importance = \sum_{i \in S}|w_i| $$
 
 $$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
 
-| Example | Element-wise | Row-wise | 
-| :---: | :---: | :---: | 
-| $\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$ | $\begin{bmatrix} \sqrt{\|3\|^2} & \sqrt{\|-2\|^2} \\ \sqrt{\|1\|^2} & \sqrt{\|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$ | $\begin{bmatrix} \sqrt{\|3\|^2 + \|-2\|^2} \\ \sqrt{\|1\|^2 + \|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$ | 
+다음은 예시 행렬을 대상으로 적용한 결과다.
+
+$$\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$$ 
+
+- Element-wise
+
+$$\begin{bmatrix} \sqrt{\|3\|^2} & \sqrt{\|-2\|^2} \\ \sqrt{\|1\|^2} & \sqrt{\|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$$
+
+- Row-wise
+
+$$\begin{bmatrix} \sqrt{\|3\|^2 + \|-2\|^2} \\ \sqrt{\|1\|^2 + \|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$$
 
 ---
 
@@ -254,7 +268,7 @@ $$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
 
 > [SNIP: Single-shot Network Pruning based on Connection Sensitivity 논문(2018)](https://arxiv.org/abs/1810.02340)
 
-SNIP 논문에서는 **connection sensitivity**라는 salience 기반의 pruning criterion을 제시했다. 가중치의 sensitivity가 높을수록 importance가 높다고 가정한다.
+SNIP 논문에서는 **connection sensitivity**라는 salience 기반의 pruning criterion을 제시했다. 가중치를 제거했을 때 변화, 즉 sensitivity가 클수록 중요한 가중치로 가정한다.
 
 $$ s_j(w; \mathcal{D}) = {{|g_{j}(w;\mathcal{D})|} \over { {{\sum}^m_{k=1}} |g_k(w;\mathcal{D})|}} $$
 
