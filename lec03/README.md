@@ -234,7 +234,7 @@ $$ Importance = \sum_{i \in S}|w_i| $$
 
 | Example | Element-wise | Row-wise | 
 | :---: | :---: | :---: | 
-| $$\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$$ | $$\begin{bmatrix} \|3\| & \|-2\| \\ \|1\| & \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$$ | $$\begin{bmatrix} \|3\| + \|-2\| \\ \|1\| + \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$$ | 
+| $\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$ | $\begin{bmatrix} \|3\| & \|-2\| \\ \|1\| & \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$ | $\begin{bmatrix} \|3\| + \|-2\| \\ \|1\| + \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$ | 
 
 ---
 
@@ -246,7 +246,7 @@ $$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
 
 | Example | Element-wise | Row-wise | 
 | :---: | :---: | :---: | 
-| $$\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$$ | $$\begin{bmatrix} \sqrt{\|3\|^2} & \sqrt{\|-2\|^2} \\ \sqrt{\|1\|^2} & \sqrt{\|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$$ | $$\begin{bmatrix} \sqrt{\|3\|^2 + \|-2\|^2} \\ \sqrt{\|1\|^2 + \|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$$ | 
+| $\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$ | $\begin{bmatrix} \sqrt{\|3\|^2} & \sqrt{\|-2\|^2} \\ \sqrt{\|1\|^2} & \sqrt{\|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$ | $\begin{bmatrix} \sqrt{\|3\|^2 + \|-2\|^2} \\ \sqrt{\|1\|^2 + \|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$ | 
 
 ---
 
