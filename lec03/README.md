@@ -232,15 +232,21 @@ $$ Importance = \sum_{i \in S}|w_i| $$
 
 다음은 예시 행렬을 대상으로, importance를 기준으로 50%만을 남기고 pruning한 결과다.
 
-$$\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$$
+```math
+\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}
+```
 
 - Element-wise 
 
-$$\begin{bmatrix} \|3\| & \|-2\| \\ \|1\| & \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$$
+```math
+\begin{bmatrix} \|3\| & \|-2\| \\ \|1\| & \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}
+```
 
 - Row-wise
 
-$$\begin{bmatrix} \|3\| + \|-2\| \\ \|1\| + \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$$
+```math
+\begin{bmatrix} \|3\| + \|-2\| \\ \|1\| + \|-5\| \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}
+```
 
 ---
 
@@ -252,15 +258,21 @@ $$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
 
 다음은 예시 행렬을 대상으로 적용한 결과다.
 
-$$\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}$$ 
+```math
+\begin{bmatrix} 3 & -2 \\ 1 & -5 \end{bmatrix}
+```
 
 - Element-wise
 
-$$\begin{bmatrix} \sqrt{\|3\|^2} & \sqrt{\|-2\|^2} \\ \sqrt{\|1\|^2} & \sqrt{\|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}$$
+```math
+\begin{bmatrix} \sqrt{\|3\|^2} & \sqrt{\|-2\|^2} \\ \sqrt{\|1\|^2} & \sqrt{\|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 3 & 0 \\ 0 & -5 \end{bmatrix}
+```
 
 - Row-wise
 
-$$\begin{bmatrix} \sqrt{\|3\|^2 + \|-2\|^2} \\ \sqrt{\|1\|^2 + \|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}$$
+```math
+\begin{bmatrix} \sqrt{\|3\|^2 + \|-2\|^2} \\ \sqrt{\|1\|^2 + \|-5\|^2} \end{bmatrix} \rightarrow \begin{bmatrix} 0 & 0 \\ 1 & -5 \end{bmatrix}
+```
 
 ---
 
