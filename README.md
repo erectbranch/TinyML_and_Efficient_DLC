@@ -161,6 +161,12 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
   > Other Efficient Methods: Kernel Decomposition, Multi-Scale Modeling, Neural Architecture Search(X3D), Skipping Redundant Frames/Clips, Utilizing Spatial Redundancy
 
+- [Generative Adversarial Networks (GANs)](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec19/summary02)
+
+  > GANs(Generator, Discriminator), Conditional/Unconditional GANs, Difficulties in GANs
+
+  > Compress Generator(GAN Compression), Dynamic Cost GANs(Anycost GANs), Data-Efficient GANs(Differentiable Augmenatation)
+
   ---
 
 - [Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023-lec12/summary01)
