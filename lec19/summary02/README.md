@@ -50,7 +50,7 @@ $$ \underset{\mathrm{real \ sample}}{E_x[\log(D(x))]} + \underset{\mathrm{fake \
 
 | Conditional GANs(CGAN) | Unconditional GANs |
 | :---: | :---: |
-| ![conditional](images/GAN_conditional.png) | ![unconditional](images/GAN_unconditional.png) |
+| ![conditional](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec19/summary02/images/GAN_conditional.png) | ![unconditional](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec19/summary02/images/GAN_unconditional.png) |
 | $G$ 가 random noise를 입력으로 받는다. | $D$ 와 $G$ 가 **labels**를 따른다.<br/>(class label, segmantation map, strokes, ...) |
 
 ---
@@ -77,7 +77,9 @@ GAN Compression 논문에서는, NAS와 Distillation 기법을 사용해 GANs의
 
   > 각 레이어마다 intermediate representation를 매칭하며, 이때 교사와 학생 차원이 일치하도록 projection 과정을 거친다.
 
-$$ \mathcal{L}_{distill} = \sum^n_{k=1}{||G_k(x) - f_k({G'}_k(x))||} $$
+```math
+\mathcal{L}_{distill} = \sum^n_{k=1}{||G_k(x) - f_k({G'}_k(x))||}
+```
 
 - 교사 모델의 출력을 함께 사용하면 성능에 도움이 된다. (unpaired to paired learning)
 
@@ -87,7 +89,9 @@ $$ \mathcal{L}_{distill} = \sum^n_{k=1}{||G_k(x) - f_k({G'}_k(x))||} $$
 
 최종적으로 objective function은 다음과 같다.
 
-$$ \mathcal{L}(x) = \mathcal{L}_{cGAN}(x) + {\lambda}_{recon}\mathcal{L}_{recon}(x) + {\lambda}_{distill}\mathcal{L}_{distill}(x) $$
+```math
+\mathcal{L}(x) = \mathcal{L}_{cGAN}(x) + {\lambda}_{recon}\mathcal{L}_{recon}(x) + {\lambda}_{distill}\mathcal{L}_{distill}(x)
+```
 
 탐색 시, Evolutionary Search(진화 탐색)를 기반으로 하여, 최적의 latency-accuracy trade-off 설정을 찾는다.(②) 이후 fine-tuning을 거친다.(③)
 
@@ -140,8 +144,10 @@ $$ \mathcal{L}(x) = \mathcal{L}_{cGAN}(x) + {\lambda}_{recon}\mathcal{L}_{recon}
 
 | Approach | Model | Note(example) |
 | :---: | :---: | :---: |
-| Real Images | ![real images only](images/GAN_augment_ex_1.png) | ![real images only ex](images/GAN_augment_ex_1_note.png)<br/>생성된 결과 이미지에 동일한 artifacts가 반영되는 문제가 발생한다. |
-| Discriminator's Reals & Fakes | ![discriminator only](images/GAN_augment_ex_2.png) | ![discriminator only ex](images/GAN_augment_ex_2_note.png)<br/>augmentation을 적용하지 않으면, 정상적으로 사용할 수 없는 성능을 획득한다. |
+| Real Images | ![real images only](images/GAN_augment_ex_1.png) | ![real images only ex](images/GAN_augment_ex_1_note.png) |
+| | | (-) 생성된 결과 이미지에 동일한 artifacts가 반영되는 문제가 발생한다. |
+| Discriminator's Reals & Fakes | ![discriminator only](images/GAN_augment_ex_2.png) | ![discriminator only ex](images/GAN_augment_ex_2_note.png) |
+| | | (-) augmentation을 적용하지 않으면, 정상적으로 사용할 수 없는 성능을 획득한다. |
 | DiffAugment | ![differentiable](images/GAN_augment_ex_3.png) | ![differentiable ex](images/GAN_augment_ex_3_note.png) |
 
 ---
