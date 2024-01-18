@@ -135,9 +135,7 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 - [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec11)
 
-  > microcontroller, flash/SRAM usage, peak SRAM usage, MCUNet: TinyNAS, TinyEngine
-
-  > TinyNAS: automated search space optimization(weight/resolution multiplier), resource-constrained model specialization(Once-for-All)
+  > Microcontroller, MCUNet(TinyNAS, TinyEngine), automated search space optimization(weight/resolution multiplier), resource-constrained model specialization(Once-for-All)
 
   > MCUNetV2: patch-based inference, network redistribution, joint automated search for optimization, MCUNetV2 architecture(VWW dataset inference)
 
@@ -185,11 +183,11 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 ### Lecture 1: Introduction
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec01-Introduction.pdf) ]
+[ [slides](https://www.dropbox.com/scl/fi/ym2frcworou622a7wrghb/lec01.pdf?rlkey=nbnjyn0wyyvhmoti7jvqbfa9s&dl=0) ]
 
 ### Lecture 2: Basics of Deep Learning
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec02-Basics-of-Neural-Networks.pdf) | [video](https://youtu.be/5HpLyZd1h0Q) ]
+[ [slides](https://www.dropbox.com/scl/fi/7q21t5meajse0mapbtice/lec02.pdf?rlkey=x1ls1ktyv8taomitdkhl7etqq&dl=0) | [video](https://youtu.be/5HpLyZd1h0Q) ]
 
 ---
 ## Efficient Inference
@@ -198,43 +196,43 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 ### Lecture 3: Pruning and Sparsity (Part I)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec03-Pruning-I.pdf) | [video](https://youtu.be/sZzc6tAtTrM) ]
+[ [slides](https://www.dropbox.com/scl/fi/vns8vgzfrjjqrjovqtrxw/lec03.pdf?rlkey=nwofk3suges17224m7idg9nwm&dl=0) | [video](https://youtu.be/sZzc6tAtTrM) ]
 
 ### Lecture 4: Pruning and Sparsity (Part II)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec04-Pruning-II.pdf) | [video](https://youtu.be/1njtOcYNAmg) ]
+[ [slides](https://www.dropbox.com/scl/fi/3ghge1dxv1lu74mnj5ktv/lec04.pdf?rlkey=afa5so7ybdu60o4zbkstr80pd&dl=0) | [video](https://youtu.be/1njtOcYNAmg) ]
 
 ### Lecture 5: Quantization (Part I)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec05-Quantization-I.pdf) | [video](https://youtu.be/91stHPsxwig) ]
+[ [slides](https://www.dropbox.com/scl/fi/i4wmuy1wgs0urtqezzr7w/lec05.pdf?rlkey=iqme56qke3zb5g5cq7zxmvmhn&dl=0) | [video](https://youtu.be/91stHPsxwig) ]
 
 ### Lecture 6: Quantization (Part II)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec06-Quantization-II.pdf) | [video](https://youtu.be/sYpl97ToNdg) ]
+[ [slides](https://www.dropbox.com/scl/fi/j8x1g500rvkd1pbjw84m3/lec06.pdf?rlkey=d9i4d2k0q6nu38lp2r7nlaw4b&dl=0) | [video](https://youtu.be/sYpl97ToNdg) ]
 
 ### Lecture 7: Neural Architecture Search 
 (Part I)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec07-NAS-I.pdf) | [video](https://youtu.be/NQj5TkqX48Q) ]
+[ [slides](https://www.dropbox.com/scl/fi/fnzeebhd9227pzr0opgol/lec07.pdf?rlkey=c612kexszsjbd3jkubyzb4jah&dl=0) | [video](https://youtu.be/NQj5TkqX48Q) ]
 
 ### Lecture 8: Neural Architecture Search
 (Part II)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec08-NAS-II.pdf) | [video](https://youtu.be/UlvkBZdOhpg) ]
+[ [slides](https://www.dropbox.com/scl/fi/mnamxcqlnglm35q1y20wz/lec08.pdf?rlkey=q3ckspu8o7vauuloh3ostlotc&dl=0) | [video](https://youtu.be/UlvkBZdOhpg) ]
 
 ### Lecture 9: Neural Architecture Search
 (Part III)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec09-NAS-III.pdf) | [video](https://youtu.be/_cvn9pflblk) ]
+[ [slides](https://www.dropbox.com/scl/fi/t5dhodsg2wqkn1rgsf1lx/lec09.pdf?rlkey=xzz8vrwlwjc6vm8foinnbecpv&dl=0) | [video](https://youtu.be/_cvn9pflblk) ]
 
 ### Lecture 10: Knowledge Distillation
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec10-Knowledge-Distillation.pdf) | [video](https://youtu.be/IIqf-oUTHe0) ]
+[ [slides](https://www.dropbox.com/scl/fi/7x4i8bf3ush5bdt0mu57k/lec10.pdf?rlkey=7viyngsy60imiilpkxqbmva1l&dl=0) | [video](https://youtu.be/IIqf-oUTHe0) ]
 
 ### Lecture 11: MCUNet - Tiny Neural Network 
 Design for Microcontrollers
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec11-MCUNet.pdf) | [video](https://youtu.be/Hi4I0ZtPsbY) ]
+[ [slides](https://www.dropbox.com/scl/fi/1b9ozxzrzk8x3lwh4lc0b/lec11.pdf?rlkey=g4wbzq8h88l9dnl94svsnn8fs&dl=0) | [video](https://youtu.be/Hi4I0ZtPsbY) ]
 
 ~~Lecture 12: Paper Reading Presentation~~
 
@@ -246,23 +244,23 @@ Design for Microcontrollers
 
 ### Lecture 13: Distributed Training and Gradient Compression (Part I)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec13-Distributed-Training-I.pdf) | [video](https://youtu.be/oIIy6nmMoeM) ]
+[ [slides](https://www.dropbox.com/scl/fi/qv7luhv8v0qnj94jpafnt/lec13.pdf?rlkey=djzxg2wbglrthzdtamr8e0zv1&dl=0) | [video](https://youtu.be/oIIy6nmMoeM) ]
 
 ### Lecture 14: Distributed Training and Gradient Compression (Part II)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec14-Distributed-Training-II.pdf) | [video](https://youtu.be/7W0MCjc8OD4) ]
+[ [slides](https://www.dropbox.com/scl/fi/tmpdgvy6we0vrj9s9q3a4/lec14.pdf?rlkey=lmi6y79y5w5hy67arx647jhh5&dl=0) | [video](https://youtu.be/7W0MCjc8OD4) ]
 
 ### Lecture 15: On-Device Training and Transfer Learning (Part I)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec15-On-Device-Training-And-Transfer-Learning-I.pdf) | [video](https://youtu.be/P_tVABpgb6w) ]
+[ [slides](https://www.dropbox.com/scl/fi/l26nz3e8yyh4friogs9yf/lec15.pdf?rlkey=wbgijgrbgdfkjs27j34t5mvrl&dl=0) | [video](https://youtu.be/P_tVABpgb6w) ]
 
 ### Lecture 16: On-Device Training and Transfer Learning (Part II)
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec16-On-Device-Training-And-Transfer-Learning-II.pdf) | [video](https://youtu.be/rG-KM8eVzj8) ]
+[ [slides](https://www.dropbox.com/scl/fi/cbmnpivl6hibs5mj2tf50/lec16.pdf?rlkey=j3i0op9yd9vdfbxgt3gvrcd9u&dl=0) | [video](https://youtu.be/rG-KM8eVzj8) ]
 
 ### Lecture 17: TinyEngine - Efficient Training and Inference on Microcontrollers
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec17-TinyEngine.pdf) | [video](https://youtu.be/oCMnJXH0c50) ]
+[ [slides](https://www.dropbox.com/scl/fi/qioqdqdszys02v1upp25p/lec17.pdf?rlkey=yuffskefckc8oab0ntyi64on5&dl=0) | [video](https://youtu.be/oCMnJXH0c50) ]
 
 ---
 
@@ -272,15 +270,15 @@ Design for Microcontrollers
 
 ### Lecture 18: Efficient Point Cloud Recognition
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec18-Efficient-Point-Cloud-Recognition.pdf) | [video](https://youtu.be/fKIxpM-F0zw) ]
+[ [slides](https://www.dropbox.com/scl/fi/os1kyo9eixyvezajpt5tw/lec18.pdf?rlkey=d8cvpn6tjivu98fhnxdu0yl04&dl=0) | [video](https://youtu.be/fKIxpM-F0zw) ]
 
 ### Lecture 19: Efficient Video Understanding and GANs
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec19-Efficient-Video-Understanding-GANs.pdf) | [video](https://youtu.be/J4olmnIwgtk) ]
+[ [slides](https://www.dropbox.com/scl/fi/a17vu1ujgxvuemev43k42/lec19.pdf?rlkey=1c9ljnyjdrtueljkp7xd4gunf&dl=0) | [video](https://youtu.be/J4olmnIwgtk) ]
 
 ### Lecture 20: Efficient Transformers
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec20-Efficient-Transformers.pdf) | [video](https://youtu.be/RGUCmX1fvOE) ]
+[ [slides](https://www.dropbox.com/scl/fi/ohk1emmjcfga0roafm2rk/lec20.pdf?rlkey=far16xdpurr900vzdrizg17mw&dl=0) | [video](https://youtu.be/RGUCmX1fvOE) ]
 
 ---
 
@@ -290,15 +288,15 @@ Design for Microcontrollers
 
 ### Lecture 21: Basics of Quantum Computing
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec21-Quantum-Basics.pdf) | [video](https://youtu.be/8eT1QTVb1uo) ]
+[ [slides](https://www.dropbox.com/scl/fi/emcqog86lsp18ku5fza0p/lec21.pdf?rlkey=co0nbj1wovxwvvvtlqogl9x15&dl=0) | [video](https://youtu.be/8eT1QTVb1uo) ]
 
 ### Lecture 22: Quantum Machine Learning
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec22-Quantum-ML.pdf) | [video](https://youtu.be/20ftuhSV4sk) ]
+[ [slides](https://www.dropbox.com/scl/fi/x71s8rrffjrcnrpdc50w0/lec22.pdf?rlkey=9d14pbcey0do8nsac6uvu72x2&dl=0) | [video](https://youtu.be/20ftuhSV4sk) ]
 
 ### Lecture 23: Noise Robust Quantum ML
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec23-Noise-Robust-Quantum-ML.pdf) | [video](https://youtu.be/1gV0u8SfXe8) ]
+[ [slides](https://www.dropbox.com/scl/fi/gllgdkus2717mrqjg8rab/lec23.pdf?rlkey=u6pqg98ppvlmfs5t6ev6l3wma&dl=0) | [video](https://youtu.be/1gV0u8SfXe8) ]
 
 ~~Lecture 24: Final Project Presentation~~
 
@@ -306,4 +304,4 @@ Design for Microcontrollers
 
 ### Lecture 26: Course Summary & Guest Lecture
 
-[ [slides](https://hanlab.mit.edu/files/course/slides/MIT-TinyML-Lec25-AIMET.pdf) | [video](https://youtu.be/NCuLGvCeYl8) ]
+[ [slides](https://www.dropbox.com/scl/fi/3svdkacflj9hv2yupsmpt/lec25.pdf?rlkey=r3q0kofbu06fw7ud0ihqboy0k&dl=0) | [video](https://youtu.be/NCuLGvCeYl8) ]
