@@ -80,7 +80,7 @@ VGGNet에서는 $3 \times 3$ 레이어를 두 개 쌓는 것이, AlexNet보다 c
 
 | Architecture | Fire Module |
 | :---: | :---: | 
-| ![SqueezeNet](images/SqueezeNet.png) | ![Fire Module](images/fire_module_2.png) |
+| ![SqueezeNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/SqueezeNet.png) | ![Fire Module](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/SqueezeNet_2.png) |
 | head에서 GAP(Global Average Pooling)을 사용한다. | $1 \times 1$ convolution(**squeeze**), $3 \times 3$ convolution(**expand**)을 사용한다. |
 
 fire module은 다음과 같은 단계로 연산이 진행된다.
