@@ -148,7 +148,7 @@ ShuffleNet에서는, group convolution에서 channel information이 손실되는
 
 | ShuffleNet block | Channel Shuffle |
 | :---: | :---: |
-| ![ShuffleNet](images/ShuffleNet.png) | ![channel shuffle](images/channel_shuffle.png) |
+| ![ShuffleNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/ShuffleNet.png) | ![channel shuffle](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec07/summary01/images/channel_shuffle.png) |
 
 ---
 
@@ -308,6 +308,5 @@ MbV3은 MbV2에서 비용이 큰 레이어(last stage)를 구조적으로 개선
 $$ \mathrm{swish} \ x = x \cdot {\sigma}(x) $$
 
 $$ \mathrm{h} \ \mathrm{swish} \ = x{{\mathrm{ReLU}6(x+3)} \over {6}} $$
-
 
 ---
