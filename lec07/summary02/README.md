@@ -20,6 +20,8 @@ NAS의 목표는 탐색 전략과 성능 평가 전략을 통해, 탐색 공간�
 
 > [Neural Architecture Search: Insights from 1000 Papers 논문(2023)](https://arxiv.org/abs/2301.08727)
 
+> DAG(Directed Acyclic Graph): feature maps이나 module blocks이 노드, operation(e.g., convolution, pooling)이 에지로 연결된 그래프
+
 최적 모델 구조를 찾기 위해서는, 먼저 탐색할 탐색 공간을 먼저 정의해야 한다. 다음은 대표적인 탐색 공간의 종류와, 해당 탐색 공간에서 찾는 하이퍼파라미터를 나타낸 도표다.
 
 | Search Space<br>(Structure) | Operation types | DAG topology | macro hyperparameters | cell topology | e.g. |
@@ -124,7 +126,7 @@ NAS로 찾은 최적 모델은 수동으로 설계한 모델과 매우 다른 �
 
 ## 7.5 Design the Search Space
 
-보다 효율적인 탐색 공간을 찾으려는 연구도 진행되어 왔다.
+예를 들어 가중치를 공유하는 학습 방법의 경우, high-quality model과 low-quality model의 adaptation이 서로 충돌하기 때문에, 최종 convergence state에 악영향을 미치게 된다. 따라서, 기존보다 효율적인 탐색 공간을 찾으려는 연구가 진행되어 왔다.
 
 ---
 
@@ -132,15 +134,13 @@ NAS로 찾은 최적 모델은 수동으로 설계한 모델과 매우 다른 �
 
 > [On Network Design Spaces for Visual Recognition 논문(2019)](https://arxiv.org/abs/1905.13214)
 
+> [Recent Convnets 정리: 11.11절 참조](https://github.com/erectbranch/Deep_Learning_for_Computer_Vision/tree/master/598-lec11)
+
 RegNet 논문에서는 **cumulative error distribution**을 기반으로, 최적의 탐색 공간을 설계했다.
 
-![ResNet cumulative error distribution](images/ResNet_cumulative_error_distribution.png)
+![RegNet](images/RegNet.png)
 
-- 파란색 곡선: 38.9% model이 49.4%가 넘는 error를 가진다.
-
-- 주황색 곡선: 38.7% model이 43.2%가 넘는 error를 가진다.
-
-하지만 수많은 모델을 직접 학습하고 평가해야 하는 문제가 있다.
+- design space $A$ 에서 시작하여, 적은 error를 갖는 모델로 구성된 최적의 design space $C$ 를 찾는다.
 
 ---
 
@@ -148,7 +148,7 @@ RegNet 논문에서는 **cumulative error distribution**을 기반으로, 최적
 
 > [MCUNet: Tiny Deep Learning on IoT Devices 논문(2020)](https://arxiv.org/abs/2007.10319)
 
-MCUNetV1 논문의 TinyNAS에서는 MCU 제약조건에 최적인 탐색 공간을 찾기 위해, 슈퍼넷에 포함된 서브넷의 연산량(FLOPs)를 관찰하여 비교했다.
+MCUNetV1 논문의 TinyNAS에서는 MCU 제약조건에 최적인 탐색 공간을 찾기 위해, 슈퍼넷에 포함된 서브넷 연산량(FLOPs)의 CDF를 관찰한다.
 
 ![FLOPs distribution](images/FLOPs_and_probability.png)
 
@@ -156,5 +156,24 @@ MCUNetV1 논문의 TinyNAS에서는 MCU 제약조건에 최적인 탐색 공간�
 
 - 큰 model capacity는 높은 accuracy와 직결된다. 
 
+---
+
+### 7.5.3 PreNAS: Zero-Cost Proxy
+
+> [PreNAS: Preferred One-Shot Learning Towards Efficient Neural Architecture Search 논문(2023)](https://arxiv.org/abs/2304.14636)
+
+PreNAS는 학습 전 gradient-based proxy를 기반으로, high-quality architecture를 주로 포함하는 탐색 공간을 구성한다.
+
+![PreNAS](images/PreNAS.png)
+
+다양한 제약 조건에서 top $N$ 개 high-quality architecture를 찾아서 탐색 공간을 구성한다.(preferred search space)
+
+$$ \tilde{\mathcal{A}} = \lbrace \mathcal{S}(\mathcal{A}_{[c]}, N) | \forall c \in \mathcal{C} \rbrace $$
+
+- $C$ : constraints
+
+$$ \mathcal{C} = (a, a + \epsilon, a + 2\epsilon , \cdots, b) $$
+
+> zero-cost proxy는 SNIP을 변형한 scoring function을 사용한다.
 
 ---

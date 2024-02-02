@@ -97,15 +97,11 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
   
   > MobileNet(depthwise-separable convolution, width/resolution multiplier), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle), SENet(squeeze-and-excitation block), MobileNetV3(redesigning expensive layers, h-swish)
 
-- [Neural Architecture Search: RNN controller & search strategy](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary02)
+- [Neural Architecture Search: Search Space](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec07/summary02)
 
-  > cell-level search space, network-level search space
+  > Search Space: Macro, Chain-Structured, Cell-based(NASNet), Hierarchical(Auto-DeepLab, NAS-FPN)
 
-  > design the search space: Cumulative Error Distribution, FLOPs distribution
-
-  > Search Strategy: grid search, random search, reinforcement learning, bayesian optimization, gradient-based search, evolutionary search
-
-  > EfficientNet(compound scaling), DARTS
+  > design search space: Cumulative Error Distribution, FLOPs distribution, zero-cost proxy
 
 - [Neural Architecture Search: Performance Estimation & Hardware-Aware NAS](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec08)
 
