@@ -104,8 +104,8 @@ MCUNetV2에서는 최대 SRAM 사용량을 추가로 줄이기 위해서, TinyEn
 
 | | per-layer inference | per-patch inference |
 | :---: | :---: | :---: |
-| | ![per-layer memory usage](images/sram_memory_usage_1.png) | ![per-patch memory usage](images/sram_memory_usage_2.png) | 
-| | ![per-layer inference](images/per-layer.gif) | ![per-patch inference](images/per-patch.gif) |
+| | ![per-layer memory usage](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec11/images/sram_memory_usage_1.png) | ![per-patch memory usage](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec11/images/sram_memory_usage_2.png) | 
+| | ![per-layer inference](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec11/images/per-layer.gif) | ![per-patch inference](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec11/images/per-patch.gif) |
 | Peak SRAM Memory | $2WHC$ | $2whC$ |
 
 
