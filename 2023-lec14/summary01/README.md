@@ -12,7 +12,7 @@
 
 || | |  |
 | :---: | :---: | :---: | :---: |
-|| ![input patch](images/image_patches_1.png) | $\rightarrow$ | ![image tokens](images/image_patches_2.png) |
+|| ![input patch](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01/images/image_patches_1.png) | $\rightarrow$ | ![image tokens](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01/images/image_patches_2.png) |
 || Image size: 96x96<br/>Patch size: 32x32 | | \#tokens: 3x3=9<br/>Dim of each token: 3x32x32=3,072 |
 
 이러한 토큰은 Linear Projection을 거쳐서 Encoder의 입력이 된다. 
@@ -25,7 +25,7 @@
 
 || | |
 | :---: | :---: | :---: 
-|| ![linear projection 1](images/linear_projection_1.png)| ![linear projection 2](images/linear_projection_2.png) |
+|| ![linear projection 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01/images/linear_projection_1.png)| ![linear projection 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01/images/linear_projection_2.png) |
 || input dim = 3,072<br/>output dim(hidden size of ViT) = 768 | \#Parameters: 3,072x768 = 2.36M |
 
 ---
@@ -121,14 +121,14 @@ $$ \mathrm{Sim}(Q,K) = \exp\left({{QK^T} \over {\sqrt{d}}}\right) \rightarrow \m
 
 | Softmax Attention | | | Relu Linear Attention | |
 | :---: | :---: | :---: | :---: | :---: |
-| ![softmax attention](images/linear_attention_1.png) | vs | ![linear attention 1](images/linear_attention_2.png) | $\longrightarrow$<br/>**(ab)c = a(bc)**<br/>(associative property of Matmul) | ![linear attention 2](images/linear_attention_3.png) |
+| ![softmax attention](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//linear_attention_1.png) | vs | ![linear attention 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//linear_attention_2.png) | $\longrightarrow$<br/>**(ab)c = a(bc)**<br/>(associative property of Matmul) | ![linear attention 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//linear_attention_3.png) |
 | Cost: $O(n^2)$ | | Cost: $O(n^2)$ | | Cost: $O(n)$ |
 
 하지만, 이러한 linear attention은 softmax attention에 비해, sharp distribution을 갖지 않는다. 따라서, local information을 잘 캡처할 수 없는 단점이 생기고, 이는 성능 저하로 이어진다.
 
 | Attention Feature Map | Accuracy Gap | 
 | :---: | :---: |
-| ![attention map](images/softmax_vs_linear_attention_1.png) | ![acc gap](images/softmax_vs_linear_attention_2.png) |
+| ![attention map](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//softmax_vs_linear_attention_1.png) | ![acc gap](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//softmax_vs_linear_attention_2.png) |
 
 ---
 
