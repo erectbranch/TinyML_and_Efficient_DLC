@@ -175,7 +175,6 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 | Date | Lecture | Youtube | Slide |
 | --- | --- | --- | --- |
-| | | | |
 | **Sep 8** | Lecture 1: **Introduction** | - | [[slides](https://www.dropbox.com/scl/fi/ym2frcworou622a7wrghb/lec01.pdf?rlkey=nbnjyn0wyyvhmoti7jvqbfa9s&dl=0)] |
 | **Sep 13** | Lecture 2: **Basics of Deep Learning** | [[video](https://youtu.be/5HpLyZd1h0Q)] | [[slides](https://www.dropbox.com/scl/fi/7q21t5meajse0mapbtice/lec02.pdf?rlkey=x1ls1ktyv8taomitdkhl7etqq&dl=0)] |
 | | | | |
@@ -190,7 +189,6 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 | **Oct 6** | Lecture 9: **Neural Architecture Search (Part III)** | [[video](https://youtu.be/_cvn9pflblk)][[video(live)](https://youtu.be/_cvn9pflblk)] | [[slides](https://www.dropbox.com/scl/fi/t5dhodsg2wqkn1rgsf1lx/lec09.pdf?rlkey=xzz8vrwlwjc6vm8foinnbecpv&dl=0)] |
 | **Oct 13** | Lecture 10: **Knowledge Distillation** | [[video](https://youtu.be/IIqf-oUTHe0)][[video(live)](https://youtu.be/tT9Lnt6stwA)] | [[slides](https://www.dropbox.com/scl/fi/7x4i8bf3ush5bdt0mu57k/lec10.pdf?rlkey=7viyngsy60imiilpkxqbmva1l&dl=0)] |
 | **Oct 18** | Lecture 11: **MCUNet - Tiny Neural Network Design for Microcontrollers** | [[video](https://youtu.be/Hi4I0ZtPsbY)][[video(live)](https://youtu.be/YBER-SNlkqs)] | [[slides](https://www.dropbox.com/scl/fi/1b9ozxzrzk8x3lwh4lc0b/lec11.pdf?rlkey=g4wbzq8h88l9dnl94svsnn8fs&dl=0)] |
-| ~~Oct 20~~ | ~~Lecture 12: Paper Reading Presentation~~ | - | - |
 | | | | |
 | | **Efficient Training and System Support** |  | |
 | | | | |
@@ -211,7 +209,5 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 | **Nov 22** | Lecture 21: **Basics of Quantum Computing** | [[video](https://youtu.be/8eT1QTVb1uo)][[video(live)](https://youtu.be/evTGcFnLu1g)] | [[slides](https://www.dropbox.com/scl/fi/emcqog86lsp18ku5fza0p/lec21.pdf?rlkey=co0nbj1wovxwvvvtlqogl9x15&dl=0)] |
 | **Nov 29** | Lecture 22: **Quantum Machine Learning** | [[video](https://youtu.be/20ftuhSV4sk)][[video(live)](https://youtu.be/20ftuhSV4sk)] | [[slides](https://www.dropbox.com/scl/fi/x71s8rrffjrcnrpdc50w0/lec22.pdf?rlkey=9d14pbcey0do8nsac6uvu72x2&dl=0)] |
 | **Dec 1** | Lecture 23: **Noise Robust Quantum ML** | [[video](https://youtu.be/1gV0u8SfXe8)][[video(live)](https://youtu.be/1gV0u8SfXe8)] | [[slides](https://www.dropbox.com/scl/fi/gllgdkus2717mrqjg8rab/lec23.pdf?rlkey=u6pqg98ppvlmfs5t6ev6l3wma&dl=0)] |
-| ~~Dec 6~~ | ~~Lecture 24: Final Project Presentation~~ | - | - |
-| ~~Dec 8~~ | ~~Lecture 25: Final Project Presentation~~ | - | - |
 | **Dec 13** | Lecture 26: **Course Summary & Guest Lecture** | [[video](https://youtu.be/NCuLGvCeYl8)] | [[slides](https://www.dropbox.com/scl/fi/3svdkacflj9hv2yupsmpt/lec25.pdf?rlkey=r3q0kofbu06fw7ud0ihqboy0k&dl=0)] |
 | | | | |
