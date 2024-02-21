@@ -133,8 +133,6 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
   > MCUNetV2: patch-based inference, network redistribution, joint automated search for optimization, MCUNetV2 architecture(VWW dataset inference)
 
-  > RNNPool, MicroNets(MOPs & latency/energy consumption relationship)
-
 ### ⚙️ Efficient Training and System Support
 
 - [TinyEngine](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec17)
@@ -175,7 +173,7 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 ## :mag: Schedule (6.S965 • Fall 2022)
 
-| <style>td, th{font-size: 17px}</style> Date | Lecture | Youtube | Slide |
+| Date | Lecture | Youtube | Slide |
 | --- | --- | --- | --- |
 | | | | |
 | **Sep 8** | Lecture 1: **Introduction** | - | [[slides](https://www.dropbox.com/scl/fi/ym2frcworou622a7wrghb/lec01.pdf?rlkey=nbnjyn0wyyvhmoti7jvqbfa9s&dl=0)] |
