@@ -121,14 +121,14 @@ $$ \mathrm{Sim}(Q,K) = \exp\left({{QK^T} \over {\sqrt{d}}}\right) \rightarrow \m
 
 | Softmax Attention | | | Relu Linear Attention | |
 | :---: | :---: | :---: | :---: | :---: |
-| ![softmax attention](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//linear_attention_1.png) | vs | ![linear attention 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//linear_attention_2.png) | $\longrightarrow$<br/>**(ab)c = a(bc)**<br/>(associative property of Matmul) | ![linear attention 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//linear_attention_3.png) |
+| ![softmax attention](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01/images/linear_attention_1.png) | vs | ![linear attention 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01/images/linear_attention_2.png) | $\longrightarrow$<br/>**(ab)c = a(bc)**<br/>(associative property of Matmul) | ![linear attention 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01/images/linear_attention_3.png) |
 | Cost: $O(n^2)$ | | Cost: $O(n^2)$ | | Cost: $O(n)$ |
 
 하지만, 이러한 linear attention은 softmax attention에 비해, sharp distribution을 갖지 않는다. 따라서, local information을 잘 캡처할 수 없는 단점이 생기고, 이는 성능 저하로 이어진다.
 
 | Attention Feature Map | Accuracy Gap | 
 | :---: | :---: |
-| ![attention map](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//softmax_vs_linear_attention_1.png) | ![acc gap](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01//softmax_vs_linear_attention_2.png) |
+| ![attention map](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01/images/softmax_vs_linear_attention_1.png) | ![acc gap](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023-lec14/summary01/images/softmax_vs_linear_attention_2.png) |
 
 ---
 

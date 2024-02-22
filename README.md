@@ -169,6 +169,10 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
   > Encoder-Decoder(T5), Encoder-only(BERT), Decoder-only(GPT), Relative Positional Encoding, KV cache optimization, Gated Linear Unit
 
+- [Efficient Vision Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023-lec14/summary01)
+
+  > Vision Transformer, Window Attention(Swin Transformer), Sparse Window Attention(FlatFormer), ReLU Linear Attention(EfficientViT), Sparsity-Aware Adaptation(SparseViT)
+
 </br>
 
 ## :mag: Schedule (6.S965 • Fall 2022)
@@ -182,7 +186,7 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 | | | | |
 | **Sep 15** | Lecture 3: **Pruning and Sparsity (Part I)** | [[video](https://youtu.be/sZzc6tAtTrM)] | [[slides](https://www.dropbox.com/scl/fi/vns8vgzfrjjqrjovqtrxw/lec03.pdf?rlkey=nwofk3suges17224m7idg9nwm&dl=0)] |
 | **Sep 20** | Lecture 4: **Pruning and Sparsity (Part II)** | [[video](https://youtu.be/1njtOcYNAmg)][[video(live)](https://youtu.be/fWP3Q6tNtYU)] | [[slides](https://www.dropbox.com/scl/fi/3ghge1dxv1lu74mnj5ktv/lec04.pdf?rlkey=afa5so7ybdu60o4zbkstr80pd&dl=0)] |
-| **Sep 22** | Lecture 5: **Quantization (Part I)** | [[video](https://youtu.be/91stHPsxwig)][[video(live)](https://youtu.be/AlASZb93rrc)] | [slides](https://www.dropbox.com/scl/fi/i4wmuy1wgs0urtqezzr7w/lec05.pdf?rlkey=iqme56qke3zb5g5cq7zxmvmhn&dl=0)  |
+| **Sep 22** | Lecture 5: **Quantization (Part I)** | [[video](https://youtu.be/91stHPsxwig)][[video(live)](https://youtu.be/AlASZb93rrc)] | [[slides](https://www.dropbox.com/scl/fi/i4wmuy1wgs0urtqezzr7w/lec05.pdf?rlkey=iqme56qke3zb5g5cq7zxmvmhn&dl=0)]  |
 | **Sep 27** | Lecture 6: **Quantization (Part II)** | [[video](https://youtu.be/sYpl97ToNdg)][[video(live)](https://hanlab.mit.edu/courses/2022-fall-6s965#)] | [[slides](https://www.dropbox.com/scl/fi/j8x1g500rvkd1pbjw84m3/lec06.pdf?rlkey=d9i4d2k0q6nu38lp2r7nlaw4b&dl=0)] |
 | **Sep 29** | Lecture 7: **Neural Architecture Search (Part I)** | [[video](https://youtu.be/NQj5TkqX48Q)][[video(live)](https://youtu.be/NQj5TkqX48Q)] | [[slides](https://www.dropbox.com/scl/fi/fnzeebhd9227pzr0opgol/lec07.pdf?rlkey=c612kexszsjbd3jkubyzb4jah&dl=0)] |
 | **Oct 4** | Lecture 8: **Neural Architecture Search (Part II)** | [[video](https://youtu.be/UlvkBZdOhpg)][[video(live)](https://youtu.be/PFitZnPIKoc)] | [[slides](https://www.dropbox.com/scl/fi/mnamxcqlnglm35q1y20wz/lec08.pdf?rlkey=q3ckspu8o7vauuloh3ostlotc&dl=0)] |
