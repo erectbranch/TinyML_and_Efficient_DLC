@@ -274,19 +274,21 @@ $$ MACs = m \cdot n $$
 
     ![General Matrix-Matrix](images/General_Matrix-Matrix.png)
 
+$$ MACs = m \cdot n \cdot k $$
+
 이번에는 여러 레이어 종류별로 계산해 보자.(batch size n=1로 가정)
 
 - Linear Layer
 
   ![linear layer](images/linear.png)
 
-$$ c_o \cdot c_i $$
+$$ MACs = c_o \cdot c_i $$
 
 - Convolution
 
   ![2D convolution](images/2D_conv.png)
 
-$$ c_i \cdot k_h \cdot k_w \cdot c_o \cdot w_o \cdot c_o $$
+$$ MACs = c_i \cdot k_h \cdot k_w \cdot c_o \cdot w_o \cdot c_o $$
 
 > $w_o, c_o$ 계산에 주의. 
 
@@ -296,13 +298,13 @@ $$ c_i \cdot k_h \cdot k_w \cdot c_o \cdot w_o \cdot c_o $$
 
   ![grouped convolution](images/grouped_conv.png)
 
-$$ c_i/g \cdot k_h \cdot k_w \cdot c_o \cdot w_o \cdot c_o $$
+$$ MACs = c_i/g \cdot k_h \cdot k_w \cdot c_o \cdot w_o \cdot c_o $$
 
 - Depthwise Convolution
 
   ![depthwise convolution](images/depthwise_conv.png)
 
-$$ k_h \cdot k_w \cdot c_o \cdot w_o \cdot c_o $$
+$$ MACs = k_h \cdot k_w \cdot c_o \cdot w_o \cdot c_o $$
 
 ### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 4: AlexNet \#MACs &nbsp;&nbsp;&nbsp;</span>
 
