@@ -470,7 +470,7 @@ linear quantization에서 양자화 오차를 발생시키는 원인을 알아�
 
 | $x \rightarrow x_{int}$ |
 | :---: |
-| ![quant error example 1](images/quant_error_ex_1.png) |
+| ![quant error example 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/quant_error_ex_1.png) |
 
 1. **round error**: $x$ 에서 근접한 값 $\rightarrow$ 동일한 $x_{int}$ grid
 
@@ -482,9 +482,9 @@ linear quantization에서 양자화 오차를 발생시키는 원인을 알아�
 
 | $x_{int} \rightarrow \hat{x}$ <br/>(case 1: round error가 큰 경우) |
 | :---: |
-| ![quant error example 3](images/quant_error_ex_3.png) |
+| ![quant error example 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/quant_error_ex_3.png) |
 | $x_{int} \rightarrow \hat{x}$ <br/>**(case 2: clip error가 큰 경우)** |
-| ![quant error example 3](images/quant_error_ex_2.png) |
+| ![quant error example 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec05/summary01/images/quant_error_ex_2.png) |
 
 따라서, 양자화 시 최적의 절충점을 고려하여 scaling factor를 정해야 한다.
 
