@@ -24,29 +24,7 @@
 
 ---
 
-## 5.9 Quantization Granularity
-
-다음은 하나의 tensor에서 quantization fuction이 적용되는 범위를, 세 가지 대표적인 quantization granularity별로 나타낸 그림이다.
-
-| Per-Tensor<br/>(Layer-wise) | Per-Channel<br/>(Channel-wise) | Per-Vector<br/>(Group-wise) |
-| :---: | :---: | :---: |
-| ![Per-Tensor](images/granularity_per-tensor.png) | ![Per-Channel](images/granularity_per-channel.png) | ![Group](images/granularity_group.png) |  
-
-오른쪽에 위치한 방법일수록 다음과 같은 특징을 갖는다.
-
-- (+) 보다 fine-grained quantization으로, 더 높은 정확도를 달성할 수 있다.
-
-  > 특히 작은 모델, 혹은 low bit-width quantization에서 정확도 보존에 유리하다.
-
-- (-) computational overhead가 크다.
-
-  > 예를 들어 per-tensor quantization은 각 레이어마다 모든 weight tensor가 하나의 scaling factor $S$ 를 공유하지만, per-vector quantization은 모든 vector 단위마다 scaling factor를 갖는다.
-
-- (-) 하드웨어에서 지원하지 않거나, 최적화가 어렵다.
-
----
-
-## 5.10 Deep Compression: Vector Quantization
+## 5.9 Deep Compression: Vector Quantization
 
 > [Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding 논문(2015)](https://arxiv.org/abs/1510.00149)
 
@@ -61,7 +39,7 @@ Deep Compression 논문은 (1) iterative pruning, (2) **vector quantization**(VQ
 
 ---
 
-### 5.10.1 K-Means-based Weight Quantization
+### 5.9.1 K-Means-based Weight Quantization
 
 Deep Compression에서는 **K-Means Algorithm** 기반의, **non-uniform weight quantization**을 수행한다.(Vector Quantization)
 
@@ -109,7 +87,7 @@ Deep Compression에서는 **K-Means Algorithm** 기반의, **non-uniform weight 
 
 ---
 
-### 5.10.2 Finetuning Codebook
+### 5.9.2 Finetuning Codebook
 
 위 예시에서 weight를 다시 reconstruct(decode)한 뒤, error를 계산해 보자.
 
@@ -133,7 +111,7 @@ Deep Compression에서는 **K-Means Algorithm** 기반의, **non-uniform weight 
 
 ---
 
-### 5.10.3 K-Means-based Quantization Limitations
+### 5.9.3 K-Means-based Quantization Limitations
 
 그러나 K-Means-based weight quantization은 다음과 같은 한계점을 갖는다.
 
@@ -147,7 +125,7 @@ Deep Compression에서는 **K-Means Algorithm** 기반의, **non-uniform weight 
 
 ---
 
-### 5.10.4 Huffman Coding
+### 5.9.4 Huffman Coding
 
 추가로 **Huffman Coding** 알고리즘을 적용하여 memory usage를 더 줄일 수 있다.
 
@@ -189,7 +167,7 @@ a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
 ---
 
-## 5.11 AND THE BIT GOES DOWN: Product Quantization
+## 5.10 AND THE BIT GOES DOWN: Product Quantization
 
 > [AND THE BIT GOES DOWN: REVISITING THE QUANTIZATION OF NEURAL NETWORKS 논문(2019)](https://arxiv.org/abs/1907.05686)
 
@@ -209,7 +187,7 @@ a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
 ---
 
-### 5.11.1 Product Quantization
+### 5.10.1 Product Quantization
 
 > [MATRIN KERSNER BLOG: Kill the bits and gain the speed?](https://martinkersner.com/2019/11/28/kill-the-bits/#product-quantization)
 
@@ -255,7 +233,7 @@ a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
 ---
 
-### 5.11.2 Minimize Difference between Output Activations
+### 5.10.2 Minimize Difference between Output Activations
 
 최적의 centroid(codeword)를 찾기 위한 방법을 살펴보자. 먼저 양자화 전,후 가중치 값을 비교하며, quantization error를 최소화하는 objective function은 다음과 같이 정의할 수 있다.
 
