@@ -67,11 +67,11 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
   > Uniform vs Non-uniform quantization, Symmetric vs Asymmetric quantization
 
-- [Vector Quantization, Linear Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05/summary02)
+  > Linear Quantization: Integer-Arithmetic-Only Quantization, Sources of Quantization Error(clipping, rounding, scaling factor, zero point)
 
-  > Vector Quantization(VQ): Deep Compression(iterative pruning, retrain codebook, Huffman encoding), Product Quantization(PQ): AND THE BIT GOES DOWN
-  
-  > Linear Quantization: Zero point, Scaling Factor, Quantization Error(clip error, round error), Linear Quantized Matrix Multiplization(FC layer, Conv layer)
+- [Vector Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05/summary02)
+
+  > Vector Quantization(Deep compression: iterative pruning, retrain codebook, Huffman encoding), Product Quantization
 
 - [Post Training Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec06/summary01)
 
