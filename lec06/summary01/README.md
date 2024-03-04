@@ -164,7 +164,9 @@ $$ = \gamma \mathcal{N} \left( {{- \beta} \over {\gamma}} \right) + \beta \left[
 
 최적의 rounding 정책을 획득하기 위해, (1) 기존 가중치와 (2) $\triangle w = \delta$ (perturbation)을 추가한 soft-quantized weight와의 차이(L2 loss)를 최소화한다.
 
-$$ \underset{V}{{\mathrm{arg}}{min}} || W\mathrm{x} - \tilde{W}\mathrm{x}||^{2}_{F} + \underset{regularizer}{\lambda f_{reg}(V)} $$
+```math
+\underset{V}{{\mathrm{arg}}{min}} || W\mathrm{x} - \tilde{W}\mathrm{x}||^{2}_{F} + \underset{regularizer}{\lambda f_{reg}(V)}
+```
 
 - $\tilde{W}$  : soft-quantized weight
 
@@ -298,6 +300,6 @@ calibration을 위한 데이터셋이 없을 경우, batch normalization 파라�
 
 - ${\mu}_i, {\sigma}_i$ : BN 레이어에 저장된 평균, 표준편차
 
-- $\tilde{\mu}_i^r, \tilde{\sigma}_{i}^{r}$ : distilled input data의 평균, 표준편차
+- ${\tilde{\mu_i^r}}, {\tilde{{\sigma}_{i}^{r}}}$ : distilled input data의 평균, 표준편차
 
 ---
