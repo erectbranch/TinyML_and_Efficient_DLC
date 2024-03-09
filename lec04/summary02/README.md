@@ -47,20 +47,6 @@ $$ \times $$
 
 이때, $PE0$ 의 피연산자 가중치(non-zero weights)는 벡터 형태로 메모리에 저장된다. 
 
-<style>
-    .heatMap {
-        width: 70%;
-        text-align: center;
-    }
-    .heatMap th {
-        background: #AEC67D;
-        word-wrap: break-word;
-        text-align: center;
-    }
-</style>
-
-<div class="heatMap">
-
 | virtual weight | $w_{0,0}$ | $w_{0,1}$ | $w_{4,2}$ | $w_{0,3}$ | $w_{4,3}$ |
 | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Relative Index** | 0 | 1 | 2 | 0 | 0 |
@@ -108,9 +94,9 @@ $$ \times $$
 
 1. **Sparse Matrix Read Unit**
 
-    ![PE graph 1](images/EIE_pe_graph_1.jpg) 
+    ![PE graph 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_1.jpg) 
 
-    ![PE graph 2](images/EIE_pe_graph_2.jpg)
+    ![PE graph 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_2.jpg)
   
     - 포인터 $p$ 를 활용해, SRAM의 column $I_j$ 에서 nonzero 활성화 값을 read한다. 
 
@@ -124,9 +110,9 @@ $$ \times $$
 
 2. **Arithmetic Unit**
 
-    ![PE graph 3](images/EIE_pe_graph_3.jpg)
+    ![PE graph 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_3.jpg)
 
-    ![PE graph 4](images/EIE_pe_graph_4.jpg)
+    ![PE graph 4](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_4.jpg)
 
     - MAC 연산( $b_{x} = b_{x} + v \times a_{j}$ )을 수행한다.
 
@@ -136,13 +122,13 @@ $$ \times $$
 
 3. **Write Back**
 
-    ![PE graph 5](images/EIE_pe_graph_5.jpg)
+    ![PE graph 5](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_5.jpg)
 
     - SRAM에 결과를 write한다.
 
 4. **ReLU**, **Non-zero Detection**
 
-    ![PE graph 6](images/EIE_pe_graph_6.jpg)
+    ![PE graph 6](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_6.jpg)
 
     - ReLU 연산을 수행한다.
     
