@@ -2,231 +2,223 @@
 
 > [Lecture 04 - Pruning and Sparsity (Part II) | MIT 6.S965](https://youtu.be/1njtOcYNAmg)
 
----
+> [EfficientML.ai Lecture 4 - Pruning and Sparsity (Part II) (MIT 6.5940, Fall 2023, Zoom recording)](https://youtu.be/sDJymyfAOKY)
 
-## 4.4 System & Hardware Support for Sparsity
+가중치 혹은 활성화 값 중 하나의 값이 0이면, 다음과 같이 연산을 생략할 수 있다.
 
-추론 시 input activation과 weight 사이의 연산을 수행하게 된다. 다음 세 가지 경우를 살펴보자.
+![zero any mat mul](images/zero_any_mul.gif)
 
-- 0 \* A = 0
+다음은 후술할 EIE 논문에서, 두 종류의 sparsity를 활용했을 때 얻은 이점이다.
 
-  weight가 0이므로 계산할 필요가 없다.(**weight sparsity**)
+| | 0 $\times$ A = 0 | W $\times$ 0 = 0 |
+| :---:| --- | --- |
+| 종류 | **weight sparsity** | **activation sparsity** |
+| (+) | (90% sparsity 기준)<br/>computation 10배 감소<br/>memory footprint 5배 감소 | (70% sparsity 기준)<br/>computation 3배 감소 | 
 
-  - computation 10배 감소, memory footprint 5배 감소
+구체적으로는 memory access(특히 DRAM)에 드는 비용을, sparsity를 활용하는 압축 알고리즘, 하드웨어를 통해 줄일 수 있다.
 
-- W \* 0 = 0
+![mem access cost](images/mem_access_cost.png)
 
-  activation이 0이므로 계산할 필요가 없다.(**activation sparsity**)
-
-  > ReLU activation function으로, activation sparsity가 쉽게 얻어지게 된다.(activation sparsity를 조절하기 위해 ReLU를 개조하기도 한다.)
-
-  - computation 3배 감소
-
-- 2.09, 1.92 $\rightarrow$ 2
-  
-  2.09와 1.92가 모두 2라는 동일한 값을 가리키도록 하면, weight를 훨씬 줄일 수 있다. (**weight sharing**)
-
-  > 높은 정밀도가 필요하지 않으므로 2로 근사할 수 있다.(quantization) 
-
-  - memory footprint 8배 감소
+> 45NM CMOS process 기준. DRAM access는 SRAM에 비해 128배 에너지를 소모한다.
 
 ---
 
-## 4.5 EIE: Efficient Inference Engine
+## 4.6 EIE: Parallelization on Sparsity
 
 > [EIE: Efficient Inference Engine on Compressed Deep Neural Network 논문(2016)](https://arxiv.org/abs/1602.01528)
 
-추론 중 다음과 같은 연산을 수행한다고 하자.
+EIE 논문에서는 변형된 CSC(Compressed Sparse Column) format을 사용하여, 희소 가중치 행렬을 encoding한다. 행렬-벡터 연산 예시를 통해 EIE의 동작 방식을 살펴보자.
 
-$$ \bar{a} = [0 \quad a_1 \quad 0 \quad a_3] $$
+$$ \vec{a} = [0 \quad a_1 \quad 0 \quad a_3] \quad \quad $$
+
+$$ \times $$
 
 ```math
 \begin{bmatrix} w_{0,0} && w_{0,1} && 0 && w_{0,3} \\ 0 && 0 && w_{1,2} && 0 \\ 0 && w_{2,1} && 0 && w_{2,3} \\ 0 && 0 && 0 && 0 \\ 0 && 0 && w_{4,2} && w_{4,3} \\ w_{5,0} && 0 && 0 && 0 \\ 0 && 0 && 0 && w_{6,3} \\ 0 && w_{7,1} && 0 && 0 \end{bmatrix} \begin{bmatrix} b_0 \\ b_1 \\ -b_2 \\ b_3 \\ -b_4 \\ b_5 \\ b_6 \\ -b_7 \end{bmatrix} \underset{ReLU}{\Rightarrow} \begin{bmatrix} b_0 \\ b_1 \\ 0 \\ b_3 \\ 0 \\ b_5 \\ b_6 \\ 0 \end{bmatrix}
 ```
 
-먼저 위 예제를 4개의 processing element로 나눠보자.
+실제 연산에서, 0인 활성화나 가중치 값은 연산을 생략한다.
 
-![processing element ex](images/pe_ex_1.png)
+| | |
+| :---: | :---: |
+| ![PE](images/PE_array.png) | ![EIE e.g.](images/sparse_calculation_eg.gif) |
 
-EIE 논문에서는 초록색 processing element를 메모리에 저장할 때, sparsity를 활용하여 물리적으로 다음과 같이 mapping한다.(오직 non-zero만 저장)
+> 색상은 동일한 PE에 store되는 element. 이때, 색상마다 가중치는 하나의 큰 배열에 저장된다.
 
-- **Relative Index**
+이때, $PE0$ 의 피연산자 가중치(non-zero weights)는 벡터 형태로 메모리에 저장된다. 
 
-  Absolute Index 대신 Relative Index를 사용하며 메모리 사용량을 줄인다.(bits 수도 감소)
+<style>
+    .heatMap {
+        width: 70%;
+        text-align: center;
+    }
+    .heatMap th {
+        background: #AEC67D;
+        word-wrap: break-word;
+        text-align: center;
+    }
+</style>
 
-  - $w_{0,0}$ : index 0
-
-  - $w_{0,1}$ : $w_{0,0}$ 아래 0, $w_{0,0}$ 의 바로 옆에 위치하므로, index 1
-
-  - $w_{4,2}$ : $w_{0,1}$ 아래 0, 오른쪽 0 다음에 위치하므로, index 2
-
-  - $w_{0,3}$ , $w_{4,3}$ : 중간에 0 없이 바로 위치하므로 index 0 
-
-- Column Pointer
-
-  - starting point $w_{0,0}$ 를 기준으로 몇 번째 column에 위치하는지 정보를 나타낸다. 
+<div class="heatMap">
 
 | virtual weight | $w_{0,0}$ | $w_{0,1}$ | $w_{4,2}$ | $w_{0,3}$ | $w_{4,3}$ |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| Relative Index | 0 | 1 | 2 | 0 | 0 |
-| Column Pointer | 0 | 1 | 2 | 3 | 5 |
+| **Relative Index** | 0 | 1 | 2 | 0 | 0 |
+| **Column Pointer** | 0 | 1 | 2 | 3 | 5 |
 
-> 이러한 format을 **CSC format**(Compressed Sparse Column)으로 지칭한다.
+</div>
 
----
+- **Relative Index**
 
-### 4.5.1 Dataflow
+  skip하는 zero element 수. (distance)
 
-- activation 0
+  > 변환 시, 열을 모두 scan하고 다음 열로 넘어가는 방식으로 진행된다.
 
-  skip
+  > (+) absolute index에 비해 작은 bit width를 사용할 수 있다.
 
-  ![dataflow 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/dataflow_1.png)
+- **Column Pointer**
 
-- activation $a_1$
+  각 column의 시작 지점에 대응되는 relative index를 가리킨다.
 
-  broadcast 후 parallel하게 연산한다.
-
-  ![dataflow 2-1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/dataflow_2_1.png)
-
-  ![dataflow 2-2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/dataflow_2_2.png)
-
-- activation 0
-
-  ![dataflow 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/dataflow_3.png)
-
-- activation $a_3$
-
-  broadcast 후 parallel하게 연산한다.
-
-  ![dataflow 4-1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/dataflow_4_1.png)
-
-  ![dataflow 4-2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/dataflow_4_2.png)
-
-끝나면 다음 cycle로 가중치 행렬의 아래 부분 연산도 수행한다. 결과를 모두 얻은 뒤 update를 수행한다.
+  > column $j$ 가 갖는 \#nonzeros: $p_{j+1} - p_{j}$
 
 ---
 
-### 4.5.2 Micro Architecture for each PE
+### 4.6.1 Micro Architecture for each PE
 
-각 PE는 다음과 같은 과정을 거쳐서 연산을 가속하여 수행하게 된다.
+다음은 PE의 micro architecture를 나타낸 도식이다.
 
-![PE](images/PE.png)
+| Layout of PE | PE architecture |
+| :---: | :---: |
+| ![PE layout](images/layout_PE.png) | ![PE](images/PE.png) |
 
-흐름도를 단계별로 파악해 보자.
+- 활성화 벡터 $a$ 를 스캔한 뒤, non-zero activation $a_j$ 만을 인덱스 $j$ 와 함께 broadcast한다.
 
-- **Activation Sparsity**: zero/non-zero인지 검사한다.
+  > 0에 해당될 경우, 대응되는 가중치 행렬의 column을 skip한다.
 
-  non-zero일 경우, weight와 연산하게 된다.
+  > (PE array를 제어하는) Central Control Unit(CCU)에서, PE 내부 Act Queue에 non-zero activation을 전달한다.
 
-  ![PE graph 1](images/EIE_pe_graph_1.jpg)
+- 한 사이클에 두 pointer를 읽도록, 두 SRAM Bank가 각각 $p_j$ , $p_{j+1}$ 를 처리한다.
 
-- **Weight Sparsity**: non-zero weight 위치 정보를 register에 전달한다.
+  > pointer 길이: 16 bits
 
-  ![PE graph 2](images/EIE_pe_graph_2.jpg)
+- 열마다 \#nonzeros가 다르기 때문에, **load imbalance** 문제가 발생할 수 있고, **FIFO**를 통해 해결한다.
 
-- **ALU**: weight decoding 수행 및 address를 계산한다.
+흐름을 단계별로 파악해 보자.
 
-  > quantization과 관련된 자세한 내용은 lec05 참조
+1. **Sparse Matrix Read Unit**
 
-  - quantized weight를 decoding한다.
+    ![PE graph 1](images/EIE_pe_graph_1.jpg) 
 
-  - relative index 정보를 바탕으로 absolute address를 계산한다.(address accumulate)
+    ![PE graph 2](images/EIE_pe_graph_2.jpg)
+  
+    - 포인터 $p$ 를 활용해, SRAM의 column $I_j$ 에서 nonzero 활성화 값을 read한다. 
 
-  ![PE graph 3](images/EIE_pe_graph_3.jpg)
+    - $(v, x)$ 를 전달한다. 
 
-- **ALU**: 연산을 수행한다.
+      - $x$ : accumulator array index
 
-  activation과 decoded weight의 연산을 수행한다.
+      - $v$ : weight value
 
-  ![PE graph 4](images/EIE_pe_graph_4.jpg)
+    > pointer $p$ (16 bits): 상위 13 bit는 SRAM row를 가리키고, 하위 3 bit는 entry(8개 원소) 중 하나를 가리킨다.
 
-- **Write Back**: SRAM에 output을 저장한다.
+2. **Arithmetic Unit**
 
-  ALU로 계산한 absolute address에 연산 결과를 저장한다.
+    ![PE graph 3](images/EIE_pe_graph_3.jpg)
 
-  ![PE graph 5](images/EIE_pe_graph_5.jpg)
+    ![PE graph 4](images/EIE_pe_graph_4.jpg)
 
-- **ReLU**, **Non-zero Detection**
+    - MAC 연산( $b_{x} = b_{x} + v \times a_{j}$ )을 수행한다.
 
-  ReLU 연산을 수행하고, Non-zero 값을 찾아낸다.(next stage에서 활용)
+    - relative index 정보를 바탕으로, 결과를 저장할 absolute address를 계산한다.(address accumulate)
 
-  ![PE graph 6](images/EIE_pe_graph_6.jpg)
+    > 4 bits 로 사전에 양자화된 $v$ 는, LUT를 조회하여 16 bits로 decoding된다.
+
+3. **Write Back**
+
+    ![PE graph 5](images/EIE_pe_graph_5.jpg)
+
+    - SRAM에 결과를 write한다.
+
+4. **ReLU**, **Non-zero Detection**
+
+    ![PE graph 6](images/EIE_pe_graph_6.jpg)
+
+    - ReLU 연산을 수행한다.
+    
+    - LNZD(Leading Non-zero Detection Node) 노드에서 nonzero 활성화를 찾아낸다.(next stage에서 활용)
 
 ---
 
-### 4.5.3 Benchmark, Pros and Cons of EIE
+### 4.6.2 Benchmark of EIE
 
-> [Retrospective: EIE: Efficient Inference Engine on Sparse and Compressed Neural Network 논문(2023)](https://arxiv.org/abs/2306.09552)
-
-weight 혹은 activation 중 하나만 0이어도 연산을 수행하지 않기 때문에, FLOP Reduction이 굉장히 크다.
+다음은 EIE를 활용한 다양한 모델 추론 결과이다. 특히, 가중치나 활성화가 0을 가질 경우 연산을 생략하기 때문에, 극적인 연산량(FLOPs) 감소를 달성했다.
 
 ![benchmark of EIE](images/EIE_benchmark.png)
 
-2023년 Retrospective: EIE 논문에서는, EIE의 장단점을 다음과 같이 요약하고 있다. 먼저 장점은 다음과 같다.
+다음은 지연시간 및 에너지 관점에서, EIE와 다양한 하드웨어 추론 결과를 비교한 도표이다.
 
-- (+) sparse operations에 특화된 hardware 사용 시, (dense와 비교하여) 최대 50% 수준의 효율을 얻을 수 있다.
+> Intel Core i7-5930k CPU, NVIDIA TitanX GPU, NVIDIA Jetson TK1 Mobile GPU
 
-- (+) weight, activation sparsity를 동시에 고려하여 연산과 에너지 효율을 극대화한다.
-
-- (+) fine-grained sparsity를 지원한다.
-
-- (+) EIE는 weights를 16bit로 decode 후 16bit 연산을 하는데, 이는 INT4까지 aggressive하게 양자화한 모델과 궁합이 좋다.(W4A16)
-
-하지만 EIE는 대표적으로 **load imbalance** 문제와, 다음과 같은 단점을 가지고 있다.
-
-- (-) structured sparsity를 효율적으로 활용하지 못한다.
-
-  따라서 vector processor와 궁합이 좋지 않다.
-
-- (-) control flow 면에서 다른 기법과 비교 시, overhead, storage overhead가 크다.
-
-- (-) FC layers에서만 지원하므로, LLM을 지원하는 EIE가 필요하다.
-
-- (-) SRAM에 초점을 두고 있어서, TinyML에는 유리하나 LLM에는 적합하지 않다.
+| | |
+| :---: | :---: |
+| speedup | ![benchmark of EIE: speedup](images/EIE_benchmark_2.png) |
+| energy | ![benchmark of EIE: energy](images/EIE_benchmark_3.png) |
 
 ---
 
-## 4.6 NVIDIA Tensor core: M:N Weight Sparsity
+### 4.6.3 EIE: Pros and Cons
 
-> [Accelerating Sparse Deep Neural Networks 논문(2021)](https://arxiv.org/abs/2104.08378)
+> [Retrospective: EIE: Efficient Inference Engine on Sparse and Compressed Neural Network 논문(2023)](https://arxiv.org/abs/2306.09552)
 
-NVIDIA (A100 이상) GPU의 tensor core에서 지원하는 M:N sparsity를 알아보자. 다음은 4개 elements마다 최대 2개의 non-zero를 지원하는 2:4 sparsity의 예시다.
+위 논문에서는, EIE 접근법의 장단점을 다음과 같이 요약하고 있다. 
 
-![M:N sparsity](images/mn_sparsity.png)
-
-1. 행렬을 1x4의 벡터로 나눈다.
-
-2. 4개 원소 중 2개의 원소를 0으로 pruning한다.
-
-    threshold를 기준으로 판단하는데, 기준에 맞는 원소가 부족해도, 혹은 더 많아도 두 개 원소를 0으로 만든다.
-
-3. 나머지 2개 non-zero element 위치를 2bit index로 나타낸다.
-
-이러한 sparse matrix의 GEMM 연산을, 일반 dense matrix 연산과 비교해 보자.
-
-- dense matrix GEMM
-
-  ![dense matrix GEMM](images/dense_gemm.png)
-
-- sparse matrix GEMM
-
-  ![sparse matrix GEMM](images/sparse_gemm.png)
+| 장점 | 단점 |
+| --- | --- |
+| 연산량, 에너지 효율<br/>fine-grained sparsity 지원<br/>INT4까지 aggressive한 양자화 지원 | control flow 관점에서 overhead, storage overhead<br/>structured sparsity 활용 불가<br/>FC layers만 지원<br/>SRAM 대상 효율화이므로, LLM 등 큰 모델에 비적합
 
 ---
 
-### 4.6.1 Benchmark of M:N Sparsity
+## 4.7 ESE: Load Balance Aware Pruning
 
-M:N Sparsity를 살펴보자.
+> [ESE: Efficient Speech Recognition Engine with Sparse LSTM on FPGA 논문(2016)](https://arxiv.org/abs/1612.00694)
 
-- speedup
+| Unbalanced | Balanced |
+| :---: | :---: |
+| ![unbalanced matrix](images/ESE_unbalanced_1.png) | ![balanced matrix](images/ESE_balanced_1.png) |
+| ![load imbalance](images/ESE_unbalanced_2.png) | ![load balance](images/ESE_balanced_2.png) |
 
-  matrix size가 클수록 speedup도 커진다.
+(생략)
 
-  ![MN sparsity speedup](images/mn_speedup.png)
+---
 
-- accuracy(FP16, INT8 quantization)
+## 4.8 Sparse Matrix-Matrix Multiplication (SpMM)
 
-  ![MN benchmark](images/mn_benchmark.png)
+다음은 표준 Dense matrix multiplication과 Sparse matrix multiplication(**SpMM**)의 코드를 비교한 도표다.
+
+![spmm eg](images/SpMM_eg.png)
+
+| Dense Matrix Multiplication | Sparse Matrix Multiplication |
+| --- | --- |
+| for m in range(m):<br/> $\quad$ for n in range(N):<br/> $\quad \quad$ for k in range(A[m].`size`):<br/> $\quad \quad \quad$ C[m][n] = A[m][k] \* B[k][n] | for m in range(m):<br/> $\quad$ for n in range(N):<br/> $\quad \quad$ for k in range(A[m].`nonzero`):<br/> $\quad \quad \quad$ C[m][n] = A[m][k] \* B[k][n] |
+
+> A[0].`nonzeros` = [2, 3], A[1].`nonzeros` = [0, 1], ...
+
+- nonzero가 많을수록 연산량이 줄어든다.
+
+---
+
+### 4.8.1 CSR Format for Sparse matrices
+
+다음은 대표적인 sparse matrix format에 해당되는 **CSR**(Compressed Sparse Row) format 예시다.
+
+![CSR format e.g. 1](images/CSR_format.gif)
+
+Row pointer는 이전 row까지의 누적 \#nonzero 값을 갖는다. 이를 통해, 해당 row의 nonzero element 수를 알 수 있다.
+
+```c
+int m_off = a.row_offsets[m_idx];
+int nnz = a.row_offsets[m_idx+1] - m_off;    // numbers of nonzeros in row m_idx
+```
 
 ---
