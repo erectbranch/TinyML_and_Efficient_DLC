@@ -53,11 +53,11 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
   > Pruning at Initialization(Connection Sensitivity, Gradient Flow)
 
-- [System & Hardware Support for Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec04/summary02)
+- [System & Hardware Support for Fine-grained Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec04/summary02)
 
-  > EIE(CSC format: relative index, column pointer)
+  > Efficient Inference Engine(EIE format: relative index, column pointer)
 
-  > M:N Sparsity
+  > Sparse Matrix-Matrix Multiplication(SpMM), Sparse Coding(CSR format)
 
   ---
 
@@ -71,7 +71,7 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 - [Vector Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec05/summary02)
 
-  > Vector Quantization(Deep compression: iterative pruning, retrain codebook, Huffman encoding), Product Quantization
+  > Vector Quantization(Deep compression: iterative pruning, K-means based quantization, Huffman encoding), Product Quantization
 
 - [Post Training Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec06/summary01)
 
@@ -93,7 +93,7 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
   > input stem, stage, head
   
-  > AlexNet, VGGNet, SqueezeNet(global average pooling, fire module, pointwise convolution), ResNet50(bottleneck block, residual learning), ResNeXt(grouped convolution)
+  > AlexNet, VGGNet, SqueezeNet(fire module), ResNet(bottleneck block, residual connection), ResNeXt(grouped convolution)
   
   > MobileNet(depthwise-separable convolution, width/resolution multiplier), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle), SENet(squeeze-and-excitation block), MobileNetV3(redesigning expensive layers, h-swish)
 
@@ -129,17 +129,19 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 - [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec11)
 
-  > Microcontroller, MCUNet(TinyNAS, TinyEngine), automated search space optimization(weight/resolution multiplier), resource-constrained model specialization(Once-for-All)
+  > MCUNetV1: TinyNAS, TinyEngine
 
-  > MCUNetV2: patch-based inference, network redistribution, joint automated search for optimization, MCUNetV2 architecture(VWW dataset inference)
+  > MCUNetV2: MCUNetV2 architecture(MobileNetV2-RD), patch-based inference, joint automated search
 
 ### ⚙️ Efficient Training and System Support
 
 - [TinyEngine](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec17)
 
-  > memory hierarchy of MCU, data layout(NCHW, NHWC, CHWN)
+  > Memory Hierarchy of Microcontroller, Primary Memory Format(NCHW, NHWC, CHWN)
 
-  > TinyEngine: Loop Unrolling, Loop Reordering, Loop Tiling, SIMD programming, Im2col, In-place depthwise convolution, appropriate data layout(pointwise, depthwise convolution), Winograd convolution
+  > Parallel Computing Techniques: Loop Unrolling, Loop Reordering, Loop Tiling, SIMD programming
+  
+  > Inference Optimization: Im2col, In-place depthwise convolution, appropriate data layout(pointwise, depthwise convolution), Winograd convolution
 
   ---
 
