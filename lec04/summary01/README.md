@@ -133,7 +133,7 @@ fine-tuning 및 training 과정에서, loss function에 **regularization** 항�
 
 - 가장 대표적으로 **L1**, **L2 Regularization**를 사용하는 weight pruning은, 다음과 같이 정의할 수 있다.
 
-  | Regularization |  |
+  | Regularization | Loss Function |
   | :---: | --- |
   | L1-Regularization | $L' = L(x; W) + \lambda \|W\|$ |
   | L2-Regularization | $L' = L(x; W) + \lambda \|\|W\|\|{}^2$ |
@@ -196,11 +196,6 @@ $$ W = \mathrm{PruningNet}(c_1, c_2, \cdots, c_l) $$
 | 60% 정확도로, 전보다 낮은 성능 획득 | 90% 정확도로, 전보다 적은 학습만으로도 기존 이상의 성능 획득 |
 
 즉, 기존 dense model보다 희소하면서, 적은 학습만으로도 기존 이상의 성능을 갖는 sub-network가 존재할 수 있다는 것이 LTH의 주장이다.
-
-| | |
-| --- | --- |
-| ticket을 대량 구매 | = overparameterized model |
-| Winning the Lottery | = overparameterized model 학습 |
 
 ---
 
@@ -279,7 +274,9 @@ $$ \triangle L_j (w; \mathcal{D}) = L(1 \odot w; \mathcal{D}) - L((1 - e_j) \odo
 <tr>
 <td> 
 
-$$ \min_{c,w} L(c \odot w; \mathcal{D}) = \min_{c,w} {{1} \over {n}} \sum_{i=1}^n l(c \odot w ; (x_i, y_i)) $$
+```math
+\min_{c,w} L(c \odot w; \mathcal{D}) = \min_{c,w} {{1} \over {n}} \sum_{i=1}^n l(c \odot w ; (x_i, y_i))
+```
 
 </td>
 <td> 
