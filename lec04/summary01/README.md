@@ -274,16 +274,12 @@ $$ \triangle L_j (w; \mathcal{D}) = L(1 \odot w; \mathcal{D}) - L((1 - e_j) \odo
 <tr>
 <td> 
 
-```math
-\min_{c,w} L(c \odot w; \mathcal{D}) = \min_{c,w} {{1} \over {n}} \sum_{i=1}^n l(c \odot w ; (x_i, y_i))
-```
+$\min_{c,w} L(c \odot w; \mathcal{D}) = \min_{c,w} {{1} \over {n}} \sum\limits_{i=1}^n l(c \odot w ; (x_i, y_i))$
 
 </td>
 <td> 
 
-```math
-s_j = {{|g_{j}(w;\mathcal{D})|} \over { {\sum}^m_{k=1} |g_k(w;\mathcal{D})|}}
-```
+$s_j = {{|g_{j}(w;\mathcal{D})|} \over { {\sum}^m_{k=1} |g_k(w;\mathcal{D})|}}$
 
 </td>
 </tr>
