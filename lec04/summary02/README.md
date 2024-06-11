@@ -4,93 +4,110 @@
 
 > [EfficientML.ai Lecture 4 - Pruning and Sparsity (Part II) (MIT 6.5940, Fall 2023, Zoom recording)](https://youtu.be/sDJymyfAOKY)
 
-가중치 혹은 활성화 값 중 하나의 값이 0이면, 다음과 같이 연산을 생략할 수 있다.
+weight 혹은 activation 값 중 하나가 0이면, 다음과 같이 곱 연산을 생략할 수 있다.
 
 ![zero any mat mul](images/zero_any_mul.gif)
 
-다음은 후술할 EIE 논문에서, 두 종류의 sparsity를 활용했을 때 얻은 이점이다.
-
-| | 0 $\times$ A = 0 | W $\times$ 0 = 0 |
-| :---:| --- | --- |
-| 종류 | **weight sparsity** | **activation sparsity** |
-| (+) | (90% sparsity 기준)<br/>computation 10배 감소<br/>memory footprint 5배 감소 | (70% sparsity 기준)<br/>computation 3배 감소 | 
-
-구체적으로는 memory access(특히 DRAM)에 드는 비용을, sparsity를 활용하는 압축 알고리즘, 하드웨어를 통해 줄일 수 있다.
-
-![mem access cost](images/mem_access_cost.png)
-
-> 45NM CMOS process 기준. DRAM access는 SRAM에 비해 128배 에너지를 소모한다.
-
 ---
 
-## 4.6 EIE: Parallelization on Sparsity
+## 4.5 EIE: Parallelization on Sparsity
 
 > [EIE: Efficient Inference Engine on Compressed Deep Neural Network 논문(2016)](https://arxiv.org/abs/1602.01528)
 
-EIE 논문에서는 변형된 CSC(Compressed Sparse Column) format을 사용하여, 희소 가중치 행렬을 encoding한다. 행렬-벡터 연산 예시를 통해 EIE의 동작 방식을 살펴보자.
+EIE 논문은 weight sparsity 및 activation sparsity를 모두 활용하며, 다음과 같은 이점을 획득했다.
 
-$$ \vec{a} = [0 \quad a_1 \quad 0 \quad a_3] \quad \quad $$
+| |  **weight sparsity**<br/>(0 $\times$ A = 0) | **activation sparsity**<br/>(W $\times$ 0 = 0) |
+| :---:| --- | --- |
+|  | 90% sparsity 기준 | 70% sparsity 기준 |
+| (+) | computation 10배 감소<br/>memory footprint 5배 감소 | computation 3배 감소<br/> | 
 
-$$ \times $$
-
-```math
-\begin{bmatrix} w_{0,0} && w_{0,1} && 0 && w_{0,3} \\ 0 && 0 && w_{1,2} && 0 \\ 0 && w_{2,1} && 0 && w_{2,3} \\ 0 && 0 && 0 && 0 \\ 0 && 0 && w_{4,2} && w_{4,3} \\ w_{5,0} && 0 && 0 && 0 \\ 0 && 0 && 0 && w_{6,3} \\ 0 && w_{7,1} && 0 && 0 \end{bmatrix} \begin{bmatrix} b_0 \\ b_1 \\ -b_2 \\ b_3 \\ -b_4 \\ b_5 \\ b_6 \\ -b_7 \end{bmatrix} \underset{ReLU}{\Rightarrow} \begin{bmatrix} b_0 \\ b_1 \\ 0 \\ b_3 \\ 0 \\ b_5 \\ b_6 \\ 0 \end{bmatrix}
-```
-
-실제 연산에서, 0인 활성화나 가중치 값은 연산을 생략한다.
-
-| | |
-| :---: | :---: |
-| ![PE](images/PE_array.png) | ![EIE e.g.](images/sparse_calculation_eg.gif) |
-
-> 색상은 동일한 PE에 store되는 element. 이때, 색상마다 가중치는 하나의 큰 배열에 저장된다.
-
-이때, $PE0$ 의 피연산자 가중치(non-zero weights)는 벡터 형태로 메모리에 저장된다. 
-
-| virtual weight | $w_{0,0}$ | $w_{0,1}$ | $w_{4,2}$ | $w_{0,3}$ | $w_{4,3}$ |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| **Relative Index** | 0 | 1 | 2 | 0 | 0 |
-| **Column Pointer** | 0 | 1 | 2 | 3 | 5 |
-
-</div>
-
-- **Relative Index**
-
-  skip하는 zero element 수. (distance)
-
-  > 변환 시, 열을 모두 scan하고 다음 열로 넘어가는 방식으로 진행된다.
-
-  > (+) absolute index에 비해 작은 bit width를 사용할 수 있다.
-
-- **Column Pointer**
-
-  각 column의 시작 지점에 대응되는 relative index를 가리킨다.
-
-  > column $j$ 가 갖는 \#nonzeros: $p_{j+1} - p_{j}$
+> 구체적으로는 sparsity를 활용하는 압축 알고리즘을 통해, DRAM memory access 비용을 절감했다.
+> 
+> ![mem access cost](images/mem_access_cost.png)
+>
+> > 45NM CMOS process 기준으로, SRAM에 비해  DRAM access가 128배나 되는 에너지를 소모한다.
 
 ---
 
-### 4.6.1 Micro Architecture for each PE
+### 4.5.1 Computation and Representation
+
+다음 예시를 통해 EIE의 동작을 살펴보자.
+
+> 기본적으로 weight matrix $W$ 의 행을 interleaving하여 연산을 병렬화한다.
+
+| Processing Element(PE)<br/>( $N=4$ ) | Sparse Matrix $\times$ Sparse Vector Operation<br/>( Input Activation Vector $a$ $\times$ Weight Matrix $W$ )  |
+| :---: | :---: |
+| ![PE](images/PE_array.png) | ![EIE e.g.](images/sparse_calculation_eg.gif) |
+
+> 동일한 PE에 저장되는 값은 동일한 색상으로 표기 (색상별로 하나의 큰 배열에 저장된다.)
+
+> (mod N) 연산을 통해 $N$ 개의 PE에 각각 대응되는 $W_i$ 를 분배한다.
+
+모든 $PE$ 는 $W_i$ (weight row), $a_i$ (input activation) $b_i$ (output activation)를 보유하며, 가중치 행렬에서 non-zero 가중치만 벡터에 저장된다. 연산은 다음과 같은 순서로 진행된다.
+
+| Step | Description |
+| :---: | --- |
+| (i) | 입력에서 non-zero $a_j$ 를 찾은 뒤, PE에게 해당 index $j$ 를 broadcast한다. |
+| (ii) | 각 PE는 $a_j$ 와 column $W_j$ 의 non-zero 값과 곱한 뒤, 결과를 output activation $b$ 에 누적한다.(MAC 연산) |
+
+---
+
+### 4.5.2 Compressing Sparse Matrix
+
+> [Matt Eding: Sparse Matrices](https://matteding.github.io/2019/04/25/sparse-matrices/)
+
+EIE 논문은 CSC(Compressed Sparse Column) 포맷을 활용해 sparse weight matrix를 encoding한다. 먼저, 하나의 column을 encoding하는 예시를 살펴보자.
+
+> EIE처럼 $v, z$ entry는 4-bit 값(0~15)으로 양자화된다고 가정하며, 앞에 위치한 0의 개수가 15개를 넘어가는 부분에 주목하자. ( $v$ 는 이후 LUT를 참조하여, 16-bit fixed-point로 decoding된다.)
+
+$$ [0,0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3] $$
+
+| | | |
+| :---: | --- | --- | 
+| $v$ | non-zero 값을 담는 벡터<br/>(**Virtual Weight**) | $v = [1,2,\mathsf{0},3]$
+| $z$ | $v$ 와 동일한 길이를 가지며, 각 $v$ entry마다 앞에 위치한 0의 개수(distance)를 담는다.<br/>(**Relative Index**) | $z = [2,0,\mathsf{15},2]$ |
+
+추가로 $v$ 와 $z$ 를 하나의 큰 배열 쌍에 저장하기 위해, 각 column의 첫 entry 위치를 가리키는 pointer vector $p$ 를 둔다. (**Column Pointer**)
+
+> column $j$ 에 위치한 모든 entry를 불러오려면, $p_j$ index부터 $(p_{j+1} -1)$ index까지 값을 모두 읽으면 된다. 
+
+다음은 sparse weight matrix에 CSC format encoding을 수행한 예시다.
+
+| | |
+| :---: | :---: |
+| Logically | ![EIE CSC e.g. 1](images/EIE_eg_CSC_1.png) |
+| Physically | ![EIE CSC e.g. 2](images/EIE_eg_CSC_2.png) |
+
+> column $j$ \#nonzero = $p_{j+1} - p_{j}$
+
+---
+
+### 4.5.3 Micro Architecture for each PE
 
 다음은 PE의 micro architecture를 나타낸 도식이다.
+
+> PE array를 제어하는 `Central Control Unit(CCU)`가, PE 내부의 큐로 non-zero activation을 broadcast한다. (queue가 가득차면 broadcast 중단)
+>
+> > **load imbalance**에 의한 문제를 방지하기 위한 구현으로, PE는 큐에서 계속해서 activation을 읽어와 작업을 수행할 수 있다.(FIFO)
+
+> 1 cycle에 2개 pointer를 모두 읽을 수 있도록, 두 `Ptr SRAM Bank`에서 각자 $p_j$ , $p_{j+1}$ 를 처리한다. (즉, $p_j$ , $p_{j+1}$ 는 항상 다른 bank에 위치한다.)
+
+> `Sparse Matrix SRAM`의 각 entry는 8 bit로 구성되며, 4-bit인 $v$ 와 $z$ 를 하나씩 포함한다. 
+>
+> > SRAM 자체의 width는 64-bit이므로 8개 entry를 한 번에 가져온다.
 
 | Layout of PE | PE architecture |
 | :---: | :---: |
 | ![PE layout](images/layout_PE.png) | ![PE](images/PE.png) |
 
-- 활성화 벡터 $a$ 를 스캔한 뒤, non-zero activation $a_j$ 만을 인덱스 $j$ 와 함께 broadcast한다.
-
-  > 0에 해당될 경우, 대응되는 가중치 행렬의 column을 skip한다.
-
-  > (PE array를 제어하는) Central Control Unit(CCU)에서, PE 내부 Act Queue에 non-zero activation을 전달한다.
-
-- 한 사이클에 두 pointer를 읽도록, 두 SRAM Bank가 각각 $p_j$ , $p_{j+1}$ 를 처리한다.
-
-  > pointer 길이: 16 bits
-
-- 열마다 \#nonzeros가 다르기 때문에, **load imbalance** 문제가 발생할 수 있고, **FIFO**를 통해 해결한다.
-
 흐름을 단계별로 파악해 보자.
+
+<table>
+<tr>
+<td>  </td> 
+</tr>
+<tr>
+<td> 
 
 1. **Sparse Matrix Read Unit**
 
@@ -98,7 +115,7 @@ $$ \times $$
 
     ![PE graph 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_2.jpg)
   
-    - 포인터 $p$ 를 활용해, SRAM의 column $I_j$ 에서 nonzero 활성화 값을 read한다. 
+    - 포인터 $p_j, p_{j+1}$ 를 활용해, (SRAM에서) column $j$ 의 nonzero 값을 읽어온다. 
 
     - $(v, x)$ 를 전달한다. 
 
@@ -108,23 +125,36 @@ $$ \times $$
 
     > pointer $p$ (16 bits): 상위 13 bit는 SRAM row를 가리키고, 하위 3 bit는 entry(8개 원소) 중 하나를 가리킨다.
 
+</td>
+</tr>
+<tr>
+<td> 
+
 2. **Arithmetic Unit**
 
     ![PE graph 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_3.jpg)
 
     ![PE graph 4](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_4.jpg)
 
-    - MAC 연산( $b_{x} = b_{x} + v \times a_{j}$ )을 수행한다.
+    - Sparse Matrix Read Unit에서 $(v, z)$ 값을 받아, MAC 연산( $b_{z} = b_{z} + v \times a_{j}$ )을 수행한다.
 
-    - relative index 정보를 바탕으로, 결과를 저장할 absolute address를 계산한다.(address accumulate)
+    > 이때, 4-bit로 사전에 양자화된 $v$ 를, LUT를 조회하여 16 bits로 decoding하는 과정을 거친다.
 
-    > 4 bits 로 사전에 양자화된 $v$ 는, LUT를 조회하여 16 bits로 decoding된다.
+</td>
+</tr>
+<tr>
+<td> 
 
 3. **Write Back**
 
     ![PE graph 5](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/lec04/summary02/images/EIE_pe_graph_5.jpg)
 
-    - SRAM에 결과를 write한다.
+    - 연산 결과를 SRAM에 저장한다.
+
+</td>
+</tr>
+<tr>
+<td> 
 
 4. **ReLU**, **Non-zero Detection**
 
@@ -132,13 +162,19 @@ $$ \times $$
 
     - ReLU 연산을 수행한다.
     
-    - LNZD(Leading Non-zero Detection Node) 노드에서 nonzero 활성화를 찾아낸다.(next stage에서 활용)
+    > Leading Non-zero Detection Node(LNZD) 노드에서 nonzero activation를 찾아낸다.(다음 stage에서 활용)
+
+</td>
+</tr>
+</table>
 
 ---
 
-### 4.6.2 Benchmark of EIE
+### 4.5.4 Benchmark of EIE
 
-다음은 EIE를 활용한 다양한 모델 추론 결과이다. 특히, 가중치나 활성화가 0을 가질 경우 연산을 생략하기 때문에, 극적인 연산량(FLOPs) 감소를 달성했다.
+다음은 EIE를 활용해 다양한 모델을 추론한 결과이다. 
+
+- 특히, 0의 값을 갖는 weight나 activation 대상으로 연산을 생략하기 때문에, 극적인 연산량(FLOPs) 감소를 달성했다.
 
 ![benchmark of EIE](images/EIE_benchmark.png)
 
@@ -153,7 +189,7 @@ $$ \times $$
 
 ---
 
-### 4.6.3 EIE: Pros and Cons
+### 4.5.5 EIE: Pros and Cons
 
 > [Retrospective: EIE: Efficient Inference Engine on Sparse and Compressed Neural Network 논문(2023)](https://arxiv.org/abs/2306.09552)
 
@@ -161,13 +197,17 @@ $$ \times $$
 
 | 장점 | 단점 |
 | --- | --- |
-| 연산량, 에너지 효율<br/>fine-grained sparsity 지원<br/>INT4까지 aggressive한 양자화 지원 | control flow 관점에서 overhead, storage overhead<br/>structured sparsity 활용 불가<br/>FC layers만 지원<br/>SRAM 대상 효율화이므로, LLM 등 큰 모델에 비적합
+| 연산량, 에너지 효율<br/>fine-grained sparsity 지원<br/>INT4까지 aggressive한 양자화 지원<br/> | control flow 관점에서 overhead, storage overhead<br/>structured sparsity 활용 불가<br/>FC layers만 지원<br/>SRAM에 주목한 최적화이므로, LLM 등 큰 모델에 비적합
 
 ---
 
-## 4.7 ESE: Load Balance Aware Pruning
+## 4.6 ESE: Load Balance Aware Pruning
 
 > [ESE: Efficient Speech Recognition Engine with Sparse LSTM on FPGA 논문(2016)](https://arxiv.org/abs/1612.00694)
+
+더 나아가 ESE 논문에서는, load balance를 고려하는 weight pruning 알고리즘을 제안했다.
+
+- 모든 submatrix 단위에서 동일한 sparsity ratio를 갖도록 pruning한다.
 
 | Unbalanced | Balanced |
 | :---: | :---: |
@@ -178,33 +218,3 @@ $$ \times $$
 
 ---
 
-## 4.8 Sparse Matrix-Matrix Multiplication (SpMM)
-
-다음은 표준 Dense matrix multiplication과 Sparse matrix multiplication(**SpMM**)의 코드를 비교한 도표다.
-
-![spmm eg](images/SpMM_eg.png)
-
-| Dense Matrix Multiplication | Sparse Matrix Multiplication |
-| --- | --- |
-| for m in range(m):<br/> $\quad$ for n in range(N):<br/> $\quad \quad$ for k in range(A[m].`size`):<br/> $\quad \quad \quad$ C[m][n] = A[m][k] \* B[k][n] | for m in range(m):<br/> $\quad$ for n in range(N):<br/> $\quad \quad$ for k in range(A[m].`nonzero`):<br/> $\quad \quad \quad$ C[m][n] = A[m][k] \* B[k][n] |
-
-> A[0].`nonzeros` = [2, 3], A[1].`nonzeros` = [0, 1], ...
-
-- nonzero가 많을수록 연산량이 줄어든다.
-
----
-
-### 4.8.1 CSR Format for Sparse matrices
-
-다음은 대표적인 sparse matrix format에 해당되는 **CSR**(Compressed Sparse Row) format 예시다.
-
-![CSR format e.g. 1](images/CSR_format.gif)
-
-Row pointer는 이전 row까지의 누적 \#nonzero 값을 갖는다. 이를 통해, 해당 row의 nonzero element 수를 알 수 있다.
-
-```c
-int m_off = a.row_offsets[m_idx];
-int nnz = a.row_offsets[m_idx+1] - m_off;    // numbers of nonzeros in row m_idx
-```
-
----
