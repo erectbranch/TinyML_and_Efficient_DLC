@@ -229,7 +229,7 @@ tensor shape은 다음과 같다.
 
 ## 2.4 Normalization Layer
 
-$$ \hat{x}_i = \frac{1}{\sigma} (x_i - {\mu}_{i}) $$
+$$ \hat{x_{i}} = \frac{1}{\sigma} (x_i - {\mu}_{i}) $$
 
 > $\mu$ : mean, $\sigma$ : standard deviation
 
@@ -242,7 +242,7 @@ $$ \hat{x}_i = \frac{1}{\sigma} (x_i - {\mu}_{i}) $$
 | Sigmoid | ReLU | ReLU6 | Leaky ReLU | Swish | Hard Swish |
 | :---: | :---: | :---: | :---: | :---: | :---: |
 | ![sigmoid](images/act_func_1.png) | ![relu](images/act_func_2.png) | ![relu6](images/act_func_3.png) | ![leaky relu](images/act_func_4.png) | ![swish](images/act_func_5.png) | ![hard swish](images/act_func_6.png) |
-| $$ y = 1/(1+e^{-x}) $$ | $$ y = \max(0, x) $$ | $$ y = \min(\max(0, x), 6) $$ | $$ y = \max(\alpha x, x) $$ | $$ y = x \cdot \sigma(x) $$ | $$ y = \begin{cases} 0, & \text{if } x \leq -3 \\ x, & \text{if } \geq 3 \\ x \cdot (x+3)/6, & \text{otherwise} \end{cases} $$ |
+| $y = 1/(1+e^{-x})$ | $y = \max(0, x)$ | $y = \min(\max(0, x), 6)$ | $y = \max(\alpha x, x)$ | $y = x \cdot \sigma(x)$ | $y = \begin{cases} 0, & \text{if } x \leq -3 \\ x, & \text{if } \geq 3 \\ x \cdot (x+3)/6, & \text{otherwise} \end{cases}$ |
 
 (생략)
 
