@@ -29,9 +29,15 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
 ### 📖 Basics of Deep Learning
 
+- [Basic Terminologies, Shape of Tensors](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec02/summary01)
+
+  > Synapse(weight), Neuron(activation), Cell body
+
+  > Fully-Connected layer, Convolution layer(padding, stride, receptive field, grouped convolution), Pooling layer
+
 - [Efficiency Metrics](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/lec02/summary02)
 
-  > latency, storage, energy
+  > Metrics(latency, storage, energy)
 
   > Memory-Related(\#parameters, model size, \#activations), Computation(MACs, FLOP)
 
