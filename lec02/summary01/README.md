@@ -239,10 +239,10 @@ $$ \hat{x_{i}} = \frac{1}{\sigma} (x_i - {\mu}_{i}) $$
 
 ## 2.5 Activation Function
 
-| Sigmoid | ReLU | ReLU6 | Leaky ReLU | Swish | Hard Swish |
-| :---: | :---: | :---: | :---: | :---: | :---: |
+| Sigmoid | ReLU | ReLU6 | Leaky ReLU | Swish |
+| :---: | :---: | :---: | :---: | :---: |
 | ![sigmoid](images/act_func_1.png) | ![relu](images/act_func_2.png) | ![relu6](images/act_func_3.png) | ![leaky relu](images/act_func_4.png) | ![swish](images/act_func_5.png) | ![hard swish](images/act_func_6.png) |
-| $y = 1/(1+e^{-x})$ | $y = \max(0, x)$ | $y = \min(\max(0, x), 6)$ | $y = \max(\alpha x, x)$ | $y = x \cdot \sigma(x)$ | $y = \begin{cases} 0, & \mathrm{if } x \leq -3 \\ x, & \mathrm{if } \geq 3 \\ x \cdot (x+3)/6, & \mathrm{otherwise} \end{cases}$ |
+| $y = 1/(1+e^{-x})$ | $y = \max(0, x)$ | $y = \min(\max(0, x), 6)$ | $y = \max(\alpha x, x)$ | $y = x \cdot \sigma(x)$ |
 
 (생략)
 
