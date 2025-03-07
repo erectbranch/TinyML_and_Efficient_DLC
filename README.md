@@ -2,14 +2,14 @@
   
 <h1 align="center">
   <p align="center">TinyML and Efficient Deep Learning Computing</p>
-  <a href="https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7">
-  </a>
 </h1>
   
   
-<b>강의 주제: TinyML and Efficient Deep Learning Computing</b></br>
-Instructor : Song Han(Associate Professor, MIT EECS)</br>
-Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtube](https://youtube.com/playlist?list=PL80kAHvQbh-pT4lCkDT53zT8DKmhE0idB&si=TmPWEvwUR79TVxrz)]) | Fall 2022([[schedule](https://hanlab.mit.edu/courses/2022-fall-6s965)] | [[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)])</b>
+<b>강의 주제: TinyML and Efficient Deep Learning Computing</b>
+<br>
+Instructor : Song Han(Associate Professor, MIT EECS)
+<br>
+Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtube](https://youtube.com/playlist?list=PL80kAHvQbh-pT4lCkDT53zT8DKmhE0idB&si=TmPWEvwUR79TVxrz)]) | Fall 2022([[schedule](https://hanlab.mit.edu/courses/2022-fall-6s965)] | [[youtube](https://www.youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7)])
 
 </div>
 
@@ -23,7 +23,7 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
   > 디바이스의 제약에 맞춘 효율적인 딥러닝 모델을 구성한다.
 
-</br>
+<br>
 
 ## 🚩 정리한 문서 목록
 
@@ -181,7 +181,7 @@ Fall 2023([[schedule](https://hanlab.mit.edu/courses/2023-fall-65940)] | [[youtu
 
   > Vision Transformer, Window Attention(Swin Transformer), Sparse Window Attention(FlatFormer), ReLU Linear Attention(EfficientViT), Sparsity-Aware Adaptation(SparseViT)
 
-</br>
+<br>
 
 ## :mag: Schedule (6.S965 • Fall 2022)
 
