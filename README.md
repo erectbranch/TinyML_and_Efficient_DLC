@@ -51,6 +51,12 @@ Instructor : Song Han(Associate Professor, MIT EECS)
 
   > Sparse Matrix-Matrix Multiplication(SpMM), Sparse Coding(CSR format)
 
+- [Sparse Matrix-Matrix Multiplication, GPU Support for Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec04/summary03)
+
+  > Sparse Matrix-Matrix Multiplication(SpMM), CSR format
+
+  > GPU Support for Sparsity: Hierarchical 1-Dimensional Tiling, Row Swizzle, M:N Sparsity, Block SpMM(Blocked-ELL format), PatDNN(FKW format)
+
   ---
 
 - [Basic Concepts of Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec05/summary01)
