@@ -161,9 +161,9 @@ Instructor : Song Han(Associate Professor, MIT EECS)
 
 - [Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec12/summary01)
 
-  > NLP Task(Discriminative, Generative), Pre-Transformer Era(RNN, LSTM, CNN)
+  > NLP Task(Discriminative, Generative), Pre-Transformer Era(RNN/LSTM, CNN)
 
-  > Transformer: Tokenizer, Embedding, Multi-Head Attention, Feed-Forward Network, Layer Normalization(Pre-Norm, Post-Norm), Positional Encoding
+  > Transformer: Tokenizer, Embedding, Multi-Head Attention(self-attention), Feed-Forward Network, Layer Normalization(Pre-Norm, Post-Norm), Positional Encoding
 
 - [Transformer Design Variants](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec12/summary02)
 
