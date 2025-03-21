@@ -2,11 +2,7 @@
 
 > [EfficientML.ai Lecture 12 - Transformer and LLM (Part I) (MIT 6.5940, Fall 2023, Zoom)](https://youtu.be/mR4u6ZaCYe4)
 
----
-
-## 12.3 Transformer Design Variants
-
-Transformer가 소개된 이래로, 다양한 변형이 제안되었다.
+Transformer의 등장 이후, 이를 기반으로 한 다양한 설계가 제안되었다.
 
 - Encoder-Decoder(T5), Encoder-only(BERT), Decoder-only(GPT)
 
@@ -20,221 +16,207 @@ Transformer가 소개된 이래로, 다양한 변형이 제안되었다.
 
 ---
 
-### 12.3.1 Encoder-Decoder
+## 12.4 Types of Transformer-based Models
+
+> original Transformer는 Encoder-Decoder 구조를 가지고 있다.
+
+---
+
+### 12.4.1 Encoder-Decoder: T5
 
 > [Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer 논문(2019)](https://arxiv.org/abs/1910.10683)
 
-> 처음 Transformer가 제안되어 machine translation에 사용되었을 때도, Encoder-Decoder 구조를 가졌다.
-
-T5에서는 transfer learning을 통해, 다양한 NLP tasks에서 unified text-to-text model을 사용하는 방법을 제안했다.
+위 논문에서는 다양한 NLP task를 text-to-text 포맷(텍스트 입력-텍스트 출력)으로 통일한 프레임워크를 제안했다.
 
 ![T5](images/T5.png)
 
-- encoder에 **prompt**가 제공되면, decoder가 출력을 생성한다.
+해당 논문의 **T5** 모델은 대표적인 Encoder-Decoder 아키텍처로, 다양한 NLP task에서 전이 학습에 기반해 최첨단 성능을 획득하였다.
+
+- encoder에 **prompt**를 제공하면, decoder에서 answer 텍스트을 생성한다.
+
+![Encoder-Decoder](images/encoder-decoder.png)
 
 ---
 
-### 12.3.2 Encoder-only(BERT)
+### 12.4.2 Encoder-only: BERT
 
 > [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding 논문(2018)](https://arxiv.org/abs/1810.04805)
 
-가장 유명한 Encoder-only 모델로, **BERT**(Bidirectional Encoder Representations from Transformers)가 있다. 이때 BERT는 두 가지 pre-training objective를 사용하여 학습된다.
+대표적인 Encoder-only 모델인 **BERT**는, 대규모 비지도 사전학습 단계에서 2개의 objective를 동시에 가진다.
+
+| Objective | Description |
+| --- | --- |
+| **Masked Language Model**(MLM) | 입력 token에서 임의로 선택된 단어를 마스킹(15%)하고, 마스킹된 단어를 예측하는 task |
+| **Next Sentence Prediction**(NSP) | 두 문장 A, B가 주어졌을 때, B가 A의 다음 문장인지 예측하는 task |
 
 ![BERT](images/BERT.png)
 
-- Task 1: **Masked Language Model**(MLM)
-
-  - 임의로 입력 토큰의 일정 비율(15%)를 masking한다.
-
-  - 모델이 **masked token**을 예측하도록 학습된다.
-
-- Task 2: **Next Sentence Prediction**(NSP)
-
-  - sentence A의 **next sentence** B를 예측하도록 학습된다.
-
-> 참고로 NSP는 잘 사용되지 않는다. (less used)
-
 ---
 
-### 12.3.3 Decoder-only(GPT)
+### 12.4.3 Decoder-only: GPT
 
 > [Improving language understanding with unsupervised learning 논문(2018)](https://openai.com/research/language-unsupervised)
 
-가장 유명한 Decoder-only 모델로, **GPT**(Generative Pre-trained Transformer)가 있다. 다음은 "a robot must obey the orders given it" 문장을 주고, 다음 word를 예측하도록 학습된 GPT 모델이다.
+대표적인 Decoder-only 모델인 **GPT**는, 비지도 사전학습 단계의 objective로 다음 단어를 예측한다. (next word prediction)
 
-![GPT](images/GPT.png)
-
-- (next word prediction) Pre-Training Objective
-
-  - pre-training은 unsupervised learning으로 진행된다.
-
-  - $\mathcal{U} = \lbrace u_1, \cdots, u_n \rbrace$ : unsupervised corpus of tokens
+- $\mathcal{U} = \lbrace u_1, \cdots, u_n \rbrace$ : unsupervised corpus of tokens
 
 $$ L_1(\mathcal{U}) = \sum_{i} \log P (u_i | u_{i-k}, \cdots , u_{i-1}; \Theta) $$
 
-이후 downstream task에 적용하기 위해서, GPT-2와 같은 (비교적 LLM 중에서 작은) 모델은 fine-tuning이 필요하다.
+다음은 GPT-2 학습에서 "a robot must obey the orders given it" 문장을 입력으로 주고, 다음 word를 예측한 예시다.
 
-> 반면 GPT-3처럼 보다 큰 모델은 fine-tuning 없이, zero-shot/few-shot만으로 downstream tasks에 적용할 수 있다.
+![GPT](images/GPT.png)
 
-- Fine-tuning Objective
-
-  - fine-tuning은 supervised learning으로 진행된다.
-
-  - $\mathcal{C}$ : labeled dataset
-
-$$ L_2(\mathcal{C}) = \sum_{i} \log P (y | x^1 , \cdots , x^m) $$
-
-참고로, Encoder-only인 BERT와, Decoder-only인 GPT의 attention mask는 다음과 같이 차이가 있다.
-
-| BERT | GPT |
-| :---: | :---: |
-| ![BERT attention mask](images/bert_attention_mask.png) | ![GPT attention mask](images/gpt_attention_mask.png) |
+> Notes: fine-tuning은 supervised learning으로 진행된다. (참고로 GPT-3 이상으로 큰 모델에서는 fine-tuning 없이, zero-shot/few-shot만으로 downstream tasks에 적용할 수 있다.)
 
 ---
 
-### 12.3.4 Absolute/Relative Positional Encoding
+## 12.5 Absolute/Relative Positional Encoding
 
-**Relative** Positional Encoding은 다음과 같은 구현을 통해, 학습에서 사용되지 않은 not seen sequence length에 대해 일반화가 가능하다.
+> [Self-Attention with Relative Position Representations 논문(2018)](https://arxiv.org/abs/1803.02155)
 
-> 즉, train short, test long이 가능하다. 단, 언제나 적용되지는 않는다.
+가령 Absolute Positional Encoding를 통해 모델을 4K length 데이터로 학습했다고 가정하자. 사전학습된 모델에 만약 6K의 입력을 전달한다면 제대로 동작하지 않는 문제가 발생한다.
 
-> attention score에서 합산되므로, Value가 필요하지 않다.
+이러한 Absolute PE의 단점을 보완하기 위해, **Relative** Positional Encoding 기법이 새롭게 제안되었다. 해당 기법에서는 attention score에 Q, K 사이의 상대적인 위치 정보를 반영한다. (Value에는 직접적인 영향을 미치지 않음)
 
-| | APE | RPE |
+| | Absolute PE | Relative PE |
 | :---: | :---: | :---: |
 | | ![APE](images/APE.png) | ![RPE](images/RPE.png) |
-| Implementation | input embeddings(Q/K/V)<br/>+ positional information | attention score<br/>+ relative distance information |
+| Fusing | **input embeddings**(Q/K/V)<br/>+ positional information | **attention score**<br/>+ **relative** distance information |
+
+따라서 relative PE으로 학습한 모델은, **학습에서 본 적 없는 sequence length**에 대해서도 generalization이 가능하다.
+
+> train short, test long 같은 활용도 가능하다. (단, 언제나 가능하지는 않음)
 
 ---
 
-#### 12.3.4.1 Relative Positional Encoding: ALiBi
+### 12.5.1 ALiBi: Attention with Linear Biases
 
 > [Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation 논문(2021)](https://arxiv.org/abs/2108.12409)
 
-ALiBi(Attention with Linear Biases) 논문에서는, attention matrix에 relative distance 기반의 offset을 더하는 방식을 제안한다.
+ALiBi 논문에서는 absolute index를 사용하지 않고, 오로지 relative distance만으로 positional encoding을 수행한다. (이를 통해 "train short, test long"을 가능하게 만든다.)
+
+다음은 ALiBi 방법으로, attention matrix에서 offset(relative distance 정보)을 계산한 예시다.
 
 ![ALiBi](images/ALiBi.png)
 
 ---
 
-#### 12.3.4.2 Relative Positional Encoding: RoPE
+### 12.5.2 RoPE: Rotary Positional Encoding
 
 > [RoFormer: Enhanced Transformer with Rotary Position Embedding 논문(2021)](https://arxiv.org/abs/2104.09864)
 
-> LLaMA에서 사용된다.
+위 논문에서는 2D rotation을 기반으로 하는 positional embedding을 제안하였다. (참고로 RoPE는 LLaMA 모델에서 사용된다.)
 
-RoPE(Rotary Positional Encoding) 논문에서는, 2D space에서의 rotation을 기반으로 positional embedding을 구현했다.
+(1) 임베딩 차원 $d$ 를 $d/2$ 쌍으로 분리한다. (각 쌍은 2차원의 한 축을 담당)
 
-> radial은 position invariant, angular는 query, key invariant와 연관된다.
+(2) position $m$ 에 따라 rotation을 적용한다. (임베딩은 복소수 타입으로 변환된다.)
+
+$$ \Theta = \lbrace {\theta}_i = {10000}^{-2(i-1)/d}, i \in [1, \cdots, d/2] \rbrace $$
 
 ![RoPE](images/RoPE.png)
 
-- token embedding: complex number로 변환한다.
+> 10000: 모든 token을 구분할 만큼 충분히 큰 상수
 
-  - embedding dimension $d$ 를 $d/2$ pair로 분리한다.
-
-  - 각 pair를 2D coordinate에서 한 쌍으로 표현한다.
-
-- position $m$ : token embedding의 rotation으로 표현한다.
+이를 general form으로 표현하면 다음과 같다.
 
 $$ f_{q,k}(x_m, m) = R_{\Theta, m}^d W_{q,k}x_m $$ 
 
+$$ R_{\Theta, m}^d = \begin{bmatrix} \cos(m \theta_1) & -\sin(m \theta_1) & 0 & 0 & \cdots & 0 & 0 \\  \sin(m \theta_1) & \cos(m \theta_1) & 0 & 0 & \cdots & 0 & 0 \\ 0 & 0 & \cos(m \theta_2) & -\sin(m \theta_2) & \cdots & 0 & 0 \\ 0 & 0 & \sin(m \theta_2) & \cos(m \theta_2) & \cdots & 0 & 0 \\ \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\ 0 & 0 & 0 & 0 & \cdots & \cos(m \theta_{d/2}) & -\sin(m \theta_{d/2}) \\ 0 & 0 & 0 & 0 & \cdots & \sin(m \theta_{d/2}) & \cos(m \theta_{d/2})\end{bmatrix} $$
+
 ---
 
-#### 12.3.4.3 Relative Positional Encoding: RoPE + Context window
+## 12.5.3 Advantage of RoPE: Extending the Context Window
 
 > [Extending Context Window of Large Language Models via Position Interpolation 논문(2023)](https://arxiv.org/abs/2306.15595)
 
-대부분의 LLM은 context length 제한을 가지고 학습된다. 하지만 RoPE PE를 interpolating하여, context length 제한을 늘릴 수 있다.
+대부분의 LLM은 제한된 context length 설정으로 학습된다. 예를 들어 LLaMA는 2k, LLaMA-2는 4k, GPT-4는 8k로 학습되었다. 
 
-![ECW](images/extending_context_window.png)
+하지만 interpolating RoPE PE를 통해, 이러한 context length 제한을 극복할 수 있다. (논문에서는 LLaMA를 2k에서 32k로 확장)
 
-- previous context length
-  
-  LLaMA: 2k, LlaMA-2: 4k, GPT-4: 8k
+> interpolation: 정수 인덱스에 0.5 인덱스를 추가하여, 1, 1.5, 2, 2.5, 3, ... 과 같이 확장하는 것을 의미한다.
 
-- extended
+주파수를 반으로 줄인 예시( ${\theta}_i/2$ )를 살펴보면, 기존에 대비해 동일한 범위에서 더 많은 성분을 갖고 4k position까지 표현하는 것을 확인할 수 있다.
 
-  LLaMA: 32k
+| | | |
+| --- | --- | --- |
+| Conventional | ![ECW wrong](images/extending_context_window_1.png) | $m \in [0, 2048 * 2), {\theta}_i' = {\theta}_i$ |
+| Interpolating | ![ECW ok](images/extending_context_window_2.png) | $m \in [0, 2048 * 2), {\theta}_i' = {\theta}_i/2$ |
 
 ---
 
-### 12.3.5 KV Cache Optimizations
+## 12.6 KV Cache Optimizations
 
 > [The KV Cache: Memory Usage in Transformers](https://youtu.be/80bIUggRJf4)
 
-다음은 attention score를 계산하는 과정이다.
+decoding(GPT-style)의 attention 계산에서는, 대체로 이전의 모든 Key, Value를 저장해 두는 방식으로 수행된다. (**KV cache**)
 
-$$ \mathrm{Attention}(Q, K, V) = \mathrm{softmax} \left( {{QK^T} \over {\sqrt{d_k}}} \right) V $$
+다음은 세 개의 토큰을 입력으로 갖는 masked self-attention을 나타낸 예시다. masked self-attention에서 새로운 query token은 이전 token이 보여야 한다.
 
-![attention memory](images/kv_cache_1.png)
+![masked self-attention](images/masked-self-attention-operator.png)
 
-- Query: 새 token
+이때, 이전의 K, V 계산을 cache해 두는 것으로 동일한 계산을 반복할 필요가 없다.
 
-- Key: attend해야 하는 previous context
+![KV cache](images/kv_cache_compare.gif)
 
-- Value: previous context의 weighted sum
+> 오로지 현재의 query token만 유지하면 되지만, 대신 보라색으로 표시된 부분을 메모리에 항상 유지해야 한다.
 
-Transformer decoding 과정(GPT-style)에서는, attention 계산을 효율적으로 수행하기 위해, 모든 previous tokens의 keys, values 쌍을 저장하고 재사용한다.(**KV cache**)
+그러나 이러한 KV cache는, 유지를 위해서 굉장히 많은 메모리를 필요로 하게 된다. ( $2 \mathrm{bytes}$ = FP16 )
 
-| | before optimization | after optimization |
-| :---: | :---: | :---: |
-| | ![before kv cache optimization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec12/summary02/images/kv_cache_before.png) | ![after kv cache optimization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec12/summary02/images/kv_cache_after.png) |
-| $q_{new}$ 와 연산 | $K, V$ | $K_{new}, V_{new}$ |
+- Llama-2-7B, KV cache size
 
-- (-) 하지만 long context 대상에서는, KV cache 사용량도 함께 커져야 한다.
+$$ \underset{minibatch}{BS} * \underset{layers}{32} * \underset{heads}{32} * \underset{n_{emd}}{128} * \underset{length}{N} * \underset{K,V}{2} * {2}\mathrm{bytes} = 512\mathrm{KB} \times BS \times N $$
 
-  다음은 Llama-2-70B (MHA 사용 가정) 예시다.
+- Llama-2-13B, KV cache size
 
-  - $\mathrm{KV} \ \mathrm{cache} \ \mathrm{size} = BS \times 80 \times 64 \times 128 \times N \times 2 \times 2 \mathrm{bytes}$
+$$ \underset{minibatch}{BS} * \underset{layers}{40} * \underset{heads}{40} * \underset{n_{emd}}{128} * \underset{length}{N} * \underset{K,V}{2} * {2}\mathrm{bytes} = 800\mathrm{KB} \times BS \times N $$
 
-    $= 2.5MB \times BS \times N$
+- Llama-2-70B, KV cache size
 
-  > minibatch \* layers \* heads \* n_emd(hidden dim) \* length(num tokens) \* K&V \* bytes(ex. FP16=2bytes) 
+$$ \underset{minibatch}{BS} * \underset{layers}{80} * \underset{heads}{64} * \underset{n_{emd}}{128} * \underset{length}{N} * \underset{K,V}{2} * {2}\mathrm{bytes} = 2.5\mathrm{MB} \times BS \times N $$
 
-  > 만약 $BS = 16$ , $n_{seq} = 4096$ 이라면, 메모리 사용량만 160GB이다.(A100 GPU 메모리의 두 배)
+가령 Llama-2-70B(using MHA) 학습 설정을 $BS=16$ , $n_{seq} = 4096$ 으로 가정하면, 필요한 KV cache size는 160GB가 된다. (A100 GPU 두 대가 필요한 수준)
+
+> Llama-2 paper 기준에서는 $BS=1$ $n_{seq} = 4096$ 으로 10GB의 메모리를 필요로 하였다.
+
+다음 그래프에서는 batch size의 증가에 따라, KV cache size가 선형적으로 증가하는 것을 확인할 수 있다.
+
+![KV cache size compare](images/kv_cache_size_compare_1.png)
 
 ---
 
-#### 12.3.5.1 Multi-Query Attention
+### 12.6.1 Multi-Query Attention (MQA)
 
 > [Fast Transformer Decoding: One Write-Head is All You Need 논문(2019)](https://arxiv.org/abs/1911.02150)
 
 > [GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints 논문(2023)](https://arxiv.org/abs/2305.13245)
 
-\#kv-heads 수를 줄이는 방식으로, KV cache size를 줄일 수 있다.
+위 논문에서는 KV cache size를 줄이기 위해, \#kv-heads 수를 최적화할 수 있는 방법을 제시하였다. 다음은 $N$ heads for query 조건에서 세 가지 설계를 비교한 도표이다.
 
-| | MHA | MQA | GQA |
-| :---: | :---: | :---: | :---: |
+| | Multi-head | Multi-query | Grouped-query |
+| --- | :---: | :---: | :---: |
 | | ![MHA](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec12/summary02/images/MHA.png) | ![MQA](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec12/summary02/images/MQA.png) | ![GQA](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec12/summary02/images/GQA.png) |
-| heads for Query | $N$ | $N$ | $N$ |
-| heads for KV | $N$ | 1 | $G$ |
+| \#heads for K, V | $N$ | 1 | $G$  |
 
-> 대체로 $G = N/8$ 로 설정하면, 정확도를 잘 유지할 수 있다.
+> 보편적으로 $G = N/8$ 로 설정하면, 정확도를 유지하면서 KV cache size를 줄일 수 있다.
 
-다음은 세 가지 방식에서의 KV cache size, accuracy 비교이다.
+- 세 가지 설계에서 KV cache size를 비교하면 다음과 같다.
 
-- KV cache size
-
-  ![KV cache size compare](images/kv_cache_size_compare.png)
+  ![KV cache size compare](images/kv_cache_size_compare_2.png)
 
 - Accuracy
 
-  다음은 Llama-2, 30B, 150B tokens 조건에서, 정확도를 비교한 도표다.
+  다음은 Llama-2, 30B, 150B tokens 설정에서, 각 설계의 정확도를 비교한 도표다.
 
   ![KV cache accuracy compare](images/kv_cache_accuracy.png)
 
-  - GQA를 사용하면, KV cache size를 절감하면서도, MHA와 유사한 정확도를 얻을 수 있다.
-
 ---
 
-### 12.3.5 Gated Linear Units
+## 12.7 Gated Linear Units (GLU)
 
 > [GLU Variants Improve Transformer 논문(2020)](https://arxiv.org/abs/2002.05202)
 
-inverted bottleneck 형태의 FFN 대신, GLU(Gate Linear Unit)를 사용하면 정확도를 향상시킬 수 있다.
-
-- 3번의 matrix multiplication로 구성된다.
+vanilla FFN을 GLU(Gate Linear Unit)로 변경하는 것으로도 성능을 향상시킬 수 있다. 3번의 matrix multiplication을 포함하며, activation function으로 swish를 사용한다.
 
 $$ \mathrm{FFN_{SwiGLU}}(x, W, V, W_2) = (\mathrm{Swish_1}(xW) \otimes xV)W_2 $$
 
@@ -242,6 +224,6 @@ $$ \mathrm{FFN_{SwiGLU}}(x, W, V, W_2) = (\mathrm{Swish_1}(xW) \otimes xV)W_2 $$
 | :---: | :---: |
 | ![FFN](images/FFN.png) | ![GLU](images/SwiGLU.png) |
 
-> total computing cost를 유지하기 위해, $8/3d$ 차원을 사용했다.
+> total computing cost를 유지하기 위해 $8/3d$ 차원으로 설정하였다.
 
 ---
