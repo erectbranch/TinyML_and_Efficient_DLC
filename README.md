@@ -167,7 +167,9 @@ Instructor : Song Han(Associate Professor, MIT EECS)
 
 - [Transformer Design Variants](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec12/summary02)
 
-  > Encoder-Decoder(T5), Encoder-only(BERT), Decoder-only(GPT), Relative Positional Encoding, KV cache optimization, Gated Linear Unit
+  > Types of Transformer-based Models: Encoder-Decoder(T5), Encoder-only(BERT), Decoder-only(GPT)
+  
+  > Relative Positional Encoding(ALiBi, RoPE, interpolating RoPE), KV cache optimization(Multi-query Attention, Grouped-query Attention), Gated Linear Unit
 
 - [Efficient Vision Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec14/summary01)
 

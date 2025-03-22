@@ -132,7 +132,7 @@ $$ R_{\Theta, m}^d = \begin{bmatrix} \cos(m \theta_1) & -\sin(m \theta_1) & 0 & 
 
 대부분의 LLM은 제한된 context length 설정으로 학습된다. 예를 들어 LLaMA는 2k, LLaMA-2는 4k, GPT-4는 8k로 학습되었다. 
 
-하지만 interpolating RoPE PE를 통해, 이러한 context length 제한을 극복할 수 있다. (논문에서는 LLaMA를 2k에서 32k로 확장)
+하지만 interpolating RoPE를 통해, 이러한 context length 제한을 극복할 수 있다. (논문에서는 LLaMA를 2k에서 32k로 확장)
 
 > interpolation: 정수 인덱스에 0.5 인덱스를 추가하여, 1, 1.5, 2, 2.5, 3, ... 과 같이 확장하는 것을 의미한다.
 
