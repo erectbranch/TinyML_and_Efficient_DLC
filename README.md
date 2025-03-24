@@ -49,8 +49,6 @@ Instructor : Song Han(Associate Professor, MIT EECS)
 
   > Efficient Inference Engine(EIE format: relative index, column pointer)
 
-  > Sparse Matrix-Matrix Multiplication(SpMM), Sparse Coding(CSR format)
-
 - [Sparse Matrix-Matrix Multiplication, GPU Support for Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec04/summary03)
 
   > Sparse Matrix-Matrix Multiplication(SpMM), CSR format
@@ -93,7 +91,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)
   
   > AlexNet, VGGNet, SqueezeNet(fire module), ResNet(bottleneck block, residual connection), ResNeXt(grouped convolution)
   
-  > MobileNet(depthwise-separable convolution, width/resolution multiplier), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle), SENet(squeeze-and-excitation block), MobileNetV3(redesigning expensive layers, h-swish)
+  > MobileNet(depthwise-separable convolution, width/resolution multiplier), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle), SENet(squeeze-and-excitation block), MobileNetV3(h-swish)
 
 - [Neural Architecture Search: Search Space](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec07/summary02)
 
@@ -143,9 +141,9 @@ Instructor : Song Han(Associate Professor, MIT EECS)
 
   ---
 
-### 🔧 Application-Specific Optimizations
+### 🔧 Domain-Specific Optimizations
 
-- [Efficient Video(live) Understanding](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec19/summary01)
+- [Efficient Video Understanding](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec19/summary01)
 
   > 2D CNNs for Video(live) Understanding, 3D CNNs for Video(live) Understanding(I3D), Temporal Shift Module(TSM)
 
