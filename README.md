@@ -173,4 +173,6 @@ Instructor : Song Han(Associate Professor, MIT EECS)
 
 - [Efficient Vision Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec14/summary01)
 
-  > Vision Transformer, Window Attention(Swin Transformer), Sparse Window Attention(FlatFormer), ReLU Linear Attention(EfficientViT), Sparsity-Aware Adaptation(SparseViT)
+  > Vision Transformer, High-Resolution Dense Prediction, Segment Anything
+  
+  > Window Attention(Swin Transformer, FlatFormer), ReLU Linear Attention(EfficientViT), Sparse Attention(SparseViT)
