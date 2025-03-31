@@ -25,7 +25,7 @@
     <tr><td>Oct 8</td><td>Lecture 10</td><td>MCUNet: TinyML on Microcontrollers</td></tr>
     <tr><td>Oct 10</td><td>Lecture 11</td><td>TinyEngine and Parallel Processing</td></tr>
     <tr><td>Oct 15</td><td>Lecture 12</td><td>Transformer and LLM</td></tr>
-    <tr><td>Oct 22</td><td>Lecture 13</td><td>Efficient LLM Deployment</td></tr>
+    <tr><td>Oct 22</td><td>Lecture 13</td><td>LLM Deployment Techniques</td></tr>
     <tr><td>Oct 24</td><td>Lecture 14</td><td>LLM Post Training</td></tr>
     <tr><td>Oct 29</td><td>Lecture 15</td><td>Long Context LLM</td></tr>
     <tr><td>Oct 31</td><td>Lecture 16</td><td>Vision Transformer</td></tr>

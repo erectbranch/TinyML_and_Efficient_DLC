@@ -220,7 +220,9 @@ $$ \mathscr{L}(\mathbf{s}) = || Q(\mathbf{W} \cdot \mathbf{s}) (\mathbf{s^{-1}} 
 
 이때 $\mathbf{s}$ 의 search space는, salient channel과 non-salient channel의 균형을 맞추기 위한 하이퍼파라미터인 $\alpha \in [0, 1]$ 를 포함한다. (`0: scaling 미적용`) $\alpha$ 의 탐색은 grid search를 통해 진행된다.
 
-$$ \mathbf{s} = \mathbf{s^{\alpha}_{X}}, \quad {\alpha}^{*} = {\argmin}_{\alpha} \mathscr{L}( \mathbf{s^{\alpha}_{X}} ) $$
+$$ \mathbf{s} = \mathbf{s^{\alpha}_{X}} $$
+
+$$ {\alpha}^{*} = \arg\min_{\alpha} \mathscr{L}( \mathbf{s^{\alpha}_{X}} ) $$
 
 > $\mathbf{s_{X}}$ : average magnitude of activation (per-channel)
 

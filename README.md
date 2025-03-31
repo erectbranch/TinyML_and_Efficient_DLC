@@ -145,7 +145,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)
 
 - [Efficient Video Understanding](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec19/summary01)
 
-  > 2D CNNs for Video(live) Understanding, 3D CNNs for Video(live) Understanding(I3D), Temporal Shift Module(TSM)
+  > 2D CNNs for Video Understanding, 3D CNNs for Video Understanding(I3D), Temporal Shift Module(TSM)
 
   > Other Efficient Methods: Kernel Decomposition, Multi-Scale Modeling, Neural Architecture Search(X3D), Skipping Redundant Frames/Clips, Utilizing Spatial Redundancy
 
@@ -169,6 +169,14 @@ Instructor : Song Han(Associate Professor, MIT EECS)
   
   > Relative Positional Encoding(ALiBi, RoPE, interpolating RoPE), KV cache optimization(Multi-query Attention, Grouped-query Attention), Gated Linear Unit
 
+- [LLM Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2024/lec13/summary01)
+  
+  > Quantization Difficulty of LLMs, Bottleneck of edge LLM Inference(Memory-bounded, Memory footprint of Weights)
+  
+  > Weight-Activation Quantization: SmoothQuant(Activation Smoothing)
+  
+  > Weight-Only Quantization: AWQ(1% Salient Weights, Activation-aware Scaling)
+  
 - [Efficient Vision Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec14/summary01)
 
   > Vision Transformer, High-Resolution Dense Prediction, Segment Anything
