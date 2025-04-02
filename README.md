@@ -173,11 +173,17 @@ Instructor : Song Han(Associate Professor, MIT EECS)
   
   > Quantization Difficulty of LLMs, Bottleneck of edge LLM Inference(Memory-bounded, Memory footprint of Weights)
   
-  > Weight-Activation Quantization: SmoothQuant(Activation Smoothing)
+  > Weight-activation Quantization: SmoothQuant(Activation Smoothing)
   
-  > Weight-Only Quantization: AWQ(1% Salient Weights, Activation-aware Scaling)
+  > Weight-only Quantization: AWQ(1% Salient Weights, Activation-aware Scaling)
+
+- [Efficient System Support for LLM Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2024/lec13/summary02)
   
-- [Efficient Vision Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec14/summary01)
+  > System for Edge: TinyChat(Hardware-aware Weight Packing, Kernel Fusion)
+
+  > System for Cloud: Overhead in Quantized GEMM, QServe(SmoothAttention, Dequantization with Reg-Level Parallelism)
+  
+- [Vision Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec14/summary01)
 
   > Vision Transformer, High-Resolution Dense Prediction, Segment Anything
   
