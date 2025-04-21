@@ -182,6 +182,14 @@ Instructor : Song Han(Associate Professor, MIT EECS)
   > System for Edge: TinyChat(Hardware-aware Weight Packing, Kernel Fusion)
 
   > System for Cloud: Overhead in Quantized GEMM, QServe(SmoothAttention, Dequantization with Reg-Level Parallelism)
+
+- [LLM Pruning & Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2024/lec13/summary03)
+  
+  > Weight Sparsity: Wanda
+
+  > Contextual Sparsity: Deja Vu, Mixture-of-Experts
+
+  > Attention Sparsity: SpAtten, H2O
   
 - [Vision Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec14/summary01)
 
