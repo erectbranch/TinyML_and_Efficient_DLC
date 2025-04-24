@@ -71,7 +71,7 @@ RLHF의 강화학습은 2단계로 구성되며, 첫 번째 단계에서는 **Re
 
 ![RLHF train reward model](images/RLHF_train_reward_model.png)
 
-$$ \max_{{r}_{\theta}} \lbrace \mathbb{E}{}_{(x, {y}_{win}, y_{lose}) \sim D} [ \log (\sigma (r_{\theta} (x, y_{win}) - r_{\theta} (x, y_{lose}))) ] \rbrace $$
+$$ \max \lbrace \mathbb{E} \underset{(x, y_{win}, y_{lose}) \sim D}{} [ \log (\sigma (r_{\theta} (x, y_{win}) - r_{\theta} (x, y_{lose}))) ] \rbrace $$
 
 ---
 
@@ -89,7 +89,7 @@ $$ \max_{{r}_{\theta}} \lbrace \mathbb{E}{}_{(x, {y}_{win}, y_{lose}) \sim D} [ 
 
 ![RLHF finetune with RL](images/RLHF_finetune_with_rl.png)
 
-$$ \max_{{\pi}_{\theta}} \lbrace \mathbb{E}{}_{x \sim D,  y \sim {\pi}_{\theta}(y|x) } [ r_{\theta} (x,y) ] - \beta \mathbb{D} {}_{KL} [ {\pi}_{\theta} (y|x) | | {\pi}_{ref}(y|x) ] \rbrace $$
+$$ \max \lbrace \mathbb{E} \underset{x \sim D, y \sim \pi_{\theta}(y|x)}{} [r_{\theta}(x,y)]-\beta \mathbb{D} \underset{KL}{} [\pi_{\theta}(y|x)||\pi_{ref}(y|x)] \rbrace $$
 
 ---
 
@@ -103,11 +103,11 @@ $$ \max_{{\pi}_{\theta}} \lbrace \mathbb{E}{}_{x \sim D,  y \sim {\pi}_{\theta}(
 | :---: | :---: |
 | ![RLHF](images/DPO_vs_RLHF_1.png) | ![DPO](images/DPO_vs_RLHF_2.png) |
 
-$$ \max_{{r}_{\theta}} \lbrace \mathbb{E}{}_{(x, {y}_{win}, y_{lose}) \sim D} [ \log (\sigma ( \beta \log \frac{{\pi}_{\theta}(y_{win}|x)}{{\pi}_{ref}(y_{win}|x)} - \beta \log \frac{{\pi}_{\theta}(y_{lose}|x)}{{\pi}_{ref}(y_{lose}|x)} )) ] \rbrace $$
+$$ \max \lbrace \mathbb{E} \underset{(x,y_{win}, y_{lose}) \sim D}{} [\log (\sigma (\beta \log \frac{\pi_{\theta}(y_{win}|x)}{\pi_{ref}(y_{win}|x)}-\beta \log \frac{\pi_{\theta}(y_{lose}|x)}{\pi_{ref}(y_{lose}|x)}))] \rbrace $$
 
-> reference 모델에서 offline으로 계산: ${\pi}_{ref}(y_{win}|x)$ , ${\pi}_{ref}(y_{lose}|x)$
+> reference 모델에서 offline으로 계산: $\pi_{ref}(y_{win}|x)$ , $\pi_{ref}(y_{lose}|x)$
 
-> 미세조정 모델에서 계산: ${\pi}_{\theta}(y_{win}|x)$ , ${\pi}_{\theta}(y_{lose}|x)$
+> 미세조정 모델에서 계산: $\pi_{\theta}(y_{win}|x)$ , $\pi_{\theta}(y_{lose}|x)$
 
 위 수식에 따라, $y_{win}$ 출력이 $y_{lose}$ 출력 확률보다 높아지도록 학습이 수행된다.
 
@@ -416,9 +416,9 @@ $$ \mathrm{Sign}(W_{ij}) = \begin{cases} +1, & \mathrm{if} \ W_{ij} > 0, \\ -1, 
 
 $$ \alpha = \frac{1}{nm} \sum_{ij} |W_{ij}| $$
 
-> **Notes**: L2 Norm 가중치 양자화 오차
+> **Notes**: L2 Norm 가중치 양자화 오차 ( $|| \triangle - \hat{\triangle} ||_2^2$ )
 >
-> $$ || \triangle - \hat{\triangle} || {}_{2}^{2} = \sum_{ij}(|W_{ij}| - \alpha)^2 $$
+> $$ \sum_{ij}(|W_{ij}| - \alpha)^2 $$
 
 ---
 
@@ -426,7 +426,7 @@ $$ \alpha = \frac{1}{nm} \sum_{ij} |W_{ij}| $$
 
 논문에서는 최적의 scaling factor를 획득하기 위해, model distillation 방식의 objective을 사용하여 미세조정한다. (model weight: freezing)
 
-$$ {\alpha}^{*} = \arg\min_{\alpha} \mathbb{E} {}_{x \sim \mathbf{X}} [ || \mathbf{Z} {}_{fine} (x) - \mathbf{Z} {}_{bin} (x; \alpha) ||{}^{2} ] $$
+$$ {\alpha}^{*} = \arg\min_{\alpha} \mathbb{E} \underset{x \sim \mathbf{X}}{} [ || \mathbf{Z_{fine}} (x) - \mathbf{Z_{bin}} (x; \alpha) ||^2 ] $$
 
 > $\mathbf{X}$ : calibration dataset, $\mathbf{Z}(\cdot)$ : logits
 

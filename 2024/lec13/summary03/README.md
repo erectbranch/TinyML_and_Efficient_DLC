@@ -93,7 +93,7 @@ $$ X' = X+F(X) $$
 | :---: | :---: |
 | ![residual around attention](images/deja_vu_residual_embedding_1.png) | ![residual around MLP](images/deja_vu_residual_embedding_2.png) |
 
-> $||X||$ 가 $F(X)$ 보다 훨씬 큰 값이므로 임베딩은 느리게 변화하게 된다.
+> $||X||$ 가 $||F(X)||$ 보다 훨씬 큰 값이므로 임베딩은 느리게 변화하게 된다.
 
 ---
 
@@ -179,7 +179,7 @@ capacity factor를 크게 설정하여 overflow를 방지할 수 있으나, 계�
 
 ---
 
-### 13.9.2 Different Routing Mechanism
+### 13.9.3 Different Routing Mechanism
 
 > [A Review of Sparse Expert Models in Deep Learning 논문(2022)](https://arxiv.org/abs/2209.01667)
 
