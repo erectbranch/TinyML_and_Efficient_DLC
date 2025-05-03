@@ -3,15 +3,26 @@
 <h1 align="center">
   <p align="center">TinyML and Efficient Deep Learning Computing</p>
 </h1>
-  
-  
-<b>강의 주제: TinyML and Efficient Deep Learning Computing</b>
+
+<b>MIT 6.S965/6.5940 • Fall • 2022-2024</b>
 <br>
 Instructor : Song Han(Associate Professor, MIT EECS)
 
 </div>
 
-## 정리한 문서 목록
+<br>
+
+Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024](https://efficientml.ai)
+
+## Courses
+
+| Course | Video | Slide | Note | Homework |
+| --- | --- | --- | --- | --- |
+| MIT 6.5940 • 2024 • Fall | [Videos](https://youtube.com/playlist?list=PL80kAHvQbh-qGtNc54A6KW4i4bkTPjiRF) | [Slides](https://hanlab.mit.edu/courses/2024-fall-65940#schedule) | [Notes](2024/) | [Lab 1](https://colab.research.google.com/drive/1Fagq3JQBzCizodyxpHKvWDzfCC7F1RWN) / [Lab 2](https://colab.research.google.com/drive/11IBla1q1McoZ2oCANCGHns8VtzG5nCMP) / [Lab 3](https://colab.research.google.com/drive/1xKReLBHVS6bkFbYkfi-Ky3C4loQmG6Yc) / [Lab 4](https://colab.research.google.com/drive/16H9RvSg4XIF35X3fLGQUVwAE9ccvDj14) / [Lab 5](https://drive.google.com/drive/folders/1MhMvxvLsyYrN-4C6eQG8Zj2JeSuyAOf0) |
+| MIT 6.5940 • 2023 • Fall | [Videos](https://youtube.com/playlist?list=PL80kAHvQbh-pT4lCkDT53zT8DKmhE0idB) | [Slides](https://hanlab.mit.edu/courses/2023-fall-65940#schedule) | [Notes](2023/) | - |
+| MIT 6.S965 • 2022 • Fall | [Videos](https://youtube.com/playlist?list=PL80kAHvQbh-ocildRaxjjBy6MR1ZsNCU7) | [Slides](https://hanlab.mit.edu/courses/2022-fall-6s965#schedule) | [Notes](2022/) | [Lab 4: Deployment on MCU](https://github.com/Xuweijia-buaa/MIT-6.S965-TinyML-and-Efficient-Deep-Learning-Computing/blob/main/notebooks/mit_6s965_lab4_tinyml.ipynb) |
+
+## Lecture Notes
 
 ### 📖 Basics of Deep Learning
 
@@ -27,7 +38,7 @@ Instructor : Song Han(Associate Professor, MIT EECS)
 
   > Memory-Related(\#parameters, model size, \#activations), Computation(MACs, FLOP)
 
-### 📔 Efficient Inference
+### 📙 Efficient Inference
 
 - [Pruning Granularity, Pruning Critertion](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec03)
 
