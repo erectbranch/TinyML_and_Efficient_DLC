@@ -125,8 +125,8 @@ loop문을 소프트웨어 방법으로 최적화하여, 딥러닝 모델을 효
 
 | | | |
 | --- | --- | --- |
-| Poor Locality | ![loop reordering ex1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec17/images/loop_reorder_ex1.png) |  for i in range(0, N):<br/> $\quad$ for `j` in range(0, N):<br/> $\quad \quad$ for `k` in range(0, N):<br/> $\quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
-| Good Locality | ![loop reordering ex2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec17/images/loop_reorder_ex2.png) | for i in range(0, N):<br/> $\quad$ for `k` in range(0, N):<br/> $\quad \quad$ for `j` in range(0, N):<br/> $\quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
+| Poor Locality | ![loop reordering ex1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec17/images/loop_reorder_ex1.png) |  for i in range(0, N):<br/> $\quad$ for `j` in range(0, N):<br/> $\quad \quad$ for `k` in range(0, N):<br/> $\quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
+| Good Locality | ![loop reordering ex2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec17/images/loop_reorder_ex2.png) | for i in range(0, N):<br/> $\quad$ for `k` in range(0, N):<br/> $\quad \quad$ for `j` in range(0, N):<br/> $\quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
 
 ---
 
@@ -140,10 +140,10 @@ loop문을 소프트웨어 방법으로 최적화하여, 딥러닝 모델을 효
 
 | | | accessed data | |
 | --- | --- | :---: | --- |
-| Original | ![loop tiling ex1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec17/images/loop_tiling_ex1.png) | $A = N^2$ <br/> $B = N^2$ | for i in range(0, N):<br/> $\quad$ for k in range(0, N):<br/> $\quad \quad$ for `j` in range(0, N):<br/> $\quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
-| Tiled<br/>(loop `j`) | ![loop tiling ex2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec17/images/loop_tiling_ex2.png) | $A = N^2$ <br/> $B = N \times tile \ size$ | ( `T_j` : TILE_SIZE )<br/>for `j_t` in range(0, N, `T_j`):<br/> $\quad$ for i in range(0, N):<br/> $\quad \quad$ for k in range(0, N):<br/> $\quad \quad \quad$ for `j` in range(`j_t`, `j_t + T_j`):<br/> $\quad \quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
-| Tiled<br/>(loop `k`) | ![loop tiling ex3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec17/images/loop_tiling_ex3.png) | $A = N^2$ <br/> $B = tile \ {size}^2$ | ( `T_j`=`T_k` : TILE_SIZE )<br/>for `k_t` in range(0, N, `T_k`):<br/> $\quad$ for `j_t` in range(0, N, `T_j`):<br/> $\quad \quad$ for i in range(0, N):<br/> $\quad \quad \quad$ for `k` in range(`k_t`, `k_t + T_j`):<br/> $\quad \quad \quad \quad$ for `j` in range(`j_t`, `j_t + T_j`):<br/> $\quad \quad \quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
-| Tiled<br/>(loop `i`) | ![loop tiling ex4](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec17/images/loop_tiling_ex4.png) | $A = tile \ {size}^2$ <br/> $B = tile \ {size}^2$ | ( `T_j`=`T_k`=`T_i` : TILE_SIZE )<br/>for `i_t` in range(0, N, `T_i`):<br/> $\quad$ for `k_t` in range(0, N, `T_k`):<br/> $\quad \quad$ for `j_t` in range(0, N, `T_j`):<br/> $\quad \quad \quad$ for `i` in range(`i_t`, `i_t + T_i`):<br/> $\quad \quad \quad \quad$ for `k` in range(`k_t`, `k_t + T_k`):<br/> $\quad \quad \quad \quad \quad$ for `j` in range(`j_t`, `j_t + T_j`):<br/> $\quad \quad \quad \quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
+| Original | ![loop tiling ex1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec17/images/loop_tiling_ex1.png) | $A = N^2$ <br/> $B = N^2$ | for i in range(0, N):<br/> $\quad$ for k in range(0, N):<br/> $\quad \quad$ for `j` in range(0, N):<br/> $\quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
+| Tiled<br/>(loop `j`) | ![loop tiling ex2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec17/images/loop_tiling_ex2.png) | $A = N^2$ <br/> $B = N \times tile \ size$ | ( `T_j` : TILE_SIZE )<br/>for `j_t` in range(0, N, `T_j`):<br/> $\quad$ for i in range(0, N):<br/> $\quad \quad$ for k in range(0, N):<br/> $\quad \quad \quad$ for `j` in range(`j_t`, `j_t + T_j`):<br/> $\quad \quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
+| Tiled<br/>(loop `k`) | ![loop tiling ex3](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec17/images/loop_tiling_ex3.png) | $A = N^2$ <br/> $B = tile \ {size}^2$ | ( `T_j`=`T_k` : TILE_SIZE )<br/>for `k_t` in range(0, N, `T_k`):<br/> $\quad$ for `j_t` in range(0, N, `T_j`):<br/> $\quad \quad$ for i in range(0, N):<br/> $\quad \quad \quad$ for `k` in range(`k_t`, `k_t + T_j`):<br/> $\quad \quad \quad \quad$ for `j` in range(`j_t`, `j_t + T_j`):<br/> $\quad \quad \quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
+| Tiled<br/>(loop `i`) | ![loop tiling ex4](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec17/images/loop_tiling_ex4.png) | $A = tile \ {size}^2$ <br/> $B = tile \ {size}^2$ | ( `T_j`=`T_k`=`T_i` : TILE_SIZE )<br/>for `i_t` in range(0, N, `T_i`):<br/> $\quad$ for `k_t` in range(0, N, `T_k`):<br/> $\quad \quad$ for `j_t` in range(0, N, `T_j`):<br/> $\quad \quad \quad$ for `i` in range(`i_t`, `i_t + T_i`):<br/> $\quad \quad \quad \quad$ for `k` in range(`k_t`, `k_t + T_k`):<br/> $\quad \quad \quad \quad \quad$ for `j` in range(`j_t`, `j_t + T_j`):<br/> $\quad \quad \quad \quad \quad \quad$ C[i][j] += A[i][j] \* B[k][j] |
 
 ---
 
@@ -284,7 +284,7 @@ convolution 연산을 direct하게 만든다면, 다음 예시에서 kernel 0과
 
 | General depth-wise convolution | In-place depth-wise convolution |
 | :---: | :---: |
-| ![general depthwise](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec17/images/general_dw.png) | ![inplace depthwise](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec17/images/inplace_dw.gif) |
+| ![general depthwise](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec17/images/general_dw.png) | ![inplace depthwise](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec17/images/inplace_dw.gif) |
 | peak mem: $2 \times C \times H \times W$ | peak mem: $(1 + C) \times H \times W$ |
 
 ---

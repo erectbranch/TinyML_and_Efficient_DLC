@@ -195,7 +195,7 @@ $$ \underset{minibatch}{BS} * \underset{layers}{80} * \underset{heads}{64} * \un
 
 | | Multi-head | Multi-query | Grouped-query |
 | --- | :---: | :---: | :---: |
-| | ![MHA](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec12/summary02/images/MHA.png) | ![MQA](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec12/summary02/images/MQA.png) | ![GQA](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec12/summary02/images/GQA.png) |
+| | ![MHA](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec12/summary02/images/MHA.png) | ![MQA](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec12/summary02/images/MQA.png) | ![GQA](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec12/summary02/images/GQA.png) |
 | \#heads for K, V | $N$ | 1 | $G$  |
 
 > 보편적으로 $G = N/8$ 로 설정하면, 정확도를 유지하면서 KV cache size를 줄일 수 있다.

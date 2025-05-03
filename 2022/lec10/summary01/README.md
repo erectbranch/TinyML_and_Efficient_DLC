@@ -172,7 +172,7 @@ $$\mathrm{attention} = {{\partial L} \over {\partial x}}$$
 
 - 높은 정확도를 갖는 모델은, 비슷한 attention map을 갖는다.
 
-  ![attention map ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec10/summary01/images/attentions_ex.png)
+  ![attention map ex](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec10/summary01/images/attentions_ex.png)
 
 ---
 

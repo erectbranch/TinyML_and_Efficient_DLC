@@ -116,13 +116,13 @@ Temporal Shift Module(TSM)은, 3D conv 기반의 장점은 유지하며 overhead
 
   - bypass를 추가하여 information loss를 보전한다.
 
-  ![offline TSM](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec19/summary01/images/TSM_offline.png)
+  ![offline TSM](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec19/summary01/images/TSM_offline.png)
 
 - **online** TSM models
 
   > $F_t$ 입력일 때, 미래인 $F_{t+1}$ 에 접근할 수 없다. 오로지 메모리에 캐싱한 과거의 frame 정보를 사용한다.(shift)
 
-  ![online TSM](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec19/summary01/images/TSM_online.png)
+  ![online TSM](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec19/summary01/images/TSM_online.png)
 
 ---
 

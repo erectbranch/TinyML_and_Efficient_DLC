@@ -26,13 +26,13 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
 ### 📖 Basics of Deep Learning
 
-- [Basic Terminologies, Shape of Tensors](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec02/summary01)
+- [Basic Terminologies, Shape of Tensors](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec02/summary01)
 
   > Synapse(weight), Neuron(activation), Cell body
 
   > Fully-Connected layer, Convolution layer(padding, stride, receptive field, grouped convolution), Pooling layer
 
-- [Efficiency Metrics](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec02/summary02)
+- [Efficiency Metrics](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec02/summary02)
 
   > Metrics(latency, storage, energy)
 
@@ -40,7 +40,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
 ### 📙 Efficient Inference
 
-- [Pruning Granularity, Pruning Critertion](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec03)
+- [Pruning Granularity, Pruning Critertion](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec03)
 
   > Unstructured/Structured pruning(Fine-grained/Pattern-based/Vector-level/Kernel-level/Channel-level)
   
@@ -48,7 +48,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
   
   > Data-Aware Pruning Criterion: Average Percentage of Zero(APoZ), Reconstruction Error, Entropy
 
-- [Automatic Pruning, Lottery Ticket Hypothesis](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec04/summary01)
+- [Automatic Pruning, Lottery Ticket Hypothesis](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec04/summary01)
 
   > Finding Pruning Ratio: Reinforcement Learning based, Rule based, Regularization based, Meta-Learning based 
 
@@ -56,11 +56,11 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   > Pruning at Initialization(Connection Sensitivity, Gradient Flow)
 
-- [System & Hardware Support for Fine-grained Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec04/summary02)
+- [System & Hardware Support for Fine-grained Sparsity](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec04/summary02)
 
   > Efficient Inference Engine(EIE format: relative index, column pointer)
 
-- [Sparse Matrix-Matrix Multiplication, GPU Support for Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec04/summary03)
+- [Sparse Matrix-Matrix Multiplication, GPU Support for Sparsity](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec04/summary03)
 
   > Sparse Matrix-Matrix Multiplication(SpMM), CSR format
 
@@ -68,7 +68,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   ---
 
-- [Basic Concepts of Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec05/summary01)
+- [Basic Concepts of Quantization](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec05/summary01)
 
   > Numeric Data Types: Integer, Fixed-Point, Floating-Point(IEEE FP32/FP16, BF16, NVIDIA FP8), INT4 and FP4
 
@@ -76,11 +76,11 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   > Linear Quantization: Integer-Arithmetic-Only Quantization, Sources of Quantization Error(clipping, rounding, scaling factor, zero point)
 
-- [Vector Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec05/summary02)
+- [Vector Quantization](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec05/summary02)
 
   > Vector Quantization(Deep compression: iterative pruning, K-means based quantization, Huffman encoding), Product Quantization
 
-- [Post Training Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec06/summary01)
+- [Post Training Quantization](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec06/summary01)
 
   > Weight Quantiztion: Per-Tensor Activation Per-Channel Activation, Group Quantization(Per-Vector, MX), Weight Equalization, Adative Rounding
 
@@ -88,7 +88,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   > Bias Correction, Zero-Shot Quantization(ZeroQ)
 
-- [Quantization-Aware Training, Low bit-width quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec06/summary02)
+- [Quantization-Aware Training, Low bit-width quantization](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec06/summary02)
 
   > Fake quantization, Straight-Through Estimator
 
@@ -96,7 +96,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   ---
 
-- [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec07/summary01)
+- [Neural Architecture Search: basic concepts & manually-designed neural networks](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec07/summary01)
 
   > input stem, stage, head
   
@@ -104,13 +104,13 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
   
   > MobileNet(depthwise-separable convolution, width/resolution multiplier), MobileNetV2(inverted bottleneck block), ShuffleNet(channel shuffle), SENet(squeeze-and-excitation block), MobileNetV3(h-swish)
 
-- [Neural Architecture Search: Search Space](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec07/summary02)
+- [Neural Architecture Search: Search Space](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec07/summary02)
 
   > Search Space: Macro, Chain-Structured, Cell-based(NASNet), Hierarchical(Auto-DeepLab, NAS-FPN)
 
   > design search space: Cumulative Error Distribution, FLOPs distribution, zero-cost proxy
 
-- [Neural Architecture Search: Performance Estimation & Hardware-Aware NAS](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec08)
+- [Neural Architecture Search: Performance Estimation & Hardware-Aware NAS](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec08)
 
   > Weight Inheritance, HyperNetwork, Weight Sharing(super-network, sub-network)
 
@@ -118,7 +118,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   ---
 
-- [Knowledge Distillation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec10/summary01)
+- [Knowledge Distillation](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec10/summary01)
 
   > Knowledge Distillation(distillation loss, softmax temperature)
   
@@ -126,7 +126,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   > Distillation Scheme: Offline Distillation, Online Distillation, Self-Distillation
 
-- [Distillation for Applications](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec10/summary02)
+- [Distillation for Applications](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec10/summary02)
 
   > Applications: Object Detection, Semantic Segmentation, GAN, NLP
 
@@ -134,7 +134,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   ---
 
-- [MCUNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec11)
+- [MCUNet](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec11)
 
   > MCUNetV1: TinyNAS, TinyEngine
 
@@ -142,7 +142,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
 ### ⚙️ Efficient Training and System Support
 
-- [TinyEngine](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec17)
+- [TinyEngine](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec17)
 
   > Memory Hierarchy of Microcontroller, Primary Memory Format(NCHW, NHWC, CHWN)
 
@@ -154,13 +154,13 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
 ### 🔧 Domain-Specific Optimizations
 
-- [Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec12/summary01)
+- [Transformer](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2023/lec12/summary01)
 
   > NLP Task(Discriminative, Generative), Pre-Transformer Era(RNN/LSTM, CNN)
 
   > Transformer: Tokenizer, Embedding, Multi-Head Attention(self-attention), Feed-Forward Network, Layer Normalization(Pre-Norm, Post-Norm), Positional Encoding
 
-- [Transformer Design Variants](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec12/summary02)
+- [Transformer Design Variants](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2023/lec12/summary02)
 
   > Types of Transformer-based Models: Encoder-Decoder(T5), Encoder-only(BERT), Decoder-only(GPT)
   
@@ -168,7 +168,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   ---
 
-- [LLM Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2024/lec13/summary01)
+- [LLM Quantization](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2024/lec13/summary01)
   
   > Quantization Difficulty of LLMs, Bottleneck of edge LLM Inference(Memory-bounded, Memory footprint of Weights)
   
@@ -176,13 +176,13 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
   
   > Weight-only Quantization: AWQ(1% Salient Weights, Activation-aware Scaling)
 
-- [Efficient System Support for LLM Quantization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2024/lec13/summary02)
+- [Efficient System Support for LLM Quantization](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2024/lec13/summary02)
   
   > System for Edge: TinyChat(Hardware-aware Weight Packing, Kernel Fusion)
 
   > System for Cloud: Overhead in Quantized GEMM, QServe(SmoothAttention, Dequantization with Reg-Level Parallelism)
 
-- [LLM Pruning & Sparsity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2024/lec13/summary03)
+- [LLM Pruning & Sparsity](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2024/lec13/summary03)
   
   > Weight Sparsity: Wanda
 
@@ -192,7 +192,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   ---
 
-- [LLM Post Training](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2024/lec14/summary01)
+- [LLM Post Training](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2024/lec14/summary01)
 
   > Supervised Fine-Tuning, Reinforcement Learning from Human Feedback, Direct Preference Optimization
 
@@ -202,19 +202,19 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   ---
 
-- [Vision Transformer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2023/lec14/summary01)
+- [Vision Transformer](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2023/lec14/summary01)
 
   > Vision Transformer, High-Resolution Dense Prediction, Segment Anything
   
   > Window Attention(Swin Transformer, FlatFormer), ReLU Linear Attention(EfficientViT), Sparse Attention(SparseViT)
 
-- [Efficient Video Understanding](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec19/summary01)
+- [Efficient Video Understanding](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec19/summary01)
 
   > 2D CNNs for Video Understanding, 3D CNNs for Video Understanding(I3D), Temporal Shift Module(TSM)
 
   > Other Efficient Methods: Kernel Decomposition, Multi-Scale Modeling, Neural Architecture Search(X3D), Skipping Redundant Frames/Clips, Utilizing Spatial Redundancy
 
-- [Generative Adversarial Networks (GANs)](https://github.com/erectbranch/TinyML_and_Efficient_DLC/tree/master/2022/lec19/summary02)
+- [Generative Adversarial Networks (GANs)](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec19/summary02)
 
   > GANs(Generator, Discriminator), Conditional/Unconditional GANs, Difficulties in GANs
 

@@ -34,7 +34,7 @@ Deep Compression 논문은 (1) iterative pruning, (2) **vector quantization**(VQ
 
 | Iterative Pruning | | Vector Quantization(VQ) | | Huffman Encoding |
 | :---: | :---: | :---: | :---: | :---: |
-| ![Deep Compression 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary02/images/deep_compression_1.png) | $\rightarrow$ | ![Deep Compression 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary02/images/deep_compression_2.png) | $\rightarrow$ | ![Deep Compression 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary02/images/deep_compression_3.png) |
+| ![Deep Compression 1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary02/images/deep_compression_1.png) | $\rightarrow$ | ![Deep Compression 2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary02/images/deep_compression_2.png) | $\rightarrow$ | ![Deep Compression 3](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary02/images/deep_compression_3.png) |
 | original network 대비<br/>크기 9x-13x 감소 | | original network 대비<br/>크기 27x-31x 감소 | | original network 대비<br/>크기 35x-49x 감소 |
 
 ---
@@ -202,7 +202,7 @@ a, b, c를 다음과 같이 압축하여 정의했다고 하자.
 
 | | Codebook | Codeword | 
 | :---: | :---: | :---: |
-| | ![codebook](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary02/images/pq_codebook_codeword_1.png) | ![codeword](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary02/images/pq_codebook_codeword_2.png) |
+| | ![codebook](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary02/images/pq_codebook_codeword_1.png) | ![codeword](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary02/images/pq_codebook_codeword_2.png) |
 | dimension | $d \times k$ | $d$ |
 
 ### <span style='background-color: #393E46; color: #F7F7F7'>&nbsp;&nbsp;&nbsp;📝 예제 3: Product Quantization의 메모리 사용량 &nbsp;&nbsp;&nbsp;</span>

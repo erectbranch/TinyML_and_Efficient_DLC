@@ -10,7 +10,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
 | Before Quantization | After Quantization |
 | :---: | :---: |
-| ![continuous signal](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/continuous-weight.png) | ![quantized signal](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/discrete-weight.png) |
+| ![continuous signal](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/continuous-weight.png) | ![quantized signal](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/discrete-weight.png) |
 
 다음은 양자화를 통해 이득을 얻을 수 있는 대표적인 예시다.
 
@@ -38,7 +38,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   n-bit range: $[0, 2^{n} - 1]$
 
-  ![uint8 ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int8_ex_1.png)
+  ![uint8 ex](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int8_ex_1.png)
 
 - **Signed Integer** (**Sign-Magnitude**)
 
@@ -46,7 +46,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   > $00000000_{(2)} = 10000000_{(2)} = 0$
 
-  ![int8 sign-magnitude ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int8_ex_2.png)
+  ![int8 sign-magnitude ex](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int8_ex_2.png)
 
 - **Signed Integer** (**Two's Complement Representation**)
 
@@ -54,7 +54,7 @@ continuous signal(input)을 discrete set으로 변환하는 테크닉을 **quant
 
   > $00000000_{(2)} = 0$ , $10000000_{(2)} = -2^{n-1}$ 
 
-  ![int8 two's complement ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int8_ex_3.png)
+  ![int8 two's complement ex](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int8_ex_3.png)
 
 ---
 
@@ -88,7 +88,7 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
 - IEEE FP32
 
-  ![32bit floating-point](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/fp32_ieee754.png)
+  ![32bit floating-point](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/fp32_ieee754.png)
 
   - Sign(1bit)
 
@@ -104,7 +104,7 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
   $0.265625 = (1 + 0.0625) \times 2^{125-127} = 1.0625 \times 2^{-2}$
 
-  ![32bit floating-point ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/fp32_ieee754_ex.png)
+  ![32bit floating-point ex](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/fp32_ieee754_ex.png)
 
 ---
 
@@ -114,7 +114,7 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
 - IEEE FP32 Subnormal Numbers
 
-  ![subnormal numbers ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/subnormal_numbers.png)
+  ![subnormal numbers ex](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/subnormal_numbers.png)
 
   - $(-1)^{\mathsf{sign}} \times \mathsf{Fraction} \times 2^{1 - 127}$
 
@@ -122,7 +122,7 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
 - Smallest Subnormal Numbers
 
-  ![subnormal number smallest](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/subnormal_smallest.png)
+  ![subnormal number smallest](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/subnormal_smallest.png)
 
   - $2^{-149} = 2^{-23} \times 2^{1 - 127}$
 
@@ -130,7 +130,7 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
 - Largest Subnormal Numbers
 
-  ![subnormal number largest](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/subnormal_largest.png)
+  ![subnormal number largest](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/subnormal_largest.png)
 
   - $2^{-126} - 2^{-149} = (1 - 2^{-23}) \times 2^{1 - 127}$
 
@@ -144,13 +144,13 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
   > Normal Numbers, Exponent $\neq$ 0
 
-  ![fp32 infinity](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/subnormal_infty.png)
+  ![fp32 infinity](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/subnormal_infty.png)
 
 - NaN (Not a Number)
 
   > Subnormal Numbers, Fraction $=$ 0
 
-  ![fp32 NaN](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/subnormal_not_a_number.png)
+  ![fp32 NaN](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/subnormal_not_a_number.png)
 
 ---
 
@@ -190,16 +190,16 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
 | | Exponent<br/>(bits) | Fraction<br/>(bits) | Total<br/>(bits) |
 | --- | :---: | :---: | :---: |
-| ![IEEE FP32](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/fp_format_ex_1.png) | 8 | 23 | 32 |
-| ![IEEE FP16](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/fp_format_ex_2.png) | 5 | 10 | 16 |
-| ![BF16](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/fp_format_ex_3.png) | **8** | 7 | 16 |
+| ![IEEE FP32](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/fp_format_ex_1.png) | 8 | 23 | 32 |
+| ![IEEE FP16](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/fp_format_ex_2.png) | 5 | 10 | 16 |
+| ![BF16](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/fp_format_ex_3.png) | **8** | 7 | 16 |
 
 이후 연구가 진행되면서 NVIDIA에서는 이보다 작은 FP8 format을 제안하게 된다.
 
 | | Exponent<br/>(bits) | Fraction<br/>(bits) | Total<br/>(bits) |
 | --- | :---: | :---: | :---: |
-| ![NVIDIA FP8 E4M3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/fp_format_nvidia_ex_1.png) | 4 | 3 | 8 |
-| ![NVIDIA FP8 E5M2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/fp_format_nvidia_ex_2.png) | 5 | 2 | 8 |
+| ![NVIDIA FP8 E4M3](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/fp_format_nvidia_ex_1.png) | 4 | 3 | 8 |
+| ![NVIDIA FP8 E5M2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/fp_format_nvidia_ex_2.png) | 5 | 2 | 8 |
 
 > 하지만 2022년 Qualcomm 연구에 따르면, edge AI 도메인의 추론에서는 FP8 포맷이 하드웨어 효율성에서 단점을 가질 뿐만 아니라, 정확도 면에서도 INT8 포맷보다 나쁜 성능을 보였다.
 
@@ -211,10 +211,10 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
 | | Range<br/>(Positive Numbers) | 
 | --- | :---: | 
-| ![INT4](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int4_fp4_ex_1.png) | ![INT4](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int4_fp4_range_ex_1.png) | 
-| ![FP4 (E1M2)](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int4_fp4_ex_2.png) | ![INT4](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int4_fp4_range_ex_2.png) | 
-| ![FP4 (E1M2)](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int4_fp4_ex_3.png) | ![INT4](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int4_fp4_range_ex_3.png) | 
-| ![FP4 (E1M2)](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int4_fp4_ex_4.png) | ![INT4](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/int4_fp4_range_ex_4.png) | 
+| ![INT4](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int4_fp4_ex_1.png) | ![INT4](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int4_fp4_range_ex_1.png) | 
+| ![FP4 (E1M2)](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int4_fp4_ex_2.png) | ![INT4](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int4_fp4_range_ex_2.png) | 
+| ![FP4 (E1M2)](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int4_fp4_ex_3.png) | ![INT4](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int4_fp4_range_ex_3.png) | 
+| ![FP4 (E1M2)](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int4_fp4_ex_4.png) | ![INT4](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/int4_fp4_range_ex_4.png) | 
 
 - INT4: centroid 사이 distance가 모두 동일하다.
 
@@ -435,7 +435,7 @@ $$M = 2^{-n}M_0$$
 
 | | Symmetric<br/>(signed) | Symmetric<br/>(unsigned) | Asymmetric<br/>(unsigned) |
 | :---: | :---: | :---: | :---: |
-| | ![Symmetric signed](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/symmetric_asymmetric_signed_1.png) | ![Symmetric unsigned](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/symmetric_asymmetric_signed_2.png) | ![Asymmetric](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/symmetric_asymmetric_signed_3.png) |
+| | ![Symmetric signed](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/symmetric_asymmetric_signed_1.png) | ![Symmetric unsigned](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/symmetric_asymmetric_signed_2.png) | ![Asymmetric](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/symmetric_asymmetric_signed_3.png) |
 | Zero Point | $Z = 0$ | $Z = 0$ | $Z \neq 0$ |
 | INT8 Range | \[-128, 127\] (restricted) <br/> \[-127,127\] (full) | [0, 255] | [0, 255] |
 | Matrix Transform | Scale | Scale | Affine |
@@ -470,7 +470,7 @@ linear quantization에서 양자화 오차를 발생시키는 원인을 알아�
 
 | $x \rightarrow x_{int}$ |
 | :---: |
-| ![quant error example 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/quant_error_ex_1.png) |
+| ![quant error example 1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/quant_error_ex_1.png) |
 
 1. **round error**: $x$ 에서 근접한 값 $\rightarrow$ 동일한 $x_{int}$ grid
 
@@ -482,9 +482,9 @@ linear quantization에서 양자화 오차를 발생시키는 원인을 알아�
 
 | $x_{int} \rightarrow \hat{x}$ <br/>(case 1: round error가 큰 경우) |
 | :---: |
-| ![quant error example 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/quant_error_ex_3.png) |
+| ![quant error example 2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/quant_error_ex_3.png) |
 | $x_{int} \rightarrow \hat{x}$ <br/>**(case 2: clip error가 큰 경우)** |
-| ![quant error example 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec05/summary01/images/quant_error_ex_2.png) |
+| ![quant error example 3](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/quant_error_ex_2.png) |
 
 따라서, 양자화 시 최적의 절충점을 고려하여 scaling factor를 정해야 한다.
 

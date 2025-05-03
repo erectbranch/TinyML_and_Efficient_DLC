@@ -86,7 +86,7 @@ $$ \approx {{Input \ activation \ size + Output \ activation \ size} \over {Memo
 
   $W^{T}$ : 입력 채널 수( $c_i$ )와 출력 채널 수( $c_o$ )를 곱하면 된다.
 
-  ![linear layer](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec02/summary02/images/linear.png)
+  ![linear layer](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec02/summary02/images/linear.png)
 
 $$ c_o \cdot c_i $$
 

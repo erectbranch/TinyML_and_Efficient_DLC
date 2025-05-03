@@ -211,9 +211,9 @@ winning ticket을 찾는 가장 대표적인 방법으로, **Iterative Magnitude
 
 | | | |
 | --- | --- | --- |
-| Step 1 | dense model training<br/> $\rightarrow$ pruning<br/> $\rightarrow$ random initialization<br/>(**same sparsity mask**) | ![iterative magnitude pruning 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary01/images/iterative_magnitude_pruning_1.png) |
-| Step 2 | training $\rightarrow$ pruning | ![iterative magnitude pruning 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary01/images/iterative_magnitude_pruning_2.png) |
-| Step 3 | random initialization<br/>(**same sparsity mask**) | ![iterative magnitude pruning 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary01/images/iterative_magnitude_pruning_3.png) |
+| Step 1 | dense model training<br/> $\rightarrow$ pruning<br/> $\rightarrow$ random initialization<br/>(**same sparsity mask**) | ![iterative magnitude pruning 1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary01/images/iterative_magnitude_pruning_1.png) |
+| Step 2 | training $\rightarrow$ pruning | ![iterative magnitude pruning 2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary01/images/iterative_magnitude_pruning_2.png) |
+| Step 3 | random initialization<br/>(**same sparsity mask**) | ![iterative magnitude pruning 3](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary01/images/iterative_magnitude_pruning_3.png) |
 | Step 4 | Repeat Step 2-3 | |
 
 > 이러한 Iterative Magnitude Pruning 방법에서는, 수렴까지 학습을 위한 비용이 소모된다는 단점에 주의해야 한다.
@@ -228,7 +228,7 @@ winning ticket을 찾는 가장 대표적인 방법으로, **Iterative Magnitude
 
 하지만 한계점으로, (MNIST, CIFAR-10과 같은) 작은 데이터셋이 아니라 ImageNet과 같이 거대한 데이터셋에서는 정확도를 복구하지 못했다. 
 
-![scaling limitation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary01/images/lottery_imagenet.png)
+![scaling limitation](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary01/images/lottery_imagenet.png)
 
 대안으로 특정 iteration까지 학습한 가중치( $W_{t=k}$ )를 활용하여, fine-tuning으로 정확도를 회복할 수 있다.
 
@@ -240,8 +240,8 @@ winning ticket을 찾는 가장 대표적인 방법으로, **Iterative Magnitude
 
 | | |
 | --- | --- |
-| Pruning after Training(PaT) | ![Traditional](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary01/images/SNIP_vs_traditional_1.png) |
-| Pruning at Initialization(PaI) | ![PaI](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary01/images/SNIP_vs_traditional_2.png) |
+| Pruning after Training(PaT) | ![Traditional](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary01/images/SNIP_vs_traditional_1.png) |
+| Pruning at Initialization(PaI) | ![PaI](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary01/images/SNIP_vs_traditional_2.png) |
 
 > 대체로 PaI는 PaT에 비해 성능이 떨어지기 때문에, 주로 효율적인 훈련(예: 훈련 속도)이 필요한 상황에서 활용된다.
 

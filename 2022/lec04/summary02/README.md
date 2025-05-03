@@ -111,9 +111,9 @@ $$ [0,0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3] $$
 
 1. **Sparse Matrix Read Unit**
 
-    ![PE graph 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary02/images/EIE_pe_graph_1.jpg) 
+    ![PE graph 1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary02/images/EIE_pe_graph_1.jpg) 
 
-    ![PE graph 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary02/images/EIE_pe_graph_2.jpg)
+    ![PE graph 2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary02/images/EIE_pe_graph_2.jpg)
   
     - 포인터 $p_j, p_{j+1}$ 를 활용해, (SRAM에서) column $j$ 의 nonzero 값을 읽어온다. 
 
@@ -132,9 +132,9 @@ $$ [0,0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3] $$
 
 2. **Arithmetic Unit**
 
-    ![PE graph 3](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary02/images/EIE_pe_graph_3.jpg)
+    ![PE graph 3](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary02/images/EIE_pe_graph_3.jpg)
 
-    ![PE graph 4](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary02/images/EIE_pe_graph_4.jpg)
+    ![PE graph 4](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary02/images/EIE_pe_graph_4.jpg)
 
     - Sparse Matrix Read Unit에서 $(v, z)$ 값을 받아, MAC 연산( $b_{z} = b_{z} + v \times a_{j}$ )을 수행한다.
 
@@ -147,7 +147,7 @@ $$ [0,0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3] $$
 
 3. **Write Back**
 
-    ![PE graph 5](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary02/images/EIE_pe_graph_5.jpg)
+    ![PE graph 5](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary02/images/EIE_pe_graph_5.jpg)
 
     - 연산 결과를 SRAM에 저장한다.
 
@@ -158,7 +158,7 @@ $$ [0,0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3] $$
 
 4. **ReLU**, **Non-zero Detection**
 
-    ![PE graph 6](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec04/summary02/images/EIE_pe_graph_6.jpg)
+    ![PE graph 6](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec04/summary02/images/EIE_pe_graph_6.jpg)
 
     - ReLU 연산을 수행한다.
     

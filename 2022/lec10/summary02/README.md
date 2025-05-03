@@ -165,7 +165,7 @@ large model에서 overfitting을 피하기 위해 사용하는 **data augmentati
 
   original, augmented model의 forward, backward를 함께 수행한다.
 
-  ![NetAug step 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec10/summary02/images/NetAug_step1.png)
+  ![NetAug step 1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec10/summary02/images/NetAug_step1.png)
 
   > 좌: original tiny model, 우: augmented model
 

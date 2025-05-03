@@ -61,14 +61,14 @@ NAS는 모델 구조를 나누어 부를 때, 다음과 같이 input stem, stage
 
 || AlexNet | VGGNet |
 | :---: | :---: | :---: |
-| 구조 | ![AlexNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec07/summary01/images/AlexNet_arch.png) | ![VGGNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec07/summary01/images/VGGNet_arch.png) |
+| 구조 | ![AlexNet](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec07/summary01/images/AlexNet_arch.png) | ![VGGNet](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec07/summary01/images/VGGNet_arch.png) |
 | 특징 | ealry stage에서 큰 kernel size를 사용 ( $11 \times 11$ ) | early stage에서 작은 kernel을 여러 개 사용 ( $3 \times 3$ ) |
 
 VGGNet에서는 $3 \times 3$ 레이어를 두 개 쌓는 것이, AlexNet보다 computational cost가 적게 들면서도 더 나은 성능을 보임을 입증했다.
 
 - (-) 하지만 \#layers, kernel call, memory access가 늘어나면서, 메모리 효율성 측면에서는 단점을 갖는다.
   
-  ![VGGNet bottleneck](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec07/summary01/images/VGGNet_FLOP_bottleneck.png)
+  ![VGGNet bottleneck](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec07/summary01/images/VGGNet_FLOP_bottleneck.png)
 
 ---
 
@@ -80,7 +80,7 @@ VGGNet에서는 $3 \times 3$ 레이어를 두 개 쌓는 것이, AlexNet보다 c
 
 | Architecture | Fire Module |
 | :---: | :---: | 
-| ![SqueezeNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec07/summary01/images/SqueezeNet.png) | ![Fire Module](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec07/summary01/images/fire_module_2.png) |
+| ![SqueezeNet](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec07/summary01/images/SqueezeNet.png) | ![Fire Module](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec07/summary01/images/fire_module_2.png) |
 | head에서 GAP(Global Average Pooling)을 사용한다. | $1 \times 1$ convolution(**squeeze**), $3 \times 3$ convolution(**expand**)을 사용한다. |
 
 fire module은 다음과 같은 단계로 연산이 진행된다.
@@ -148,7 +148,7 @@ ShuffleNet에서는, group convolution에서 channel information이 손실되는
 
 | ShuffleNet block | Channel Shuffle |
 | :---: | :---: |
-| ![ShuffleNet](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec07/summary01/images/ShuffleNet.png) | ![channel shuffle](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec07/summary01/images/channel_shuffle.png) |
+| ![ShuffleNet](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec07/summary01/images/ShuffleNet.png) | ![channel shuffle](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec07/summary01/images/channel_shuffle.png) |
 
 ---
 
@@ -182,7 +182,7 @@ $$ z = F_{sq}(u_{c}) = {{1} \over {H \times W}} {\sum_{i=1}^{H}}{\sum_{j=1}^{W}}
 
   - $\delta$ : ReLU 연산, $\sigma$ : Sigmoid 연산
 
-  ![Excitation](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec07/summary01/images/Excitation.png)
+  ![Excitation](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec07/summary01/images/Excitation.png)
 
 $$ s = F_{ex}(z, W) = {\sigma}(W_{2} {\delta}(W_{1} z)) $$
 

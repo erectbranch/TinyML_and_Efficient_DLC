@@ -12,7 +12,7 @@
 
 | 2D Image | | Tokenization |  
 | --- | :---: | --- | 
-| ![input patch](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec14/summary01/images/image_patches_1.png) | $\rightarrow$ | ![image tokens](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec14/summary01/images/image_patches_2.png) |
+| ![input patch](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec14/summary01/images/image_patches_1.png) | $\rightarrow$ | ![image tokens](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec14/summary01/images/image_patches_2.png) |
 | size: 96x96<br/>patch size: 32x32 | | \#tokens: 3x3=9<br/>dim of each token: 3x32x32=3,072 |
 
 다음은 ViT에서 이미지 입력을 분류하기까지의 과정을 나타낸 그림이다.
@@ -25,7 +25,7 @@
 
 | | |
 | --- | --- | 
-| ![linear projection 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec14/summary01/images/linear_projection_1.png)| ![linear projection 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec14/summary01/images/linear_projection_2.png) |
+| ![linear projection 1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec14/summary01/images/linear_projection_1.png)| ![linear projection 2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec14/summary01/images/linear_projection_2.png) |
 | input dim = 3,072<br/>output dim(hidden size of ViT) = 768 | \#Parameters: 3,072x768 = 2.36M |
 
 ---
@@ -146,7 +146,7 @@ $$ \mathrm{Sim}(Q,K) = \exp\left({{QK^T} \over {\sqrt{d}}}\right) \rightarrow \m
 <tr>
 <td>
 
-![softmax attention](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec14/summary01/images/linear_attention_1.png) 
+![softmax attention](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec14/summary01/images/linear_attention_1.png) 
 
 </td>
 <td>
@@ -156,7 +156,7 @@ vs
 </td>
 <td>
 
-![linear attention 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec14/summary01/images/linear_attention_2.png)
+![linear attention 1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec14/summary01/images/linear_attention_2.png)
 
 </td>
 <td align="center">
@@ -166,7 +166,7 @@ $\longrightarrow$<br/>**(ab)c = a(bc)**<br/>(associative property of Matmul)
 </td>
 <td>
 
-![linear attention 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec14/summary01/images/linear_attention_3.png)
+![linear attention 2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec14/summary01/images/linear_attention_3.png)
 
 </td>
 </tr>
@@ -195,7 +195,7 @@ Cost: $O(n)$
 
 | Attention Feature Map | Accuracy Gap | 
 | :---: | :---: |
-| ![attention map](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec14/summary01/images/softmax_vs_linear_attention_1.png) | ![acc gap](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2023/lec14/summary01/images/softmax_vs_linear_attention_2.png) |
+| ![attention map](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec14/summary01/images/softmax_vs_linear_attention_1.png) | ![acc gap](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2023/lec14/summary01/images/softmax_vs_linear_attention_2.png) |
 
 ---
 

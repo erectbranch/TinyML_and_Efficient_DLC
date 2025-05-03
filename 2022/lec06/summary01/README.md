@@ -52,7 +52,7 @@ MobileNetV2 모델의 weight를 대상으로 PTQ를 적용하고 싶다고 하�
 
 | | Per-Tensor | Per-Channel |
 | :---: | :---: | :---: |
-| ![model ex](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec06/summary01/images/per-tensor_vs_per-channel_1.png) | ![per-tensor](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec06/summary01/images/per-tensor_vs_per-channel_2.png) | ![per-channel](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec06/summary01/images/per-tensor_vs_per-channel_3.png) |
+| ![model ex](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary01/images/per-tensor_vs_per-channel_1.png) | ![per-tensor](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary01/images/per-tensor_vs_per-channel_2.png) | ![per-channel](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary01/images/per-tensor_vs_per-channel_3.png) |
 | Fliter scaling factor | single scale $S$ | $S_1, \cdots S_C$  |
 | quantization resolution | bad | good |
 | outlier | sensitive | robust |
@@ -71,9 +71,9 @@ MobileNetV2 모델의 weight를 대상으로 PTQ를 적용하고 싶다고 하�
 
 | CLE example |
 | :---: |
-| ![CLE range e.g. 1](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec06/summary01/images/cle_eg_1.png) |
+| ![CLE range e.g. 1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary01/images/cle_eg_1.png) |
 | $\downarrow$ |
-| ![CLE range e.g. 2](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec06/summary01/images/cle_eg_2.png) |
+| ![CLE range e.g. 2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary01/images/cle_eg_2.png) |
 
 두 개 레이어 층을 통과한 출력을 수식으로 표현하면 다음과 같다.
 
@@ -115,7 +115,7 @@ $$ s_i = {{1} \over {r_{i}^{(2)}}}\sqrt{r_{i}^{(1)}r_{i}^{(2)}} $$
 
 | Before CLE | | After CLE |
 | :---: | :---: | :---: |
-| ![before cross layer equalization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec06/summary01/images/before_cross-layer_equalization.png) | $\rightarrow$ | ![after cross layer equalization](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec06/summary01/images/after_cross-layer_equalization.png) |
+| ![before cross layer equalization](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary01/images/before_cross-layer_equalization.png) | $\rightarrow$ | ![after cross layer equalization](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary01/images/after_cross-layer_equalization.png) |
 
 ---
 
@@ -194,7 +194,7 @@ $$ f_{reg}(V) = \sum_{i,j} 1 - |2h (V_{i,j}) - 1|^{\beta} $$
 
 | Symmetric | Asymmetric |
 | :---: | :---: |
-| ![symmetric](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec06/summary01/images/symmetric_asymmetric_quant_ex_1.png) | ![asymmetric](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec06/summary01/images/symmetric_asymmetric_quant_ex_2.png) | 
+| ![symmetric](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary01/images/symmetric_asymmetric_quant_ex_1.png) | ![asymmetric](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary01/images/symmetric_asymmetric_quant_ex_2.png) | 
 | $\alpha = -\beta$ | $\alpha \neq -\beta$ |
 
 ---

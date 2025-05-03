@@ -50,7 +50,7 @@ $$ \underset{\mathrm{real \ sample}}{E_x[\log(D(x))]} + \underset{\mathrm{fake \
 
 | Conditional GANs(CGAN) | Unconditional GANs |
 | :---: | :---: |
-| ![conditional](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec19/summary02/images/GAN_conditional.png) | ![unconditional](https://github.com/erectbranch/TinyML_and_Efficient_DLC/blob/master/2022/lec19/summary02/images/GAN_unconditional.png) |
+| ![conditional](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec19/summary02/images/GAN_conditional.png) | ![unconditional](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec19/summary02/images/GAN_unconditional.png) |
 | $G$ 가 random noise를 입력으로 받는다. | $D$ 와 $G$ 가 **labels**를 따른다.<br/>(class label, segmantation map, strokes, ...) |
 
 ---
