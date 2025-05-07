@@ -53,19 +53,19 @@ $$ Y \rightarrow S_{Y}(q_{Y} - Z_{Y}) = Q(Y) $$
 
 하지만 양자화된 값은 discrete하므로, 거의 대부분의 경우에서 미분 값은 0이 된다.
 
-$$ {{\partial Q(W)} \over {\partial W}} = 0 $$
+$$ { {\partial Q(W)} \over {\partial W} } = 0 $$
 
 따라서 다음과 같이 gradient update 과정 역시 불가능하게 된다.
 
-$$ g_{W} = {{\partial L} \over {\partial W}} = {{\partial L} \over {\partial Q(W)}} \cdot {{\partial Q(W)} \over {\partial W}} = 0 $$
+$$ g_{W} = { {\partial L} \over {\partial W} } = { {\partial L} \over {\partial Q(W)} } \cdot { {\partial Q(W)} \over {\partial W} } = 0 $$
 
 이러한 문제를 해결하기 위해 등장한 방법이 **Straight-Through Estimator**(STE)이다.
 
-- ${{\partial Q(W)}/{\partial W}}$ deriative를 무시하고, identity function처럼 고려한다. 
+- ${ {\partial Q(W)}/{\partial W} }$ deriative를 무시하고, identity function처럼 고려한다. 
 
 - 따라서 quantized weight만으로 바로 gradient update를 수행한다.
 
-$$ g_{W} = {{\partial L} \over {\partial W}} = {{\partial L} \over {\partial Q(W)}} $$
+$$ g_{W} = { {\partial L} \over {\partial W} } = { {\partial L} \over {\partial Q(W)} } $$
 
 ---
 
@@ -92,7 +92,7 @@ real number weight 연산과, binary quantizated weight 연산을 비교해 보�
 | baseline | Real Number Weights | Binary Quantized Weights |
 | :---: | :---: | :---: |
 | ![binary quantization ex 1](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary02/images/binary_ex_1.png) | ![binary quantization ex 2](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary02/images/binary_ex_2.png) | ![binary quantization ex 3](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec06/summary02/images/binary_ex_3.png) |
-| $y_i = \sum_{j}{W_{ij} \cdot x_{j}}$ | $8 \times 5 + (-3) \times 2 + 5 \times 0 + (-1) \times 1$ | $5 - 2 + 0 - 1$ |
+| $y_i = \sum_{j}{W_{ij} \cdot x_{j} }$ | $8 \times 5 + (-3) \times 2 + 5 \times 0 + (-1) \times 1$ | $5 - 2 + 0 - 1$ |
 | operation | + x | + - |
 | memory | 1x | ~32x less |
 | computation | 1x | ~2x less |
@@ -127,7 +127,7 @@ q = sign(r) = \begin{cases} +1, & r \ge 0 \\ -1, & r < 0 \end{cases}
 q = \begin{cases} +1, & with \, probability \, p = \sigma(r) \\ -1, & with \, probability \, 1 - p \end{cases}
 ```
 
-$$ \sigma (r) = \min (\max ({{r+1} \over {2}}), 1) $$
+$$ \sigma (r) = \min (\max ({ {r+1} \over {2} }), 1) $$
 
 - (-) 하지만 정확도 손실이 크다. (ImageNet 대상 AlexNet Top-1 accuracy: -21.2%p)
 
@@ -141,7 +141,7 @@ $$ \sigma (r) = \min (\max ({{r+1} \over {2}}), 1) $$
 
 XNOR-Net 논문에서는 weight binarization에 따른 정확도를 회복하기 위해, binarized weight tensor(`fp32`)에 FP32 scaling factor를 추가한다.
 
-$$ W \approx \alpha W^{\mathbb{B}} $$
+$$ W \approx \alpha W^{\mathbb{B} } $$
 
 | weights<br/>(32bit float) | BinaryConnection | XNOR-Net |
 | :---: | :---: | :---: |
@@ -157,7 +157,7 @@ $$ \alpha = {1 \over n}||W||_1 $$
 
 혹은 weight과 activation에 모두 binary quantization을 적용할 수 있다. 이 경우 모든 연산을 XNOR 연산으로 대체할 수 있다. 가령 다음과 같은 연산을 생각해 보자.
 
-$$ y_i = \sum_{j}{W_{ij} \cdot x_{j}} $$
+$$ y_i = \sum_{j}{W_{ij} \cdot x_{j} } $$
 
 - 연산의 가능한 경우의 수는 다음과 같다.
 
@@ -239,19 +239,19 @@ q = \begin{cases} r_t, & r > \triangle \\ 0, & |r| \le \triangle \\ -r_t, & r < 
 
 - $\triangle = 0.7 \times \mathbb{E}(|r|)$
 
-- $r_t = \mathbb{E_{|r| > \triangle}}(r)$
+- $r_t = \mathbb{E_{|r| > \triangle} }(r)$
 
 앞선 예시에 ternary quantization을 적용해 보자.
 
 - threshold $\triangle$
 
-$$\triangle = 0.7 \times {{1}\over{16}}||W||_1 = 0.73$$
+$$\triangle = 0.7 \times { {1}\over{16} }||W||_1 = 0.73$$
 
 - scaling factor $r_t$
 
   non-zero 값을 바탕으로 l1 norm을 계산한다.
 
-$$ {{1} \over {11}}||W_{W^T \neq 0} ||_1 = 1.5 $$
+$$ { {1} \over {11} }||W_{W^T \neq 0} ||_1 = 1.5 $$
 
 | weights $W$ <br/>(32bit float) | ternary weights $W^T$ <br/>(2bit) |
 | :---: | :---: |

@@ -50,7 +50,7 @@ $$ Latency \approx \max(T_{computation}, T_{memory}) $$
 
   분모는 hardware 특성, 분자는 NN 특성이다.
 
-$$ \approx {{Number \ of \ Operations \ of \ NN} \over {Number \ of \ Opeartions \ that \ Processor \ can \ Process \ Per \ Second}} $$
+$$ \approx { {Number \ of \ Operations \ of \ NN} \over {Number \ of \ Opeartions \ that \ Processor \ can \ Process \ Per \ Second} } $$
 
 - $T_{memory}$
 
@@ -62,11 +62,11 @@ $$ \approx T_{data \ movement \ of \ activations} + T_{data \ movement \ of \ we
 
   > weight를 SRAM에 모두 저장하면, main memory에 접근하지 않을 수 있다.
 
-$$ \approx {{Model \ size} \over {Memory \ Bandwidth \ of \ Processor}} $$
+$$ \approx { {Model \ size} \over {Memory \ Bandwidth \ of \ Processor} } $$
 
 - $T_{data \ movement \ of \ activations}$ 
 
-$$ \approx {{Input \ activation \ size + Output \ activation \ size} \over {Memory \ Bandwidth \ of \ Processor}} $$
+$$ \approx { {Input \ activation \ size + Output \ activation \ size} \over {Memory \ Bandwidth \ of \ Processor} } $$
 
 ---
 
@@ -126,7 +126,7 @@ $$ 96 \times 3 \times 11 \times 11 = 24,848 $$
 
 - Conv Layer 2(grouped convolution 1)
 
-$$ {{256 \times 96 \times 5 \times 5} \over {2}} = 307,200 $$
+$$ { {256 \times 96 \times 5 \times 5} \over {2} } = 307,200 $$
 
 - Conv Layer 3
 

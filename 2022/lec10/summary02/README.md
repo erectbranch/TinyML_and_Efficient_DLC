@@ -172,7 +172,7 @@ large model에서 overfitting을 피하기 위해 사용하는 **data augmentati
 이때 loss function은 base supervision, auxiliary supervision 두 항의 결합으로 표현된다. 
 
 ```math
-{\mathcal{L}}_{aug} = {\mathcal{L}}(W_{base}) + {\alpha}{\mathcal{L}}([W_{base}, W_{aug}])
+{\mathcal{L} }_{aug} = {\mathcal{L} }(W_{base}) + {\alpha}{\mathcal{L} }([W_{base}, W_{aug}])
 ```
 
 - scaling factor $\alpha$ : auxiliary supervision가 loss에 미치는 영향을 조절

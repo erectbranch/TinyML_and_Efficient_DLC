@@ -146,7 +146,7 @@ prining은 크게 세 가지 단계로 구성된다.
 
 일반적으로 Pruning은 loss function에서, \#non-zero 수의 threshold $N$ 을 두어 제한하는 것으로 구현할 수 있다.
 
-$$ \underset{W_p}{\mathrm{argmin}}{L(\mathbf{x}; W_p)} $$
+$$ \underset{W_p}{\mathrm{argmin} }{L(\mathbf{x}; W_p)} $$
 
 $$ s.t. {||W_{p}||}_{0} \le N $$
 
@@ -254,7 +254,7 @@ $$ Importance = \sum_{i \in S}|w_i| $$
 
 혹은 L2-norm이나, $L_p$ norm을 사용할 수도 있다.
 
-$$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
+$$ Importance = \sqrt{\sum_{i \in S}{ {|w_{i}|}^{2} }} $$
 
 다음은 예시 행렬을 대상으로 적용한 결과다.
 
@@ -282,7 +282,7 @@ $$ Importance = \sqrt{\sum_{i \in S}{{|w_{i}|}^{2}}} $$
 
 SNIP 논문에서는 **connection sensitivity**라는 salience 기반의 pruning criterion을 제시했다. 가중치를 제거했을 때 변화, 즉 sensitivity가 클수록 중요한 가중치로 가정한다.
 
-$$ s_j(w; \mathcal{D}) = {{|g_{j}(w;\mathcal{D})|} \over { {{\sum}^m_{k=1}} |g_k(w;\mathcal{D})|}} $$
+$$ s_j(w; \mathcal{D}) = { {|g_{j}(w;\mathcal{D})|} \over { { {\sum}^m_{k=1} } |g_k(w;\mathcal{D})|} } $$
 
 - $s_j$ : weight $w_j$ 의 sensitivity
 
@@ -316,7 +316,7 @@ $$ \triangle \mathcal{L} = \mathcal{L} (w + \triangle w) - \mathcal{L}(w) = {\na
 
 굉장히 오래 전부터 사용된 방법으로, loss function의 2차 테일러 근사를 이용하여 importance를 측정할 수도 있다.
 
-$$ \mathcal{L} (w + \triangle w) - \mathcal{L}(w) = {\nabla}_w \mathcal{L} \triangle w + {{1} \over {2}} {\triangle}w^{T}H \triangle w $$
+$$ \mathcal{L} (w + \triangle w) - \mathcal{L}(w) = {\nabla}_w \mathcal{L} \triangle w + { {1} \over {2} } {\triangle}w^{T}H \triangle w $$
 
 - $H  = {\triangle}_w^2 \mathcal{L}(w)$
 
@@ -350,7 +350,7 @@ Network Trimming 논문은 **Average Percentage of Zeros**(APoZ) 기반의 activ
 
   - batch 2 channel 0 \#zeros: 6
 
-$$ {{5+6} \over {2 \cdot 4 \cdot 4}} = {11 \over 32} $$
+$$ { {5+6} \over {2 \cdot 4 \cdot 4} } = {11 \over 32} $$
 
 - channel 1
 
@@ -358,7 +358,7 @@ $$ {{5+6} \over {2 \cdot 4 \cdot 4}} = {11 \over 32} $$
 
   - batch 2 \#zeros: 7
 
-$$ {{5+7} \over {2 \cdot 4 \cdot 4}} = {12 \over 32} $$
+$$ { {5+7} \over {2 \cdot 4 \cdot 4} } = {12 \over 32} $$
 
 - channel 2
 
@@ -366,7 +366,7 @@ $$ {{5+7} \over {2 \cdot 4 \cdot 4}} = {12 \over 32} $$
 
   - batch 2 \#zeros: 8
 
-$$ {{6+8} \over {2 \cdot 4 \cdot 4}} = {14 \over 32} $$
+$$ { {6+8} \over {2 \cdot 4 \cdot 4} } = {14 \over 32} $$
 
 > 제일 0의 비율이 많은 channel 2를 pruning한다.
 
@@ -385,7 +385,7 @@ pruning 전/후 출력을 비교하여, 제일 오차가 적은 channel을 pruni
 pruning 전/후 output activation $\hat{Z}$ 와 $Z$ 의 차이를 최소화하는 loss function은, 다음과 같이 나타낼 수 있다.
 
 ```math
-{\mathrm{arg}}\underset{W, {\beta}}{\mathrm{min}}{||Z-\hat{Z}||}^{2}_{F} = || Z - \sum_{c=0}^{c_{i}-1}{||{{\beta}_{c}X_{c}{W_{c}}^{T}}||}^{2}_{F}
+{\mathrm{arg} }\underset{W, {\beta} }{\mathrm{min} }{||Z-\hat{Z}||}^{2}_{F} = || Z - \sum_{c=0}^{c_{i}-1}{||{ {\beta}_{c}X_{c}{W_{c} }^{T} }||}^{2}_{F}
 ```
 
 ```math

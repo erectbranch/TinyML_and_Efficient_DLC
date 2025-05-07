@@ -165,15 +165,15 @@ decoding(GPT-style)의 attention 계산에서는, 대체로 이전의 모든 Key
 
 - Llama-2-7B, KV cache size
 
-$$ \underset{minibatch}{BS} * \underset{layers}{32} * \underset{heads}{32} * \underset{n_{emd}}{128} * \underset{length}{N} * \underset{K,V}{2} * {2}\mathrm{bytes} = 512\mathrm{KB} \times BS \times N $$
+$$ \underset{minibatch}{BS} * \underset{layers}{32} * \underset{heads}{32} * \underset{n_{emd} }{128} * \underset{length}{N} * \underset{K,V}{2} * {2}\mathrm{bytes} = 512\mathrm{KB} \times BS \times N $$
 
 - Llama-2-13B, KV cache size
 
-$$ \underset{minibatch}{BS} * \underset{layers}{40} * \underset{heads}{40} * \underset{n_{emd}}{128} * \underset{length}{N} * \underset{K,V}{2} * {2}\mathrm{bytes} = 800\mathrm{KB} \times BS \times N $$
+$$ \underset{minibatch}{BS} * \underset{layers}{40} * \underset{heads}{40} * \underset{n_{emd} }{128} * \underset{length}{N} * \underset{K,V}{2} * {2}\mathrm{bytes} = 800\mathrm{KB} \times BS \times N $$
 
 - Llama-2-70B, KV cache size
 
-$$ \underset{minibatch}{BS} * \underset{layers}{80} * \underset{heads}{64} * \underset{n_{emd}}{128} * \underset{length}{N} * \underset{K,V}{2} * {2}\mathrm{bytes} = 2.5\mathrm{MB} \times BS \times N $$
+$$ \underset{minibatch}{BS} * \underset{layers}{80} * \underset{heads}{64} * \underset{n_{emd} }{128} * \underset{length}{N} * \underset{K,V}{2} * {2}\mathrm{bytes} = 2.5\mathrm{MB} \times BS \times N $$
 
 가령 Llama-2-70B(using MHA) 학습 설정을 $BS=16$ , $n_{seq} = 4096$ 으로 가정하면, 필요한 KV cache size는 160GB가 된다. (A100 GPU 두 대가 필요한 수준)
 
@@ -218,7 +218,7 @@ $$ \underset{minibatch}{BS} * \underset{layers}{80} * \underset{heads}{64} * \un
 
 vanilla FFN을 GLU(Gate Linear Unit)로 변경하는 것으로도 성능을 향상시킬 수 있다. 3번의 matrix multiplication을 포함하며, activation function으로 swish를 사용한다.
 
-$$ \mathrm{FFN_{SwiGLU}}(x, W, V, W_2) = (\mathrm{Swish_1}(xW) \otimes xV)W_2 $$
+$$ \mathrm{FFN_{SwiGLU} }(x, W, V, W_2) = (\mathrm{Swish_1}(xW) \otimes xV)W_2 $$
 
 | FFN | SwiGLU |
 | :---: | :---: |

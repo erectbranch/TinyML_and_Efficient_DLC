@@ -426,7 +426,7 @@ $$ \alpha = \frac{1}{nm} \sum_{ij} |W_{ij}| $$
 
 논문에서는 최적의 scaling factor를 획득하기 위해, model distillation 방식의 objective을 사용하여 미세조정한다. (model weight: freezing)
 
-$$ {\alpha}^{*} = \arg\min_{\alpha} \mathbb{E} \underset{x \sim \mathbf{X}}{} [ || \mathbf{Z_{fine}} (x) - \mathbf{Z_{bin}} (x; \alpha) ||^2 ] $$
+$$ {\alpha}^{*} = \arg\min_{\alpha} \mathbb{E} \underset{x \sim \mathbf{X} }{} [ || \mathbf{Z_{fine} } (x) - \mathbf{Z_{bin} } (x; \alpha) ||^2 ] $$
 
 > $\mathbf{X}$ : calibration dataset, $\mathbf{Z}(\cdot)$ : logits
 

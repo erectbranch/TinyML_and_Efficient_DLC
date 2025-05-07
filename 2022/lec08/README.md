@@ -138,9 +138,9 @@ Zen-NAS 논문에서는 **Zen-Score**라는 cost proxy를 도입하여 performan
 
 4. feature map perturbation $\triangle$ 을 계산한다.
 
-$$ \triangle \overset{\triangle}{=} \mathbb{E_{x, \epsilon}} || f(x) - f(x+\alpha \epsilon)||_{F} $$
+$$ \triangle \overset{\triangle}{=} \mathbb{E_{x, \epsilon} } || f(x) - f(x+\alpha \epsilon)||_{F} $$
 
-- $f: \mathbb{R^{m_0}} \rightarrow \mathbb{R^{m_L}}$
+- $f: \mathbb{R^{m_0} } \rightarrow \mathbb{R^{m_L} }$
 
   $L$ 개 레이어(function)을 의미한다.( $m_0$ : input dimension, $m_L$ : output dimension)
 
@@ -153,14 +153,14 @@ $$ \triangle \overset{\triangle}{=} \mathbb{E_{x, \epsilon}} || f(x) - f(x+\alph
     output channels $m$ 개를 갖는 $i$ 번째 BN layer에서, 각 채널이 갖는 분산의 평균을 제곱근한 값을 계산한다.
 
 ```math
-\bar{{\sigma}_{i}} = \sqrt{{\sum}_{j}{\sigma}^2_{i,j}/m}
+\bar{ {\sigma}_{i} } = \sqrt{ {\sum}_{j}{\sigma}^2_{i,j}/m}
 ```
 
 - ${\sigma}_{i,j}$ : $i$ 번째 BN layer의 $j$ 번째 output channel의 standard deviation.
 
 6. Zen score를 계산한다.
 
-$$ \mathrm{Zen}(F) \overset{\triangle}{=} \log(\triangle) + \sum_{i}\log(\bar{{\sigma}_{i}}) $$
+$$ \mathrm{Zen}(F) \overset{\triangle}{=} \log(\triangle) + \sum_{i}\log(\bar{ {\sigma}_{i} }) $$
 
 ---
 

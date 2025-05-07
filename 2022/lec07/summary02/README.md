@@ -168,7 +168,7 @@ PreNAS는 학습 전 gradient-based proxy를 기반으로, high-quality architec
 
 다양한 제약 조건에서 top $N$ 개 high-quality architecture를 찾아서 탐색 공간을 구성한다.(preferred search space)
 
-$$ \tilde{\mathcal{A}} = \lbrace \mathcal{S}(\mathcal{A}_{[c]}, N) | \forall c \in \mathcal{C} \rbrace $$
+$$ \tilde{\mathcal{A} } = \lbrace \mathcal{S}(\mathcal{A}_{[c]}, N) | \forall c \in \mathcal{C} \rbrace $$
 
 - $C$ : constraints
 

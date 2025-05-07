@@ -91,13 +91,13 @@ $$= f(W^{(2)} S \hat{f}(S^{-1}W^{(1)}x + S^{-1}b^{(1)})+b^{(2)})$$
 
 > ReLU는 scale-equivalent한 연산이다. $\mathrm{ReLU}(sx) = s \cdot \mathrm{ReLU}(x)$
 
-$$ \quad = f({\widehat{W}}^{(2)} \hat{f}({\widehat{W}}^{(1)} x + {\widehat{b}}^{(1)})+b^{(2)}) $$
+$$ \quad = f({\widehat{W} }^{(2)} \hat{f}({\widehat{W} }^{(1)} x + {\widehat{b} }^{(1)})+b^{(2)}) $$
 
-$a. \quad {\widehat{W}}^{(2)} = W^{(2)}S$
+$a. \quad {\widehat{W} }^{(2)} = W^{(2)}S$
 
-$b. \quad {\widehat{W}}^{(1)} = S^{(-1)}W^{(1)}$
+$b. \quad {\widehat{W} }^{(1)} = S^{(-1)}W^{(1)}$
 
-$c. \quad {\widehat{b}}^{(1)} = S^{(-1)}b^{(1)}S$
+$c. \quad {\widehat{b} }^{(1)} = S^{(-1)}b^{(1)}S$
 
 ---
 
@@ -105,11 +105,11 @@ $c. \quad {\widehat{b}}^{(1)} = S^{(-1)}b^{(1)}S$
 
 논문에서는 각 channel $i$ 별 최적의 scaling factor를 다음과 같은 수식을 통해 찾는다.
 
-- ${\hat{r_i}}$ : 가중치 행렬 내 채널 $i$ 의 quantization range
+- ${\hat{r_i} }$ : 가중치 행렬 내 채널 $i$ 의 quantization range
 
-- ${\hat{R}}$ : 가중치 행렬의 total range
+- ${\hat{R} }$ : 가중치 행렬의 total range
 
-$$ s_i = {{1} \over {r_{i}^{(2)}}}\sqrt{r_{i}^{(1)}r_{i}^{(2)}} $$
+$$ s_i = { {1} \over {r_{i}^{(2)} }}\sqrt{r_{i}^{(1)}r_{i}^{(2)} } $$
 
 다음은 MobileNetV2 대상으로 CLE의 적용 전, 후 채널별 가중치 값의 범위를 비교한 그림이다.
 
@@ -141,9 +141,9 @@ $$ \mathbb{E}[y] - \mathbb{E}[\widehat{y}] =  \mathbb{E}[W\mathrm{x}] -  \mathbb
 
 **bias correction**는 calibration set 없이, (1) batch norm 파라미터와 (2) Gaussian pre-activation에 기반한 방법으로 bias를 보정하는 방법이다.
 
-$$ \mathbb{E}[\mathrm{x}] = \mathbb{E}[ReLU({\mathrm{x}}^{pre})] $$
+$$ \mathbb{E}[\mathrm{x}] = \mathbb{E}[ReLU({\mathrm{x} }^{pre})] $$
 
-$$ = \gamma \mathcal{N} \left( {{- \beta} \over {\gamma}} \right) + \beta \left[ 1 - \Phi \left( {{- \beta} \over {\gamma}} \right) \right] $$
+$$ = \gamma \mathcal{N} \left( { {- \beta} \over {\gamma} } \right) + \beta \left[ 1 - \Phi \left( { {- \beta} \over {\gamma} } \right) \right] $$
 
 
 아래 그림은 MobileNetV2 모델에서, bias correction 전/후 biased output error의 분포를 비교한 그림이다.
@@ -165,7 +165,7 @@ $$ = \gamma \mathcal{N} \left( {{- \beta} \over {\gamma}} \right) + \beta \left[
 최적의 rounding 정책을 획득하기 위해, (1) 기존 가중치와 (2) $\triangle w = \delta$ (perturbation)을 추가한 soft-quantized weight와의 차이(L2 loss)를 최소화한다.
 
 ```math
-\underset{V}{{\mathrm{arg}}{min}} || W\mathrm{x} - \tilde{W}\mathrm{x}||^{2}_{F} + \underset{regularizer}{\lambda f_{reg}(V)}
+\underset{V}{ {\mathrm{arg} }{min} } || W\mathrm{x} - \tilde{W}\mathrm{x}||^{2}_{F} + \underset{regularizer}{\lambda f_{reg}(V)}
 ```
 
 - $\tilde{W}$  : soft-quantized weight
@@ -212,7 +212,7 @@ $$ f_{reg}(V) = \sum_{i,j} 1 - |2h (V_{i,j}) - 1|^{\beta} $$
 모델 훈련 중 max와 min 값의 exponential moving average(EMA)를 수집하고, 양자화 시 이를 활용하여 clipping range를 결정한다.
 
 ```math
-{\hat{r}}^{(t)}_{max, min} = \alpha \cdot {r}^{(t)}_{max, min} + (1-\alpha) \cdot {\hat{r}}^{(t-1)}_{max, min}
+{\hat{r} }^{(t)}_{max, min} = \alpha \cdot {r}^{(t)}_{max, min} + (1-\alpha) \cdot {\hat{r} }^{(t-1)}_{max, min}
 ```
 
 > 이때, 수천 회 training step에 걸쳐서 평탄해지도록, EMA의 smoothing parameter( $\alpha$ ) 로 1에 가까운 값을 사용한다.
@@ -229,7 +229,7 @@ $$ f_{reg}(V) = \sum_{i,j} 1 - |2h (V_{i,j}) - 1|^{\beta} $$
 
 ![uniformly quantized activation distribution](images/uniform_quantized_acitvation.png)
 
-- quantization step: $\triangle = {{2\alpha} / {2^M}}$
+- quantization step: $\triangle = { {2\alpha} / {2^M} }$
 
 - 값은 midpoint 영역으로 반올림된다고 가정한다.
 
@@ -237,7 +237,7 @@ $$ f_{reg}(V) = \sum_{i,j} 1 - |2h (V_{i,j}) - 1|^{\beta} $$
 
 위와 같은 설정에서 MSE는 다음과 같이 정의할 수 있다. ( $f$ : density function )
 
-$$ \underset{{|r|}_{max}}{\min} \ \mathbb{E}[{(X - Q(X))}^{2}] $$
+$$ \underset{ {|r|}_{max} }{\min} \ \mathbb{E}[{(X - Q(X))}^{2}] $$
 
 $$ =	\int_{-\infty}^{-\alpha} f(x) \cdot (x+\alpha)^2 dx + \sum_{i=0}^{2^M -1} \int_{-\alpha + i\triangle}^{-\alpha + (i+1) \triangle} f(x) \cdot (x- q_i)^2 dx + \int_{\alpha}^{\infty} f(x) \cdot (x+\alpha)^2 dx $$
 
@@ -249,7 +249,7 @@ $$ =	\int_{-\infty}^{-\alpha} f(x) \cdot (x+\alpha)^2 dx + \sum_{i=0}^{2^M -1} \
 
 여기서 (1) density function $f$ 를 piecewise linear function으로 근사하고, (2) symmetric distribution을 가정하면, 미분을 통해 최적의 clipping 값을 획득할 수 있다. 다음은 $f$ 가 Laplace 분포일 때 최적의 $\alpha$ 를 찾는 수식이다.
 
-$$ {{\partial \mathbb{E}[{(X - Q(X))}^{2}]} \over {\partial \alpha}} = {{2 \alpha} \over {3 \cdot 2^{2M}}} - 2be^{- \alpha / b} = 0 $$
+$$ { {\partial \mathbb{E}[{(X - Q(X))}^{2}]} \over {\partial \alpha} } = { {2 \alpha} \over {3 \cdot 2^{2M} }} - 2be^{- \alpha / b} = 0 $$
 
 ---
 
@@ -262,7 +262,7 @@ $$ {{\partial \mathbb{E}[{(X - Q(X))}^{2}]} \over {\partial \alpha}} = {{2 \alph
 양자화 전,후 activation distribution(**entropy**) 분포의 차이를, **KL divergence**를 기반으로 최소화하여 양자화 오차를 줄일 수 있다.
 
 ```math
-D_{KL}(P||Q) = {\sum}_{i}^{N}P(x_{i})\log{{P(x_{i})} \over {Q(x_{i})}}
+D_{KL}(P||Q) = {\sum}_{i}^{N}P(x_{i})\log{ {P(x_{i})} \over {Q(x_{i})} }
 ```
 
 다음은 ResNet 대상 실험에서 clipping 전/후 activation이 갖는 값의 빈도를 비교한 그림이다.
@@ -300,6 +300,6 @@ calibration을 위한 데이터셋이 없을 경우, batch normalization 파라�
 
 - ${\mu}_i, {\sigma}_i$ : BN 레이어에 저장된 평균, 표준편차
 
-- ${\tilde{\mu_i^r}}, {\tilde{{\sigma}_{i}^{r}}}$ : distilled input data의 평균, 표준편차
+- ${\tilde{\mu_i^r} }, {\tilde{ {\sigma}_{i}^{r} }}$ : distilled input data의 평균, 표준편차
 
 ---

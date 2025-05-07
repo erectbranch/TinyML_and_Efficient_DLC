@@ -30,7 +30,7 @@ $$ \mathrm{sequence} =  w_{0}, w_{16}, w_{1}, w_{17}, \cdots, w_{15}, w_{31} $$
 
 (3) 32개 가중치를 unpacking한다. (**Runtime**, SIMD 명령어 3개로 구현)
 
-$$ \mathrm{W_{low}} = \mathrm{P_{w}} \And \mathrm{Mask} \quad \mathrm{W_{high}} = (\mathrm{P_{w}} >> 4) \And \mathrm{Mask}  $$
+$$ \mathrm{W_{low} } = \mathrm{P_{w} } \And \mathrm{Mask} \quad \mathrm{W_{high} } = (\mathrm{P_{w} } >> 4) \And \mathrm{Mask}  $$
 
 $$ \mathrm{Mask} = 0000 \ 1111 \ 0000 \ 1111 \ \cdots \ 0000 \ 1111 \ (\mathrm{128} \ \mathrm{bit}) $$
 
@@ -167,7 +167,7 @@ QServe는 4-bit KV 양자화에서 발생하는 정확도 하락을 방지할 �
 
 따라서 **SmoothAttention**에서는, Key 행렬의 outlier를 smoothing하는 방식으로 성능 저하를 방지한다. (SmoothQuant와 유사)
 
-$$ \mathbf{Z} = \mathbf{Q} \mathbf{\Lambda} \cdot ( \mathbf{K} \mathbf{{\Lambda}^{-1}} )^{T} $$
+$$ \mathbf{Z} = \mathbf{Q} \mathbf{\Lambda} \cdot ( \mathbf{K} \mathbf{ {\Lambda}^{-1} } )^{T} $$
 
 > $\mathbf{\Lambda} = \mathrm{diag} (\lambda)$ , ${\lambda}_i = \max (| \mathbf{K_i} |)^{\alpha}$
 

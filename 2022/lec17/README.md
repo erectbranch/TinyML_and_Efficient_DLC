@@ -164,7 +164,7 @@ loop문을 소프트웨어 방법으로 최적화하여, 딥러닝 모델을 효
 | | | Arithmetic for pointer | \#loop test | Code size |
 | --- | --- | :---: | :---: | :---: |
 | Original | for i in range(0, N):<br/> $\quad$ for j in range(0, N):<br/> $\quad \quad$ for k in range(0, N):<br/> $\quad \quad \quad$ c[i][j] += A[i][k] \* B[k][j] | $N^3$ | $N^3$ | 1 |
-| Unrolled(by 4) | for i in range(0, N):<br/> $\quad$ for j in range(0, N):<br/> $\quad \quad$ for k in range(0, N, `4`):<br/> $\quad \quad \quad$ c[i][j] += A[i][k] \* B[k][j]<br/> $\quad \quad \quad$ c[i][j] += A[i][k+`1`] \* B[k+`1`][j]<br/> $\quad \quad \quad$ c[i][j] += A[i][k+`2`] \* B[k+`2`][j]<br/> $\quad \quad \quad$ c[i][j] += A[i][k+`3`] \* B[k+`3`][j] | ${{1} \over {4}}N^3$ | ${{1} \over {4}}N^3$ | 4 |
+| Unrolled(by 4) | for i in range(0, N):<br/> $\quad$ for j in range(0, N):<br/> $\quad \quad$ for k in range(0, N, `4`):<br/> $\quad \quad \quad$ c[i][j] += A[i][k] \* B[k][j]<br/> $\quad \quad \quad$ c[i][j] += A[i][k+`1`] \* B[k+`1`][j]<br/> $\quad \quad \quad$ c[i][j] += A[i][k+`2`] \* B[k+`2`][j]<br/> $\quad \quad \quad$ c[i][j] += A[i][k+`3`] \* B[k+`3`][j] | ${ {1} \over {4} }N^3$ | ${ {1} \over {4} }N^3$ | 4 |
 
 ---
 

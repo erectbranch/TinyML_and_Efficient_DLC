@@ -229,7 +229,7 @@ tensor shape은 다음과 같다.
 
 ## 2.4 Normalization Layer
 
-$$ \hat{x_{i}} = \frac{1}{\sigma} (x_i - {\mu}_{i}) $$
+$$ \hat{x_{i} } = \frac{1}{\sigma} (x_i - {\mu}_{i}) $$
 
 > $\mu$ : mean, $\sigma$ : standard deviation
 

@@ -32,7 +32,7 @@ Generative Adversarial Networks(GANs)은, 크게 **Generator**(생성자)와 **D
 
 - GAN의 objective function는 다음과 같다.
 
-$$ \underset{\mathrm{real \ sample}}{E_x[\log(D(x))]} + \underset{\mathrm{fake \ sample}}{E_z[\log(1-D(G(z)))]} $$
+$$ \underset{\mathrm{real \ sample} }{E_x[\log(D(x))]} + \underset{\mathrm{fake \ sample} }{E_z[\log(1-D(G(z)))]} $$
 
 다음은 MNIST 데이터셋을 이용하여 GANs을 학습할 때, generator가 생성한 입력 샘플을 시각화한 그림이다.
 

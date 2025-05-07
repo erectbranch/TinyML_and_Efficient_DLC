@@ -96,7 +96,7 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
   - Fraction(mantissa): (가수, 23bit)
 
-  - $(-1)^{\mathsf{sign}} \times (1 + \mathsf{Fraction}) \times 2^{\mathsf{Exponent} - 127}$
+  - $(-1)^{\mathsf{sign} } \times (1 + \mathsf{Fraction}) \times 2^{\mathsf{Exponent} - 127}$
 
     > Exponent Bias $= 127 = 2^{8-1}-1$
 
@@ -116,7 +116,7 @@ fixed-point number는 정수 표현과 매우 유사하기 때문에, **실수 �
 
   ![subnormal numbers ex](https://github.com/erectbranch/MIT-Efficient-AI/blob/master/2022/lec05/summary01/images/subnormal_numbers.png)
 
-  - $(-1)^{\mathsf{sign}} \times \mathsf{Fraction} \times 2^{1 - 127}$
+  - $(-1)^{\mathsf{sign} } \times \mathsf{Fraction} \times 2^{1 - 127}$
 
   - normal number과 다르게, **linear한 표현력**을 갖는다.
 
@@ -271,7 +271,7 @@ $$r_{max} = S(q_{max} - Z), \ r_{min} = S(q_{min} - Z)$$
 
 $$ \downarrow $$
 
-$$ S = {{r_{max} - r_{min}} \over {q_{max} - q_{min}}} $$
+$$ S = { {r_{max} - r_{min} } \over {q_{max} - q_{min} }} $$
 
 ---
 
@@ -289,7 +289,7 @@ W = \begin{bmatrix} 0.97 & 0.64 & 0.74 & 1.00 \\ 0.58 & 0.84 & 0.84 & 0.81 \\ 0.
 
 ![MAC array](images/MAC_array.png)
 
-$$ A_{i} = \sum_{j}{C_{i,j}} + b_i $$
+$$ A_{i} = \sum_{j}{C_{i,j} } + b_i $$
 
 $$ A_{i} = W_{i,1} \cdot \mathrm{x_1} + W_{i,2} \cdot \mathrm{x_2} + W_{i,3} \cdot \mathrm{x_3} + W_{i,4} \cdot \mathrm{x_4} $$
 
@@ -328,7 +328,7 @@ X_{fp32} \approx s_{X}X_{int} = \hat{X}
 ```
 
 ```math
-\hat{X} = {{1} \over {255}} \begin{bmatrix} 105 & 64 & 186 & 168 \\ 0 & 105 & 105 & 145 \\ 107 & 61 & 181 & 255 \\ 99 & 209 & 43 & 89 \end{bmatrix}
+\hat{X} = { {1} \over {255} } \begin{bmatrix} 105 & 64 & 186 & 168 \\ 0 & 105 & 105 & 145 \\ 107 & 61 & 181 & 255 \\ 99 & 209 & 43 & 89 \end{bmatrix}
 ```
 
 - Weight Matrix
@@ -338,7 +338,7 @@ W_{fp32} \approx s_{W}W_{int} = \hat{W}
 ```
 
 ```math
-\hat{W} = {{1} \over {255}}\begin{bmatrix} 247 & 163 & 189 & 255 \\ 148 & 214 & 214 & 207 \\ 0 & 46 & 229 & 71 \\ 145 & 245 & 204 & 207 \end{bmatrix}
+\hat{W} = { {1} \over {255} }\begin{bmatrix} 247 & 163 & 189 & 255 \\ 148 & 214 & 214 & 207 \\ 0 & 46 & 229 & 71 \\ 145 & 245 & 204 & 207 \end{bmatrix}
 ```
 
 - bias tensor
@@ -347,16 +347,16 @@ W_{fp32} \approx s_{W}W_{int} = \hat{W}
 
     **overflow**를 피하기 위해, activation은 더 큰 bit width에 해당되는 32 bit를 사용해야 한다.
 
-  - bias scaling factor: $\hat{W}, \hat{X}$ 의 scaling factor 값을 서로 곱하면 ${{1} \over {255^2}}$ 가 된다.
+  - bias scaling factor: $\hat{W}, \hat{X}$ 의 scaling factor 값을 서로 곱하면 ${ {1} \over {255^2} }$ 가 된다.
 
 ```math
-\hat{b} = {{1} \over {255^2}}\begin{bmatrix} 650 \\ 1300 \\ 1951 \\ 650 \end{bmatrix} 
+\hat{b} = { {1} \over {255^2} }\begin{bmatrix} 650 \\ 1300 \\ 1951 \\ 650 \end{bmatrix} 
 ```
 
 이후, bias까지 합산을 마치면, 다시 INT8로 양자화된 activation tensor $\hat{Out}$ 을 획득한다.
 
 ```math
-\hat{Out} = {{1} \over {136671 \cdot 255}} \begin{bmatrix} 134 & 185 & 206 & 255 \\ 111 & 167 & 186 & 242 \\ 60 & 65 & 96 & 134 \\ 109 & 172 & 187 & 244 \end{bmatrix}
+\hat{Out} = { {1} \over {136671 \cdot 255} } \begin{bmatrix} 134 & 185 & 206 & 255 \\ 111 & 167 & 186 & 242 \\ 60 & 65 & 96 & 134 \\ 109 & 172 & 187 & 244 \end{bmatrix}
 ```
 
 ---
@@ -377,7 +377,7 @@ $$ S_{Y}(q_{Y} - Z_{Y}) =  S_{W}(q_{W} - Z_{W}) \cdot S_{X}(q_{X} - Z_{X}) $$
 
 $$ \downarrow $$ 
 
-$$ q_{Y} = \underset{precompute}{{{S_{W}S_{X}} \over {S_{Y}}}} \left( q_{W}q_{X} - Z_{W}q_{X} \underset{Precompute}{- Z_{X}q_{W} - Z_{W}Z_{X}} \right) + Z_{Y} $$
+$$ q_{Y} = \underset{precompute}{ {{S_{W}S_{X} } \over {S_{Y} }} } \left( q_{W}q_{X} - Z_{W}q_{X} \underset{Precompute}{- Z_{X}q_{W} - Z_{W}Z_{X} } \right) + Z_{Y} $$
 
 여기서 얻을 수 있는 통찰은, 일부 항을 **offline에서 미리 계산**하여 추론 시 연산을 최적화할 수 있다는 것이다.
 
@@ -393,7 +393,7 @@ $$ Y = WX + b $$
 
 $$ \downarrow $$
 
-$$ q_{Y} = {{S_{W}S_{X}} \over {S_{Y}}}(q_{W}q_{X} + q_{bias}) + Z_{Y} $$
+$$ q_{Y} = { {S_{W}S_{X} } \over {S_{Y} }}(q_{W}q_{X} + q_{bias}) + Z_{Y} $$
 
 - Convolutional Layer
 
@@ -401,7 +401,7 @@ $$ Y = \mathrm{Conv} (W, X) + b $$
 
 $$ \downarrow $$
 
-$$ q_{Y} = {{S_{W}S_{X}} \over {S_{Y}}}(\mathrm{Conv}(q_{W}, q_{X}) + q_{bias}) + Z_{Y} $$
+$$ q_{Y} = { {S_{W}S_{X} } \over {S_{Y} }}(\mathrm{Conv}(q_{W}, q_{X}) + q_{bias}) + Z_{Y} $$
 
 ---
 
@@ -409,7 +409,7 @@ $$ q_{Y} = {{S_{W}S_{X}} \over {S_{Y}}}(\mathrm{Conv}(q_{W}, q_{X}) + q_{bias}) 
 
 앞서 multiplier $M$ 은 $S_1, S_2, S_3$ 으로 이루어진다. 
 
-$$ M := {{S_1 S_2} \over {S_3}} $$
+$$ M := { {S_1 S_2} \over {S_3} } $$
 
 - 경험적으로 **언제나 (0,1) 사이의 값**을 갖는다.
 
@@ -460,7 +460,7 @@ $$ WX \approx s_W s_X(W_{int}X_{int}) $$
 
     > 따라서 계산 속도가 빠른 `unsigned int`를 주로 함께 사용한다.
 
-$$ WX \approx \underset{same \ calculation}{s_W s_X(W_{int}X_{int})} + \underset{precompute, \ layer \ bias}{s_W s_X z_X W_{int} + s_W z_W s_X z_X} + \underset{data-dependent \ overhead}{s_W s_X z_W X_{int}} $$
+$$ WX \approx \underset{same \ calculation}{s_W s_X(W_{int}X_{int})} + \underset{precompute, \ layer \ bias}{s_W s_X z_X W_{int} + s_W z_W s_X z_X} + \underset{data-dependent \ overhead}{s_W s_X z_W X_{int} } $$
 
 ---
 

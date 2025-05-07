@@ -64,7 +64,7 @@ activation의 smoothing은, LayerNorm에서 $s$ 를 나누는 방식으로 통�
 
 ![SmoothQuant inference](images/smoothquant_inference.png)
 
-$$ \mathbf{Y} = (\mathbf{X} diag (s)^{-1}) \cdot (diag (s)\mathbf{W}) = \hat{\mathbf{X}}\hat{\mathbf{W}} $$
+$$ \mathbf{Y} = (\mathbf{X} diag (s)^{-1}) \cdot (diag (s)\mathbf{W}) = \hat{\mathbf{X} }\hat{\mathbf{W} } $$
 
 ---
 
@@ -182,17 +182,17 @@ SmoothQuant는 (NVIDIA에서 Transformer 추론 가속을 위해 설계한) **Fa
 
 > **Notes**: 양자화는 일반적으로 다음과 같은 수식으로 정의된다. ( $y = Q(\mathbf{w})\mathbf{x}$ )
 > 
-> $$ Q(\mathbf{w}) = \triangle \cdot \mathrm{round} \frac{\mathbf{w}}{\triangle} $$
+> $$ Q(\mathbf{w}) = \triangle \cdot \mathrm{round} \frac{\mathbf{w} }{\triangle} $$
 >
-> $$ \triangle = \frac{\max (|\mathbf{w}|)}{2^{N-1}} $$
+> $$ \triangle = \frac{\max (|\mathbf{w}|)}{2^{N-1} } $$
 >
 > $N$ : number of bits, $\mathbf{w}$ : group/block of weight (그룹마다 Absmax를 적용한다.)
 
 따라서 AWQ는 mixed precision을 유지하는 대신, 양자화에 scaling을 추가하여 salient weight를 보호하는 방법을 제안하였다. 
 
-$$ \mathbf{WX} \overset{Quant}{\longrightarrow} Q(\mathbf{W} \cdot \mathbf{s}) (\mathbf{s^{-1}} \cdot \mathbf{X}) $$
+$$ \mathbf{WX} \overset{Quant}{\longrightarrow} Q(\mathbf{W} \cdot \mathbf{s}) (\mathbf{s^{-1} } \cdot \mathbf{X}) $$
 
-> $\mathbf{s^{-1}}$ : 이전 연산에 결합(fused)하여 수행된다.
+> $\mathbf{s^{-1} }$ : 이전 연산에 결합(fused)하여 수행된다.
 
 그러나 해당 scaling으로 발생하는 양자화 오차를 고려해야 하므로, 이를 위한 적절한 기준도 필요하게 되었다.
 
@@ -204,7 +204,7 @@ $$ \mathbf{WX} \overset{Quant}{\longrightarrow} Q(\mathbf{W} \cdot \mathbf{s}) (
 
 ### 13.3.3 Activation-aware Optimal Scaling
 
-> **Notes**: $\mathbf{s}$ 가 너무 크지 않다는 가정( $\triangle \approx \triangle '$ ) 하에, 양자화 오차는 $\mathbf{s^{-1}}$ 에 비례한다.
+> **Notes**: $\mathbf{s}$ 가 너무 크지 않다는 가정( $\triangle \approx \triangle '$ ) 하에, 양자화 오차는 $\mathbf{s^{-1} }$ 에 비례한다.
 > 
 > - 99% weight channel
 >
@@ -216,15 +216,15 @@ $$ \mathbf{WX} \overset{Quant}{\longrightarrow} Q(\mathbf{W} \cdot \mathbf{s}) (
 
 AWQ는 양자화 전,후 activation의 차이를 최소화하는 방식으로 최적 scaling 설정을 탐색한다.
 
-$$ \mathscr{L}(\mathbf{s}) = || Q(\mathbf{W} \cdot \mathbf{s}) (\mathbf{s^{-1}} \cdot \mathbf{X}) - \mathbf{WX} || $$
+$$ \mathscr{L}(\mathbf{s}) = || Q(\mathbf{W} \cdot \mathbf{s}) (\mathbf{s^{-1} } \cdot \mathbf{X}) - \mathbf{WX} || $$
 
 이때 $\mathbf{s}$ 의 search space는, salient channel과 non-salient channel의 균형을 맞추기 위한 하이퍼파라미터인 $\alpha \in [0, 1]$ 를 포함한다. (`0: scaling 미적용`) $\alpha$ 의 탐색은 grid search를 통해 진행된다.
 
-$$ \mathbf{s} = \mathbf{s^{\alpha}_{X}} $$
+$$ \mathbf{s} = \mathbf{s^{\alpha}_{X} } $$
 
-$$ {\alpha}^{*} = \arg\min_{\alpha} \mathscr{L}( \mathbf{s^{\alpha}_{X}} ) $$
+$$ {\alpha}^{*} = \arg\min_{\alpha} \mathscr{L}( \mathbf{s^{\alpha}_{X} } ) $$
 
-> $\mathbf{s_{X}}$ : average magnitude of activation (per-channel)
+> $\mathbf{s_{X} }$ : average magnitude of activation (per-channel)
 
 ---
 

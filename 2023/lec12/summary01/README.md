@@ -145,7 +145,7 @@ embedding은 transformer 블록 내부의 MHA(**Multi-Head Attention**)로 전�
 
 (2) softmax를 통해 **attention weight**를 구한다. (*softmax*: weight sum이 1이 되도록 정규화)
 
-$$ \mathrm{Attention}(Q,K,V) = \mathrm{softmax}({QK^T \over {\sqrt{d_k}}})V $$
+$$ \mathrm{Attention}(Q,K,V) = \mathrm{softmax}({QK^T \over {\sqrt{d_k} }})V $$
 
 (3) attention weight와 $V$ 벡터를 곱하여 **output**을 얻는다.
 
@@ -232,7 +232,7 @@ Layer Normalization은 각 token의 embedding을 정규화하여, (residual conn
 
 ![bn vs ln](images/batch_vs_layer_norm.png)
 
-$$ y = \frac{x - E[x]}{\sqrt{Var[x] + \epsilon}} * \gamma + \beta $$
+$$ y = \frac{x - E[x]}{\sqrt{Var[x] + \epsilon} } * \gamma + \beta $$
 
 <div style="clear: both;">
 
@@ -268,9 +268,9 @@ Transformer는 이러한 문제를 해결하기 위해, PE(**Positional Encoding
 
 - 10000: 모든 token이 구분될 만큼 충분히 큰 임의의 상수
 
-$$ {\vec{p_t}}^{(i)} = f(t)^{(i)} := \begin{cases} \sin(w_k. t), & if \ i = 2k \\ \cos(w_k.t), & if \ i = 2k + 1 \end{cases} $$
+$$ {\vec{p_t} }^{(i)} = f(t)^{(i)} := \begin{cases} \sin(w_k. t), & if \ i = 2k \\ \cos(w_k.t), & if \ i = 2k + 1 \end{cases} $$
 
-$$ w_k = {{1} \over {10000^{2k/d}}} $$
+$$ w_k = { {1} \over {10000^{2k/d} }} $$
 
 다음은 PE matrix를 heatmap으로 시각화한 예시다. (하나의 문장은 최대 50개 token으로 구성, 128개 차원으로 Positional Embedding 수행)
 

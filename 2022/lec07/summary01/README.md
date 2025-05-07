@@ -172,7 +172,7 @@ SE block은 Squeeze-Ecxcitation 두 단계로 이루어진다.
 
   - $u_{c}$ : feature map( $H \times W$ )
 
-$$ z = F_{sq}(u_{c}) = {{1} \over {H \times W}} {\sum_{i=1}^{H}}{\sum_{j=1}^{W}}{u_{c}(i, j)} $$
+$$ z = F_{sq}(u_{c}) = { {1} \over {H \times W} } {\sum_{i=1}^{H} }{\sum_{j=1}^{W} }{u_{c}(i, j)} $$
 
 - **Excitation**(재조정)
 
@@ -307,6 +307,6 @@ MbV3은 MbV2에서 비용이 큰 레이어(last stage)를 구조적으로 개선
 
 $$ \mathrm{swish} \ x = x \cdot {\sigma}(x) $$
 
-$$ \mathrm{h} \ \mathrm{swish} \ = x{{\mathrm{ReLU}6(x+3)} \over {6}} $$
+$$ \mathrm{h} \ \mathrm{swish} \ = x{ {\mathrm{ReLU}6(x+3)} \over {6} } $$
 
 ---

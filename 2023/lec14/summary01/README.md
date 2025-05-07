@@ -133,7 +133,7 @@ FlatFormer에서는 이러한 sparsity에 특화된 **Flattened Window Attention
 
 EfficientViT 논문은 attention의 softmax를, ReLU 기반의 **linear attention**으로 대체하여 연산량을 줄이는 방법을 제안하였다.
 
-$$ \mathrm{Sim}(Q,K) = \exp\left({{QK^T} \over {\sqrt{d}}}\right) \rightarrow \mathrm{Sim}(Q,K) =  \mathrm{ReLU}(Q)\mathrm{ReLU}(K)^T $$
+$$ \mathrm{Sim}(Q,K) = \exp\left({ {QK^T} \over {\sqrt{d} }}\right) \rightarrow \mathrm{Sim}(Q,K) =  \mathrm{ReLU}(Q)\mathrm{ReLU}(K)^T $$
 
 따라서, 다음과 같이 연산 비용을 $O(n)$ 으로 줄일 수 있다.
 

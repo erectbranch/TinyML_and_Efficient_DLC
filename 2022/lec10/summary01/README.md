@@ -66,11 +66,11 @@ cloud model(ResNet50)과 edge model(MobileNetV2-Tiny)의 training curve를 비�
 
 - Teacher
 
-$${{e^5} \over {e^5 + e^1}} = 0.982$$
+$${ {e^5} \over {e^5 + e^1} } = 0.982$$
 
 - Student
 
-$${{e^3} \over {e^3 + e^2}} = 0.731$$
+$${ {e^3} \over {e^3 + e^2} } = 0.731$$
 
 student는, teacher에 비해 입력이 고양이라는 confidence가 부족하다. 이를 teacher model의 information으로 보완한다.
 
@@ -80,7 +80,7 @@ student는, teacher에 비해 입력이 고양이라는 confidence가 부족하�
 
 하지만 teacher의 confidence가 높을수록, 정답이 아닌 다른 class의 information이 0에 가깝게 된다. teacher의 information을 보존하여 전달하기 위해, **temperature**라는 개념이 등장한다.
 
-$$ p(z_i, T) = {{\exp({z_{i} \over T})} \over {\sum_{j}{\exp({z_{j} \over T})}}} $$
+$$ p(z_i, T) = { {\exp({z_{i} \over T})} \over {\sum_{j}{\exp({z_{j} \over T})} }} $$
 
 - $T$ : temperature
 
@@ -106,11 +106,11 @@ $$ p(z_i, T) = {{\exp({z_{i} \over T})} \over {\sum_{j}{\exp({z_{j} \over T})}}}
 
 - $T = 1$ (**standard softmax**)
 
-$${{e^{5 \over 1}} \over {e^{5 \over 1} + e^{1 \over 1}}} = 0.982$$
+$${ {e^{5 \over 1} } \over {e^{5 \over 1} + e^{1 \over 1} }} = 0.982$$
 
 - $T = 10$
 
-$${{e^{5 \over 10}} \over {e^{5 \over 10} + e^{1 \over 10}}} = 0.599$$
+$${ {e^{5 \over 10} } \over {e^{5 \over 10} + e^{1 \over 10} }} = 0.599$$
 
 ---
 
@@ -166,7 +166,7 @@ Like What You Like 논문에서는 **MMD**(Maximum Mean Discrepancy. 최대 평�
 
 - CNN feature map $x$ 의 attention
 
-$$\mathrm{attention} = {{\partial L} \over {\partial x}}$$
+$$\mathrm{attention} = { {\partial L} \over {\partial x} }$$
 
 - intuition: position $i, j$ 의 attention이 크다면, 해당 지점에 작은 변화(perturbation)를 주어도 최종 출력에 큰 영향을 미칠 것이다.
 
@@ -218,7 +218,7 @@ $$ \rho(x) = 1[x > 0] $$
 
 - Loss Function
 
-$$ \mathcal{L}(I) = {|| \rho({{T}(I)}) - \rho({{S}(I)}) ||}_{1} $$
+$$ \mathcal{L}(I) = {|| \rho({ {T}(I)}) - \rho({ {S}(I)}) ||}_{1} $$
 
 ---
 
@@ -242,7 +242,7 @@ $$ \mathcal{L}(I) = {|| \rho({{T}(I)}) - \rho({{S}(I)}) ||}_{1} $$
 
   > Flow of Solution Procedure(FSP) matrix
 
-$$ G_{i,j}(x; W) = \sum_{s=1}^h \sum_{t=1}^w {{F^1_{s,t,i}(x;W) \times F^2_{s,t,j}(x; W)} \over {h \times w}} $$
+$$ G_{i,j}(x; W) = \sum_{s=1}^h \sum_{t=1}^w { {F^1_{s,t,i}(x;W) \times F^2_{s,t,j}(x; W)} \over {h \times w} } $$
 
 - 교사와 학생 FSP matrix의, L2 loss를 계산한다.
 
