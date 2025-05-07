@@ -271,7 +271,7 @@ $$r_{max} = S(q_{max} - Z), \ r_{min} = S(q_{min} - Z)$$
 
 $$ \downarrow $$
 
-$$ S = { {r_{max} - r_{min} } \over {q_{max} - q_{min} }} $$
+$$ S = { {r_{max} - r_{min} } \over {q_{max} - q_{min} } } $$
 
 ---
 
@@ -377,7 +377,7 @@ $$ S_{Y}(q_{Y} - Z_{Y}) =  S_{W}(q_{W} - Z_{W}) \cdot S_{X}(q_{X} - Z_{X}) $$
 
 $$ \downarrow $$ 
 
-$$ q_{Y} = \underset{precompute}{ {{S_{W}S_{X} } \over {S_{Y} }} } \left( q_{W}q_{X} - Z_{W}q_{X} \underset{Precompute}{- Z_{X}q_{W} - Z_{W}Z_{X} } \right) + Z_{Y} $$
+$$ q_{Y} = \underset{precompute}{ { {S_{W}S_{X} } \over {S_{Y} } } } \left( q_{W}q_{X} - Z_{W}q_{X} \underset{Precompute}{- Z_{X}q_{W} - Z_{W}Z_{X} } \right) + Z_{Y} $$
 
 여기서 얻을 수 있는 통찰은, 일부 항을 **offline에서 미리 계산**하여 추론 시 연산을 최적화할 수 있다는 것이다.
 
@@ -393,7 +393,7 @@ $$ Y = WX + b $$
 
 $$ \downarrow $$
 
-$$ q_{Y} = { {S_{W}S_{X} } \over {S_{Y} }}(q_{W}q_{X} + q_{bias}) + Z_{Y} $$
+$$ q_{Y} = { {S_{W}S_{X} } \over {S_{Y} } }(q_{W}q_{X} + q_{bias}) + Z_{Y} $$
 
 - Convolutional Layer
 
@@ -401,7 +401,7 @@ $$ Y = \mathrm{Conv} (W, X) + b $$
 
 $$ \downarrow $$
 
-$$ q_{Y} = { {S_{W}S_{X} } \over {S_{Y} }}(\mathrm{Conv}(q_{W}, q_{X}) + q_{bias}) + Z_{Y} $$
+$$ q_{Y} = { {S_{W}S_{X} } \over {S_{Y} } }(\mathrm{Conv}(q_{W}, q_{X}) + q_{bias}) + Z_{Y} $$
 
 ---
 

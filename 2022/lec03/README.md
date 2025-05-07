@@ -254,7 +254,7 @@ $$ Importance = \sum_{i \in S}|w_i| $$
 
 혹은 L2-norm이나, $L_p$ norm을 사용할 수도 있다.
 
-$$ Importance = \sqrt{\sum_{i \in S}{ {|w_{i}|}^{2} }} $$
+$$ Importance = \sqrt{\sum_{i \in S}{ {|w_{i}|}^{2} } } $$
 
 다음은 예시 행렬을 대상으로 적용한 결과다.
 

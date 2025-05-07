@@ -80,7 +80,7 @@ student는, teacher에 비해 입력이 고양이라는 confidence가 부족하�
 
 하지만 teacher의 confidence가 높을수록, 정답이 아닌 다른 class의 information이 0에 가깝게 된다. teacher의 information을 보존하여 전달하기 위해, **temperature**라는 개념이 등장한다.
 
-$$ p(z_i, T) = { {\exp({z_{i} \over T})} \over {\sum_{j}{\exp({z_{j} \over T})} }} $$
+$$ p(z_i, T) = { {\exp({z_{i} \over T})} \over {\sum_{j}{\exp({z_{j} \over T})} } } $$
 
 - $T$ : temperature
 
@@ -106,11 +106,11 @@ $$ p(z_i, T) = { {\exp({z_{i} \over T})} \over {\sum_{j}{\exp({z_{j} \over T})} 
 
 - $T = 1$ (**standard softmax**)
 
-$${ {e^{5 \over 1} } \over {e^{5 \over 1} + e^{1 \over 1} }} = 0.982$$
+$${ {e^{5 \over 1} } \over {e^{5 \over 1} + e^{1 \over 1} } } = 0.982$$
 
 - $T = 10$
 
-$${ {e^{5 \over 10} } \over {e^{5 \over 10} + e^{1 \over 10} }} = 0.599$$
+$${ {e^{5 \over 10} } \over {e^{5 \over 10} + e^{1 \over 10} } } = 0.599$$
 
 ---
 

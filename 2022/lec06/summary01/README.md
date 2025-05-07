@@ -109,7 +109,7 @@ $c. \quad {\widehat{b} }^{(1)} = S^{(-1)}b^{(1)}S$
 
 - ${\hat{R} }$ : 가중치 행렬의 total range
 
-$$ s_i = { {1} \over {r_{i}^{(2)} }}\sqrt{r_{i}^{(1)}r_{i}^{(2)} } $$
+$$ s_i = { {1} \over {r_{i}^{(2)} } }\sqrt{r_{i}^{(1)}r_{i}^{(2)} } $$
 
 다음은 MobileNetV2 대상으로 CLE의 적용 전, 후 채널별 가중치 값의 범위를 비교한 그림이다.
 
@@ -249,7 +249,7 @@ $$ =	\int_{-\infty}^{-\alpha} f(x) \cdot (x+\alpha)^2 dx + \sum_{i=0}^{2^M -1} \
 
 여기서 (1) density function $f$ 를 piecewise linear function으로 근사하고, (2) symmetric distribution을 가정하면, 미분을 통해 최적의 clipping 값을 획득할 수 있다. 다음은 $f$ 가 Laplace 분포일 때 최적의 $\alpha$ 를 찾는 수식이다.
 
-$$ { {\partial \mathbb{E}[{(X - Q(X))}^{2}]} \over {\partial \alpha} } = { {2 \alpha} \over {3 \cdot 2^{2M} }} - 2be^{- \alpha / b} = 0 $$
+$$ { {\partial \mathbb{E}[{(X - Q(X))}^{2}]} \over {\partial \alpha} } = { {2 \alpha} \over {3 \cdot 2^{2M} } } - 2be^{- \alpha / b} = 0 $$
 
 ---
 
@@ -300,6 +300,6 @@ calibration을 위한 데이터셋이 없을 경우, batch normalization 파라�
 
 - ${\mu}_i, {\sigma}_i$ : BN 레이어에 저장된 평균, 표준편차
 
-- ${\tilde{\mu_i^r} }, {\tilde{ {\sigma}_{i}^{r} }}$ : distilled input data의 평균, 표준편차
+- ${\tilde{\mu_i^r} }, {\tilde{ {\sigma}_{i}^{r} } }$ : distilled input data의 평균, 표준편차
 
 ---
