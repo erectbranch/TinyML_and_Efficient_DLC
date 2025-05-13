@@ -81,7 +81,7 @@ R = \begin{cases} -Error, & if \ \mathrm{satisfies} \ \mathrm{constraints} \\ -\
 | **Peaks** | 대부분 1x1 convolution(**pointwise**) | **pruning에 민감**하다. |
 | **Crests** | 대부분 3x3 convolution(**depthwise**) | **pruning에 덜 민감**하며, 공격적인 가지치기가 가능하다. |
 
-즉, 강화학습의 결과를 통해, $3 \times 3$ convolution을 더 가지치기하는 것이 효율적임을 알 수 있다.
+즉, 강화학습의 결과를 통해, 3x3 convolution을 더 가지치기하는 것이 효율적임을 알 수 있다.
  
 ---
 

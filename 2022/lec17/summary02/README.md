@@ -266,40 +266,24 @@ $$ Y = \overset{Output \ Transform}{A^T}[\underset{Filter \ Transform}{[GgG^T]} 
 
 이때 Transform 종류에 따라 offline 혹은 online 시점에 계산된다.
 
-<table>
-<tr>
-<td> Online </td> <td> Offline </td> 
-</tr>
-<tr>
-<td>
+**(1) Online**
 
-**Output Transform**
+- **Output Transform**
 
-$A^T = \begin{bmatrix} 1 & 1 & 1 & 0 \\ 0 & 1 & -1 & -1 \end{bmatrix}$
+  $A^T = \begin{bmatrix} 1 & 1 & 1 & 0 \\ 0 & 1 & -1 & -1 \end{bmatrix}$
 
-**Data Transform** $V$
+- **Data Transform** $V$
 
-$B^T = \begin{bmatrix} 1 & 0 & -1 & 0 \\ 0 & 1 & 1 & 0 \\ 0 & -1 & 1 & 0 \\ 0 & 1 & 0 & -1 \end{bmatrix}$
+  $B^T = \begin{bmatrix} 1 & 0 & -1 & 0 \\ 0 & 1 & 1 & 0 \\ 0 & -1 & 1 & 0 \\ 0 & 1 & 0 & -1 \end{bmatrix}$
 
-$B = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & -1 & 1 \\ -1 & 1 & 1 & 0 \\ 0 & 1 & 0 & -1 \end{bmatrix}$
+  $B = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & -1 & 1 \\ -1 & 1 & 1 & 0 \\ 0 & 1 & 0 & -1 \end{bmatrix}$
 
-</td>
-<td>
+**(2) Offline**
 
-**Filter Transform** $U$
+- **Filter Transform** $U$
 
-$G = \begin{bmatrix} 1 & 0 & 0 \\ 1/2 & 1/2 & 1/2 \\ 1/2 & -1/2 & 1/2  \\ 0 & 0 & 1  \end{bmatrix}$
+  $G = \begin{bmatrix} 1 & 0 & 0 \\ 1/2 & 1/2 & 1/2 \\ 1/2 & -1/2 & 1/2  \\ 0 & 0 & 1  \end{bmatrix}$
 
-$G^T = \begin{bmatrix} 1 & 1/2 & 1/2 & 0 \\ 0 & 1/2 & -1/2 & 0 \\ 0 & 1/2 & 1/2 & 1 \end{bmatrix}$
-
-<br>
-<br>
-<br>
-<br>
-<br>
-
-</td>
-</tr>
-</table>
+  $G^T = \begin{bmatrix} 1 & 1/2 & 1/2 & 0 \\ 0 & 1/2 & -1/2 & 0 \\ 0 & 1/2 & 1/2 & 1 \end{bmatrix}$
 
 ---
