@@ -142,13 +142,17 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
 ### ⚙️ Efficient Training and System Support
 
-- [TinyEngine](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec17)
+- [Microcontroller, Loop Optimization](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec17/summary01)
 
   > Memory Hierarchy of Microcontroller, Primary Memory Format(NCHW, NHWC, CHWN)
 
-  > Parallel Computing Techniques: Loop Unrolling, Loop Reordering, Loop Tiling, SIMD programming
+  > Parallel Computing Techniques: Loop Optimization(Unrolling, Reordering, Tiling)
+
+- [Inference Optimization](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec17/summary02)
+
+  > Parallel Computing Techniques: SIMD Programming(CMSIS-NN)
   
-  > Inference Optimization: Im2col, In-place depthwise convolution, appropriate data layout(pointwise, depthwise convolution), Winograd convolution
+  > Inference Optimization: Im2col, In-place, Choosing Data Layout(pointwise, depthwise), Winograd Convolution
 
   ---
 
@@ -204,9 +208,9 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
 - [Vision Transformer](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2023/lec14/summary01)
 
-  > Vision Transformer, High-Resolution Dense Prediction, Segment Anything
+  > Vision Transformer, High-Resolution Dense Prediction(Segment Anything)
   
-  > Window Attention(Swin Transformer, FlatFormer), ReLU Linear Attention(EfficientViT), Sparse Attention(SparseViT)
+  > Window Attention(Swin Transformer, FlatFormer), ReLU Linear Attention(EfficientViT, EfficientViT-SAM), Sparse Attention(SparseViT)
 
 - [Efficient Video Understanding](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2022/lec19/summary01)
 
