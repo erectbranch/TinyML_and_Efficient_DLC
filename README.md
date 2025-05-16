@@ -72,7 +72,7 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
 
   > Numeric Data Types: Integer, Fixed-Point, Floating-Point(IEEE FP32/FP16, BF16, NVIDIA FP8), INT4 and FP4
 
-  > Uniform vs Non-uniform quantization, Symmetric vs Asymmetric quantization
+  > Uniform vs. Non-uniform quantization, Symmetric vs. Asymmetric quantization
 
   > Linear Quantization: Integer-Arithmetic-Only Quantization, Sources of Quantization Error(clipping, rounding, scaling factor, zero point)
 
@@ -193,6 +193,12 @@ Lecture notes for courses [MIT 6.S965, Fall 2022 | MIT 6.5940, Fall 2023•2024]
   > Contextual Sparsity: Deja Vu, Mixture-of-Experts
 
   > Attention Sparsity: SpAtten, H2O
+
+- [LLM Serving Systems](https://github.com/erectbranch/MIT-Efficient-AI/tree/master/2024/lec13/summary04)
+
+  > Metrics for LLM Serving(TTFT, TPOT, Latency, Throughput),  Heuristics for Evaluation
+
+  > PagedAttention(vLLM), FlashAttention, Speculative Decoding, Batching(Static, Dynamic, Continuous)
 
   ---
 
